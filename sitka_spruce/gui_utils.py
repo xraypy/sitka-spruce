@@ -1,5 +1,8 @@
+import inspect
+
 import wx
 from pyshortcuts import uname
+
 FONTSIZE = 12
 FONTSIZE_FW = 13
 
@@ -34,3 +37,37 @@ def get_font(larger=0, smaller=0, serif=False, bold=False, fixed_width=False):
     for i in range(smaller):
         fnt = fnt.Smaller()
     return fnt
+
+def call_signature(obj):
+    """try to get call signature for callable object"""
+    fname = obj.__name__
+
+    if isinstance(obj, partial):
+        obj = obj.func
+
+    argspec = None
+    argspec = inspect.getfullargspec(obj)
+    keywords = argspec.varkw
+
+    fargs = []
+    ioff = len(argspec.args) - len(argspec.defaults)
+    for iarg, arg in enumerate(argspec.args):
+        if iarg < ioff:
+            fargs.append(arg)
+        else:
+            fargs.append(f"{arg}={repr(argspec.defaults[iarg-ioff])}")
+    if keywords is not None:
+        fargs.append(f"**{keywords}")
+
+    out = f"{fname}({', '.join(fargs)})"
+    maxlen = 71
+    if len(out) > maxlen:
+        o  = []
+        while len(out) > maxlen:
+            ecomm = maxlen - out[maxlen-1::-1].find(',')
+            o.append(out[:ecomm])
+            out = " "*(len(fname)+1) + out[ecomm:].strip()
+        if len(out)  > 0:
+            o.append(out)
+        out = '\n'.join(o)
+    return out
