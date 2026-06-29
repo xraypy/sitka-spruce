@@ -19,9 +19,10 @@ def get_items(obj):
     """return if object is dict-like for tree"""
     if (isinstance(obj, dict) or
         (larch is not None and isinstance(obj, larch.Group)) or
-        (h5py is not None and isinstance(obj, h5py.Group)) or
-        (zarr is not None and isinstance(obj, zarr.Group))):
+        (h5py is not None and isinstance(obj, h5py.Group))):
         return {key: val for key, val in obj.items()}
+    if (zarr is not None and isinstance(obj, zarr.Group)):
+        return {key: obj[key] for key in obj.keys()}
     elif ((h5py is not None and isinstance(obj, h5py.Dataset)) or
           (zarr is not None and isinstance(obj, zarr.Array))):
         return obj
