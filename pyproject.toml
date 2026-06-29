@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "sitka_spruce/version.py"
+version_scheme = "post-release"
+
+[tool.setuptools.packages.find]
+include = ["sitka_spruce"]
+
+[tool.coverage.run]
+omit = ["tests/*"]
+
+[project]
+name = "sitka_spruce"
+dynamic = ["version"]
+requires-python = ">= 3.10"
+description = "Visualization for complex scientific data in HDF5, Zarr, etc"
+readme = "README.md"
+authors = [
+  {name = "Matthew Newville", email = "matt.newville@gmail.com"}
+  ]
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["HDF5", "Zarr", "wxPython", "wxmplot", "matplotlib"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Developers",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14"
+    ]
+
+dependencies = [
+   "wxPython>=4.2.0",
+   "wxutils>=2026.1.0",
+   "wxmplot",
+   "h5py",
+   "zarr",
+   "fsspec",
+   "s3fs",
+   "darkdetect",
+   "pyobjc-framework-Cocoa; platform_system == 'Darwin'",
+   "matplotlib>=3.9.0",
+   "pytz",
+   "numpy>=1.26",
+   "Pillow>=7.0",
+   "pyyaml>=5.0",
+   "pyshortcuts>=1.9.5"]
+
+[project.urls]
+Homepage = "https://github.com/xraypy/sitka-spruce"
+Documentation = "https://xraypy.github.io/sitka-spruce"
+Tracker = "https://github.com/xraypy/sitka-spruce/issues"
+
+[project.optional-dependencies]
+dev = ["build", "twine"]
+doc = ["Sphinx", "jupyter_sphinx", "sphinx-copybutton", "sphinxcontrib-video"]
+test = ["pytest", "pytest-cov", "coverage"]
+all = ["sitka_spruce[dev, doc, test]"]
