@@ -59,6 +59,10 @@ dependencies = [
    "pyyaml>=5.0",
    "pyshortcuts>=1.9.5"]
 
+
+[project.scripts]
+sitka = "sitka_spruce.app:sitka_cli"
+
 [project.urls]
 Homepage = "https://github.com/xraypy/sitka-spruce"
 Documentation = "https://xraypy.github.io/sitka-spruce"
