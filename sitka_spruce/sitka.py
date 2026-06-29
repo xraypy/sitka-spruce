@@ -8,7 +8,6 @@ import time
 import glob
 import numpy as np
 
-import inspect
 from functools import partial
 from pathlib import Path
 
@@ -17,7 +16,6 @@ import wx.lib.scrolledpanel as scrolled
 import wx.dataview as dv
 import wx.lib.agw.flatnotebook as flat_nb
 import wx.lib.mixins.inspection
-import wx.html as html
 from wx.adv import AboutBox, AboutDialogInfo
 
 from wxmplot import PlotFrame, ImageFrame
@@ -54,44 +52,15 @@ COMMONTYPES = (int, float, complex, str, bytes, bool, list, tuple, np.ndarray)
 
 FILE_WILDCARD = 'HDF5/Zarr files(*.hdf5;*.h5;*.zarr)|*.hdf5;*.h5;*.zarr|All files (*.*)|*.*'
 
+FILE_SUFFIXES = {'hdf5': h5py.File, 'h5': h5py.File}
+if zarr is not None:
+    FILE_SUFFIXES['zarr'] = zarr.open
+
+
 DV_STYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 
 ARRAY_TYPES = ('h5py.Dataset', 'zarr.Array', 'np.ndarray')
 GROUP_TYPES = ('h5py.Group', 'zarr.Group', 'larch.Group')
-
-def call_signature(obj):
-    """try to get call signature for callable object"""
-    fname = obj.__name__
-
-    if isinstance(obj, partial):
-        obj = obj.func
-
-    argspec = None
-    argspec = inspect.getfullargspec(obj)
-    keywords = argspec.varkw
-
-    fargs = []
-    ioff = len(argspec.args) - len(argspec.defaults)
-    for iarg, arg in enumerate(argspec.args):
-        if iarg < ioff:
-            fargs.append(arg)
-        else:
-            fargs.append(f"{arg}={repr(argspec.defaults[iarg-ioff])}")
-    if keywords is not None:
-        fargs.append(f"**{keywords}")
-
-    out = f"{fname}({', '.join(fargs)})"
-    maxlen = 71
-    if len(out) > maxlen:
-        o  = []
-        while len(out) > maxlen:
-            ecomm = maxlen - out[maxlen-1::-1].find(',')
-            o.append(out[:ecomm])
-            out = " "*(len(fname)+1) + out[ecomm:].strip()
-        if len(out)  > 0:
-            o.append(out)
-        out = '\n'.join(o)
-    return out
 
 class H5ZTree(wx.TreeCtrl):
     """FillingTree based on TreeCtrl."""
@@ -467,7 +436,7 @@ class ArrayPlotPanel(wx.Panel):
         if xarray == '<index>':
             xarr = np.arange(len(yarr))
 
-        frame_opts = {'title':  f'SitkaSpruce PlotWindow {win} '}
+        frame_opts = {'title':  f'SitkaPlotWindow {win} '}
         pframe = self.show_plotframe(win, **frame_opts)
 
         plot = pframe.oplot
@@ -504,7 +473,6 @@ class ArrayPlotPanel(wx.Panel):
             self.plotframes[window] = PlotFrame(self, **opts)
             self.plotframes[window].Raise()
         return self.plotframes[window]
-
 
 
 class ArrayImagePanel(wx.Panel):
@@ -553,14 +521,13 @@ class ArrayImagePanel(wx.Panel):
         print("imshow")
 
 
-class HDF5_Frame(wx.Frame):
-    """Frame containing the namespace tree component."""
-    name = 'HDF5 Data Tree'
+class SitkaFrame(wx.Frame):
+    """Main Window for Sitka HDF5/Zarr viewer"""
     def __init__(self, parent=None, root_data=None,
-                 title='HDF5 Data Tree', id=-1,
+                 title='Sitka HDF5 Viewer', id=-1,
                  pos=wx.DefaultPosition, size=(850, 600),
                  style=wx.DEFAULT_FRAME_STYLE):
-        """Create HDF5_Frame instance."""
+        """Create Frame instance."""
         self.wids = {}
         wx.Frame.__init__(self, parent, id, title, pos, size, style)
         self.create_display(root_data, size=size)
@@ -822,7 +789,7 @@ class HDF5_Frame(wx.Frame):
             except:
                 pass
 
-class HDF5_App(wx.App, wx.lib.mixins.inspection.InspectionMixin):
+class Sitka_App(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     "simple app to wrap HDF5_Frame"
     def __init__(self, with_inspect=False, root_data=None, **kws):
         self.with_inspect = with_inspect
@@ -830,7 +797,7 @@ class HDF5_App(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         wx.App.__init__(self, **kws)
 
     def createApp(self):
-        self.frame = HDF5_Frame(root_data=self.root_data)
+        self.frame = SitkaFrame(root_data=self.root_data)
         self.frame.Show()
         self.SetTopWindow(self.frame)
         return True
@@ -844,9 +811,6 @@ class HDF5_App(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def set_data(self, root_data):
         self.frame.root_data = self.root_data = root_data
 
-    def run(self):
-        self.MainLoop()
-
 if __name__ == '__main__':
     files = {}
     for fname in sorted(glob.glob('*.h5')):
@@ -858,5 +822,7 @@ if __name__ == '__main__':
         if len(files) > 2:
             break
 
-    app = HDF5_App(root_data=files, with_inspect=False)
+    app = Sitka_App(root_data=files, with_inspect=False)
     app.MainLoop()
+    def run(self):
+        self.MainLoop()
