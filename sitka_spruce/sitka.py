@@ -44,8 +44,7 @@ from pyshortcuts import uname, fix_filename, get_cwd
 VERSION = '0.1'
 
 from .gui_utils import Font, fontsize, get_font
-from .data  import (get_items, get_itemtype, get_attributes,
-                    get_data1d, get_data2d)
+from .data  import (get_items, get_itemtype, get_attributes, get_data)
 
 
 COMMONTYPES = (int, float, complex, str, bytes, bool, list, tuple, np.ndarray)
@@ -158,21 +157,20 @@ class H5ZTree(wx.TreeCtrl):
         self.SetItemHasChildren(item, self.objHasChildren(obj))
 
         if self.on_select is not None:
-            filename = self.get_fullname(item)
-            itemname = ''
-            if '/' in filename:
-                filename, itemname = filename.split('/', 1)
+            filename, itemname = self.get_fullname(item)
             self.on_select(obj, filename=filename,
                            itemname=itemname,
                            itemtype=get_itemtype(obj))
 
-    def get_fullname(self, item, part=''):
+    def oldget_fullname(self, item, part=''):
         """Return a syntactically proper name for item."""
         try:
             name = self.GetItemText(item)
         except:
             print("no name ? ", item)
             return None
+        print(f"Get Fullname1 {item=}  {name=} {part=}")
+        print(f"Get Fullname2 ", dir(item))
 
         parent = None
         obj = None
@@ -190,7 +188,28 @@ class H5ZTree(wx.TreeCtrl):
         # and first level children of a namespace.
         if (item != self.root and parent != self.root):
             name = self.get_fullname(parent, part=name)
+        print(f"Get Fullname:  {name=}")
         return name
+
+    def get_fullname(self, item):
+        """Return a syntactically proper name for item."""
+        try:
+            name = self.GetItemText(item)
+        except:
+            print("no name ? ", item)
+            return '', ''
+
+        tree = [name]
+        while item != self.root:
+            item = self.GetItemParent(item)
+            if item.IsOk() and item != self.root:
+                tree.append(self.GetItemText(item))
+
+        filename = tree.pop()
+        tree.reverse()
+        itemname = '/'.join(tree)
+        return filename, itemname
+
 
 class DimReduceWidgets():
     """panel for selecting how to reduce array dimension to scalar"""
@@ -213,8 +232,6 @@ class DimReduceWidgets():
     def onMinMax(self, event=None):
         redval = self.wids['reduce'].GetStringSelection()
         fix_width = self.wids['fix_width'].IsChecked()
-        # print(f'onMinMax  {redval=}  {fix_width=} {self.min=}  {self.max=}')
-
         if (redval in ('sum', 'mean') and fix_width):
             newmin = int(self.wids['min'].GetValue())
             newmax = int(self.wids['max'].GetValue())
@@ -300,7 +317,7 @@ class DimReducePanel(wx.Panel):
         sizer.Add(panel, 1, 0, LEFT|wx.EXPAND|wx.GROW, 2)
 
         panel.SetMinSize((400, 200))
-        panel.SetSize((500, 300))
+        panel.SetSize((550, 300))
 
     def set_datashape(self, dshape):
         choices = []
@@ -313,7 +330,9 @@ class DimReducePanel(wx.Panel):
         return choices
 
     def enable_dimension(self, idim, enable=True, npts=None):
-        self.wids[f'data_dim{idim}'].on_enable(enable=enable, npts=npts)
+        wname = f'data_dim{idim}'
+        if wname in self.wids:
+            self.wids[wname].on_enable(enable=enable, npts=npts)
 
     def get_result(self):
         result = []
@@ -396,7 +415,6 @@ class ArrayPlotPanel(wx.Panel):
 
     def set_object(self, object, itemtype='?', itemname='', filename='', **kws):
         """fill from object"""
-        # print("set object ", object, itemtype, kws)
         self.filename = filename
         self.itemname = itemname
         isdata = (itemtype in ARRAY_TYPES)
@@ -428,15 +446,15 @@ class ArrayPlotPanel(wx.Panel):
         yop    = self.wids['yop'].GetStringSelection()
         xarray = self.wids['xarray'].GetStringSelection()
         ###
-        print(f"plot  {ydim=}, {yop=}, {ynorm=}, {xarray=}, {win=}, {sharey=}")
-        yarr, alabel = get_data1d(self.data_obj, ydim, reddim)
+        # print(f"plot  {ydim=}, {yop=}, {ynorm=}, {xarray=}, {win=}, {sharey=}")
+        yarr, alabel = get_data(self.data_obj, reddim)
         xarr = np.arange(len(yarr))
         if 'ynorm' == '1':
             ynorm  = 1.0
         if xarray == '<index>':
             xarr = np.arange(len(yarr))
 
-        frame_opts = {'title':  f'SitkaPlotWindow {win} '}
+        frame_opts = {'title':  f'SitkaPlot {win} '}
         pframe = self.show_plotframe(win, **frame_opts)
 
         plot = pframe.oplot
@@ -482,50 +500,204 @@ class ArrayImagePanel(wx.Panel):
 
         self.SetBackgroundColour(get_color('nb_area'))
 
+        self.data_shape = None
+        self.data_obj = None
+        self.xsel_cur, self.ysel_cur = 0, 1
+        self.skip_dim_proc = False
+        self.imageframes = {}
         self.wids = wids = {}
-        panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
-        wids['imshow'] = Button(panel, 'Show Image', size=(150, -1),
-                                action=self.onImshow)
 
+        self.dim_reduce = DimReducePanel(parent=self)
+
+        panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
+        wids['imshow_new'] = Button(panel, 'Show New Image', size=(150, -1),
+                                action=self.onImshow)
+        wids['imshow_replace'] = Button(panel, 'Replace Last Image', size=(150, -1),
+                                  action=partial(self.onImshow, new=False))
 
         wids['plot_xchoices'] = ['<index>']
         wids['plot_xval'] = Choice(panel, wids['plot_xchoices'],
-                                   size=(200, -1), action=self.onPlot)
-        #
+                                   size=(200, -1), action=self.onImshow)
+        wids['plot_ychoices'] = ['<index>']
+        wids['plot_yval'] = Choice(panel, wids['plot_ychoices'],
+                                   size=(200, -1), action=self.onImshow)
+        wids['ydir'] = Check(panel, 'Y=0 at top', default=False)
+
+
+        wids['win'] = Choice(panel, ['1', '2', '3', '4', '5'], size=(75, -1))
+        wids['win'].SetStringSelection('1')
+
+        wids['axes'] =  ['dim0: 0 points', 'dim1: 0 points']
+
+        wids['xdim'] = Choice(panel, wids['axes'],
+                              size=(175, -1), action=self.onXdim)
+        wids['ydim'] = Choice(panel, wids['axes'],
+                              size=(175, -1), action=self.onYdim)
+        wids['xdim'].SetSelection(0)
+        wids['ydim'].SetSelection(1)
+
         def padd_text(text, dcol=1, newrow=True):
             panel.Add(SimpleText(panel, text), dcol=dcol, newrow=newrow)
 
-
-        padd_text('Select X dimension')
+        padd_text(' X (Horiz): ')
+        panel.Add(wids['xdim'])
+        padd_text(' X values: ', newrow=False)
         panel.Add(wids['plot_xval'])
-        panel.Add(wids['imshow'], newrow=True)
+
+        padd_text(' Y (Vert): ')
+        panel.Add(wids['ydim'])
+        padd_text(' Y values: ', newrow=False)
+        panel.Add(wids['plot_yval'])
+
+        padd_text(' ')
+        panel.Add(wids['imshow_new'])
+        padd_text(' windows:', newrow=False)
+        panel.Add(wids['win'])
+
+        padd_text(' ')
+        panel.Add(wids['imshow_replace'])
+        panel.Add(wids['ydir'])
+
 
         panel.Add(HLine(panel, size=(500, 3)), dcol=6, newrow=True)
 
         panel.pack()
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(panel, 1, 0, LEFT|wx.EXPAND|wx.GROW, 2)
+        sizer.Add(panel, 0, 0, LEFT|wx.GROW, 2)
+        sizer.Add(self.dim_reduce, 0, 0, LEFT|wx.GROW, 2)
         pack(self, sizer)
 
+    def onXdim(self, event=None):
+        if self.skip_dim_proc:
+            return
+        self.skip_dim_proc = True
+        xsel = self.wids['xdim'].GetSelection()
+        ysel = self.wids['ydim'].GetSelection()
+        if ysel == xsel and xsel != self.xsel_cur:
+            self.wids['ydim'].SetSelection(self.xsel_cur)
+            self.ysel_cur = self.xsel_cur
+        else:
+            self.ysel_cur = ysel
+        self.xsel_cur = xsel
+        if self.data_shape is not None:
+            for i, npts in enumerate(self.data_shape):
+                enable = i not in (self.xsel_cur, self.ysel_cur)
+                self.dim_reduce.enable_dimension(i, enable=enable, npts=npts)
 
-    def set_object(self, object, itemtype, name='?'):
+        self.skip_dim_proc = False
+
+    def onYdim(self, event=None):
+        if self.skip_dim_proc:
+            return
+        self.skip_dim_proc = True
+        xsel = self.wids['xdim'].GetSelection()
+        ysel = self.wids['ydim'].GetSelection()
+        if ysel == xsel and ysel != self.ysel_cur:  # y changed
+            self.wids['xdim'].SetSelection(self.ysel_cur)
+            self.xsel_cur = self.ysel_cur
+        else:
+            self.xsel_cur = xsel
+        self.ysel_cur = ysel
+
+        if self.data_shape is not None:
+            for i, npts in enumerate(self.data_shape):
+                enable = i not in (self.xsel_cur, self.ysel_cur)
+                self.dim_reduce.enable_dimension(i, enable=enable, npts=npts)
+
+        self.skip_dim_proc = False
+
+    def set_object(self, object, itemtype='?', itemname='', filename='', **kws):
         """fill from object"""
-        print("fill ", itemtype, name, object)
+        print("fill 2d obj ", itemtype, itemname, filename, object)
+
+        self.filename = filename
+        self.itemname = itemname
+        isdata = (itemtype in ARRAY_TYPES)
+        self.data_obj = object
+        if isdata:
+            self.data_shape = object.shape
+            choices = self.dim_reduce.set_datashape(object.shape)
+            xcur = self.wids['xdim'].GetSelection()
+            ycur = self.wids['ydim'].GetSelection()
+            self.wids['xdim'].SetChoices(choices)
+            self.wids['ydim'].SetChoices(choices)
+            self.wids['ydim'].SetSelection(ycur)
+            self.wids['xdim'].SetSelection(xcur)
+
+            xcur = self.wids['xdim'].GetSelection()
+            ycur = self.wids['ydim'].GetSelection()
+            self.dim_reduce.enable_dimension(xcur, enable=False, npts=None)
+            self.dim_reduce.enable_dimension(ycur, enable=False, npts=None)
+
         self.Refresh()
 
-    def onPlot(self, event=None):
-        print("plot")
 
-    def onImshow(self, event=None):
-        print("imshow")
+    def show_imageframe(self, window=1, **opts):
+        shown = False
+        if window in self.imageframes:
+            try:
+                self.imageframes[window].Raise()
+                shown = True
+            except:
+                f = self.imageframes.pop(window)
+                del f
+                shown = False
+        if not shown:
+            self.imageframes[window] = ImageFrame(self, **opts)
+            self.imageframes[window].Raise()
+        return self.imageframes[window]
+
+    def onImshow(self, event=None, new=True):
+        print("imshow ", new)
+
+        reddim = self.dim_reduce.get_result()
+
+        ########
+        win    = self.wids['win'].GetStringSelection()
+        ydir   = self.wids['ydir'].IsChecked()
+        ydim   = self.wids['ydim'].GetSelection()
+        xdim   = self.wids['xdim'].GetSelection()
+        xarray  = self.wids['plot_xval'].GetStringSelection()
+        yarray  = self.wids['plot_yval'].GetStringSelection()
+
+        xdstr   = self.wids['xdim'].GetStringSelection()
+        ydstr   = self.wids['ydim'].GetStringSelection()
+        print(f"imshow  {ydim=}, {xdim=}, {xdstr=}, {ydstr=}, {win=}, {ydir=}")
+
+        img, alabel = get_data(self.data_obj, reddim)
+
+        print("Got image ", img.shape, self.data_shape, alabel)
+        _ny, _nx = img.shape
+
+        _ry, _rx = self.data_shape[ydim], self.data_shape[xdim]
+
+        print("Got image {_nx=}  {_rx=}   {_ny=}  {_ry=}  ")
+
+        if _ry == _nx and _rx == _ny:
+            img = img.transpose()
+
+        if ydir:
+            img = img[::-1, :]
+
+        # xarr = np.arange(len(yarr))
+        # xarr = np.arange(len(yarr))
+
+        frame_opts = {'title':  f'SitkaImage {win} '}
+        iframe = self.show_imageframe(win, **frame_opts)
+
+        opts = {'title': f'{self.filename}{alabel}'}
+        iframe.display(img)
+        iframe.Show()
+        iframe.Raise()
+
 
 
 class SitkaFrame(wx.Frame):
     """Main Window for Sitka HDF5/Zarr viewer"""
     def __init__(self, parent=None, root_data=None,
                  title='Sitka HDF5 Viewer', id=-1,
-                 pos=wx.DefaultPosition, size=(850, 600),
+                 pos=wx.DefaultPosition, size=(900, 650),
                  style=wx.DEFAULT_FRAME_STYLE):
         """Create Frame instance."""
         self.wids = {}
@@ -536,9 +708,9 @@ class SitkaFrame(wx.Frame):
         self.BuildMenus()
 
 
-    def create_display(self, root_data, size=(850, 600)):
+    def create_display(self, root_data, size=(900, 650)):
         splitter = wx.SplitterWindow(self, size=size, style=wx.SP_LIVE_UPDATE)
-        splitter.SetMinimumPaneSize(250)
+        splitter.SetMinimumPaneSize(300)
 
         leftpanel = wx.Panel(splitter)
         rightpanel = scrolled.ScrolledPanel(splitter)
@@ -554,8 +726,8 @@ class SitkaFrame(wx.Frame):
             this.Sortable = False
             this.Alignment = this.Renderer.Alignment = wx.ALIGN_LEFT
 
-        self.tree.SetMinSize((300, 250))
-        self.info.SetMinSize((300, 250))
+        self.tree.SetMinSize((325, 300))
+        self.info.SetMinSize((325, 300))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.tree, 1, wx.ALL|wx.GROW)
@@ -598,8 +770,8 @@ class SitkaFrame(wx.Frame):
         self.tree.SetFont(get_font())
         self.set_fontsize(14)
 
-        splitter.SplitVertically(leftpanel, rightpanel, 300)
-        splitter.SetMinimumPaneSize(175)
+        splitter.SplitVertically(leftpanel, rightpanel, 1)
+        splitter.SetMinimumPaneSize(300)
         register_darkdetect(self.onDarkMode)
 
         # Display the root item.
@@ -609,6 +781,7 @@ class SitkaFrame(wx.Frame):
     def onNBChanged(self, event=None):
         oldpage = self.nb.GetPage(event.GetOldSelection())
         newpage = self.nb.GetPage(event.GetSelection())
+        self.current_nbpage = event.GetSelection()
         on_hide = getattr(oldpage, 'onPanelHidden', None)
         if callable(on_hide):
             on_hide()
@@ -623,15 +796,15 @@ class SitkaFrame(wx.Frame):
         self.filename_label.SetLabel(f" Filename: {filename}")
         if len(itemname) < 1:
             itemname = ''
+
+        # print(f"on Object {itemtype=}, {itemname=}, {filename=}", object)
         self.itemname_label.SetLabel(f" Address: {itemname}")
         self.fill_info(filename, itemtype, object)
 
-        curpage = self.nb.GetPage(self.current_nbpage)
-        try:
-            curpage.set_object(object, itemtype=itemtype,
-                               filename=filename, itemname=itemname)
-        except Exception:
-            pass
+        for ipage in range(self.nb.GetPageCount()):
+            page = self.nb.GetPage(ipage)
+            page.set_object(object, itemtype=itemtype,
+                           filename=filename, itemname=itemname)
 
 
     def fill_info(self, name, itemtype, object):
