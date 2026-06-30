@@ -9,8 +9,10 @@ The immediaate goals for sitka-spruce are:
   1. Support Image Displays and X/Y Plots with `wxmplot`.
   2. Support for both HDF5 (including NeXuS), and Zarr data,
      and maybe more data forms.
-  3. Being able to name and use arrays or slices for visualization
+  3. Support Table views
+  4. Being able to name and use arrays or slices for visualization
      and processing.
+
 
 Longer term goals may include:
 
