@@ -649,7 +649,7 @@ class ArrayImagePanel(wx.Panel):
         return self.imageframes[window]
 
     def onImshow(self, event=None, new=True):
-        print("imshow ", new)
+        # print("imshow ", new)
 
         reddim = self.dim_reduce.get_result()
 
@@ -672,16 +672,13 @@ class ArrayImagePanel(wx.Panel):
 
         _ry, _rx = self.data_shape[ydim], self.data_shape[xdim]
 
-        print("Got image {_nx=}  {_rx=}   {_ny=}  {_ry=}  ")
+       # print("Got image {_nx=}  {_rx=}   {_ny=}  {_ry=}  ")
 
         if _ry == _nx and _rx == _ny:
             img = img.transpose()
 
         if ydir:
             img = img[::-1, :]
-
-        # xarr = np.arange(len(yarr))
-        # xarr = np.arange(len(yarr))
 
         frame_opts = {'title':  f'SitkaImage {win} '}
         iframe = self.show_imageframe(win, **frame_opts)
@@ -690,7 +687,6 @@ class ArrayImagePanel(wx.Panel):
         iframe.display(img)
         iframe.Show()
         iframe.Raise()
-
 
 
 class SitkaFrame(wx.Frame):
