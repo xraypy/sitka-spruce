@@ -83,38 +83,10 @@ def get_attributes(obj):
         out[key] = val
     return out
 
-def get_data1d(obj, dim0, reductions):
-    """return 1d dataset from multidimensional array"""
-    # print("get data1d ", obj, obj.shape, dim0, reductions)
-    ret = obj[()]
-    slices = {}
-    for ix in range(len(obj.shape), 0, -1):
-        idim = ix - 1
-        slices[idim] = ':'
-        try:
-            jdim, use, method, i0, i1 = reductions[idim]
-        except IndexError:
-            jdim, use, method, i0, i1 = idim, True, 'sum', 0, obj.shape(idim)
-        if use:
-            if method == 'single':
-                ret = ret.take((i0), axis=idim)
-                slices[idim] = f'{i0}'
-            else:
-                ret = ret.take(range(i0, 1+i1), axis=idim).sum(axis=idim)
-                if method == 'mean':
-                    ret = ret/(1+i1-i0)
-                slices[idim] = f'{method}({i0},{i1})'
 
-    s = []
-    for key, val in slices.items():
-        s.append(val)
-    op = '[' + ','.join(reversed(s)) + ']'
-    return ret, op
-
-
-
-def get_data2d(obj, dim0, dim1, reductions):
-    """return 2d dataset from multidimensional array"""
+def get_data(obj, reductions):
+    """return dataset (1d or 2d) from multidimensional array"""
+    # print("get data ", obj, obj.shape,  reductions)
     ret = obj[()]
     slices = {}
     for ix in range(len(obj.shape), 0, -1):
