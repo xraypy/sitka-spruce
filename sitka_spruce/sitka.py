@@ -3,47 +3,39 @@
 sitka_spruce HDF5 and Zarr data browser
 """
 
-import sys
-import time
-import glob
-from pathlib import Path
-
-import numpy as np
+import os
 
 import wx
 import wx.lib.scrolledpanel as scrolled
 import wx.dataview as dv
-import wx.lib.agw.flatnotebook as flat_nb
 import wx.lib.mixins.inspection
-from wx.adv import AboutBox, AboutDialogInfo
-
-from wxmplot import ImageFrame
 
 import h5py
 import zarr
 
-try:
-    import larch
-except:
-    larch = None
+from pathlib import Path
 
-from wxutils import (FloatCtrl, FloatSpin, GridPanel,
-                     SimpleText, pack, Button, HLine, Choice,
-                     get_widget_value, set_widget_value,
-                     TextCtrl, Check, CEN, RIGHT, LEFT,
-                     get_color, use_darkdetect, register_darkdetect, MenuItem,
+from wxutils import (SimpleText, pack,  LEFT,
+                     get_color, use_darkdetect, register_darkdetect,
+                     MenuItem,
                      flatnotebook)
 
-from pyshortcuts import uname, fix_filename, get_cwd
+from pyshortcuts import get_cwd
 
-VERSION = '0.1'
-
-from .gui_utils import Font, fontsize, get_font
-from .data  import (get_items, get_itemtype, get_attributes, get_data,
-                    SitkaData, ARRAY_TYPES)
+from .gui_utils import  get_font
+from .data  import get_attributes, SitkaData
 from .hdatatree import HDataTree
 from .plot1dpanel import ArrayPlot1DPanel
 from .plot2dpanel import ArrayImagePanel
+
+try:
+    import larch
+except ImportError:
+    larch = None
+
+
+VERSION = '0.1'
+
 
 
 FILE_WILDCARD = 'HDF5/Zarr files(*.hdf5;*.h5;*.zarr)|*.hdf5;*.h5;*.zarr|All files (*.*)|*.*'
@@ -156,7 +148,7 @@ class SitkaFrame(wx.Frame):
         itemname = '/'.join(address[1:])
         if len(filename) < 1:
             filename = ''
-        self.filename_label.SetLabel(f" Filename: {filename}")
+            self.filename_label.SetLabel(f" Filename: {filename}")
         if len(itemname) < 2:
             itemname = ''
 
@@ -167,7 +159,7 @@ class SitkaFrame(wx.Frame):
         for ipage in range(self.nb.GetPageCount()):
             page = self.nb.GetPage(ipage)
             page.set_object(object, itemtype=itemtype,
-                           filename=filename, itemname=itemname)
+                            filename=filename, itemname=itemname)
 
 
     def fill_info(self, name, itemtype, object):
@@ -186,14 +178,13 @@ class SitkaFrame(wx.Frame):
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)
         bgcol = get_color('text_bg', dark=is_dark)
-        orint("Colors ", fgcol, bgcol)
         self.tree.SetBackgroundColour(bgcol)
         self.tree.SetForegroundColour(fgcol)
         self.info.SetBackgroundColour(bgcol)
         self.info.SetForegroundColour(fgcol)
         wx.CallAfter(self.Refresh)
-#         self.text.SetBackgroundColour(bgcol)
-#         self.text.SetForegroundColour(fgcol)
+        #         self.text.SetBackgroundColour(bgcol)
+        #         self.text.SetForegroundColour(fgcol)
 
 
     def Raise(self):
@@ -255,7 +246,7 @@ class SitkaFrame(wx.Frame):
             try:
                 self.subframes[name].Raise()
                 shown = True
-            except:
+            except Exception:
                 del self.subframes[name]
         if not shown:
             self.subframes[name] = creator(parent=self, **opts)
@@ -269,7 +260,7 @@ class SitkaFrame(wx.Frame):
         path = None
         if dlg.ShowModal() == wx.ID_OK:
             path = Path(dlg.GetPath()).absolute()
-        dlg.Destroy()
+            dlg.Destroy()
 
         if path is None:
             return
@@ -299,7 +290,7 @@ class SitkaFrame(wx.Frame):
 
         if dlg.ShowModal() == wx.ID_OK:
             os.chdir(dlg.GetPath())
-        dlg.Destroy()
+            dlg.Destroy()
         return get_cwd()
 
     def onAbout(self, event=None):
@@ -319,13 +310,13 @@ class SitkaFrame(wx.Frame):
             try:
                 for a in self.GetChildren():
                     a.Destroy()
-            except:
+            except Exception:
                 pass
             self.Destroy()
         else:
             try:
                 event.Veto()
-            except:
+            except Exception:
                 pass
 
 class Sitka_App(wx.App, wx.lib.mixins.inspection.InspectionMixin):
