@@ -1,7 +1,7 @@
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
-from pyshortcuts import uname, make_shortcut, ico_ext, get_folders
+from pyshortcuts import uname, make_shortcut, ico_ext
 from glob import glob
 
 from .sitka import Sitka_App, FILE_SUFFIXES
@@ -17,7 +17,7 @@ def sitka_cli():
     if args.makeicon:
         bindir = 'Scripts' if uname == 'win' else 'bin'
         bindir = Path(sys.prefix, bindir).absolute()
-        script = f'sitka'
+        script = 'sitka'
         script = Path(bindir, script).absolute().as_posix()
 
         for ext in ico_ext:

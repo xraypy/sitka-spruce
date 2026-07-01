@@ -1,11 +1,8 @@
 import wx
-import numpy as np
 
 from wxutils import get_color, register_darkdetect
 
-from .data  import get_items, get_itemtype
-
-COMMONTYPES = (int, float, complex, str, bytes, bool, list, tuple, np.ndarray)
+from .data  import get_items, get_itemtype, COMMONTYPES
 
 TREESTYLE = wx.TR_DEFAULT_STYLE|wx.TR_HIDE_ROOT
 
@@ -50,7 +47,7 @@ class HDataTree(wx.TreeCtrl):
                 if this == root:
                     break
                 parents.append(self.GetItemText(this))
-            except:
+            except Exception:
                 break
 
         self.addChildren(root)
@@ -64,7 +61,7 @@ class HDataTree(wx.TreeCtrl):
         try:
             self.Expand(node)
             self.SelectItem(node)
-        except:
+        except Exception:
             pass
 
     def get_node_by_name(self, node, name):

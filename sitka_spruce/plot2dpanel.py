@@ -151,7 +151,7 @@ class ArrayImagePanel(wx.Panel):
             try:
                 self.imageframes[window].Raise()
                 shown = True
-            except:
+            except Exception:
                 f = self.imageframes.pop(window)
                 del f
                 shown = False

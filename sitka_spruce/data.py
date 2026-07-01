@@ -1,14 +1,12 @@
 import numpy as np
 
-from pathlib import Path
-
 import h5py
 import zarr
 
 import asteval
 try:
     import larch
-except ImportException:
+except ImportError:
     larch = None
 
 
@@ -98,9 +96,9 @@ def get_data(obj, reductions):
         idim = ix - 1
         slices[idim] = ':'
         try:
-            jdim, use, method, i0, i1 = reductions[idim]
+            _, use, method, i0, i1 = reductions[idim]
         except Exception:
-            jdim, use, method, i0, i1 = idim, True, 'sum', 0, obj.shape(idim)
+            _, use, method, i0, i1 = idim, True, 'sum', 0, obj.shape(idim)
         if use:
             if method == 'single':
                 ret = ret.take((i0), axis=idim)
@@ -137,8 +135,8 @@ class SitkaData:
         """add array to interpreter, and keep track of its shape"""
 
         # remove existing value
-        if name in self_symtab:
-            oldval = self_symtab.pop(name)
+        if name in self._symtab:
+            oldval = self._symtab.pop(name)
             dshape = 0
             if isinstance(oldval, np.ndarray):
                 dshape = oldval.shape
