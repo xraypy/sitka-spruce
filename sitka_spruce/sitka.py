@@ -36,7 +36,7 @@ from wxutils import (FloatCtrl, FloatSpin, GridPanel,
                      SimpleText, pack, Button, HLine, Choice,
                      get_widget_value, set_widget_value,
                      TextCtrl, Check, CEN, RIGHT, LEFT,
-                     get_color, register_darkdetect, MenuItem,
+                     get_color, use_darkdetect, register_darkdetect, MenuItem,
                      flatnotebook)
 
 from pyshortcuts import uname, fix_filename, get_cwd
@@ -45,9 +45,9 @@ VERSION = '0.1'
 
 from .gui_utils import Font, fontsize, get_font
 from .data  import (get_items, get_itemtype, get_attributes, get_data)
+from .hdatatree import HDataTree
+from .dimreduce import DimReducePanel
 
-
-COMMONTYPES = (int, float, complex, str, bytes, bool, list, tuple, np.ndarray)
 
 FILE_WILDCARD = 'HDF5/Zarr files(*.hdf5;*.h5;*.zarr)|*.hdf5;*.h5;*.zarr|All files (*.*)|*.*'
 
@@ -60,287 +60,6 @@ DV_STYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 
 ARRAY_TYPES = ('h5py.Dataset', 'zarr.Array', 'np.ndarray')
 GROUP_TYPES = ('h5py.Group', 'zarr.Group', 'larch.Group')
-
-class H5ZTree(wx.TreeCtrl):
-    """FillingTree based on TreeCtrl."""
-    __label__ = 'Data'
-
-    def __init__(self, parent, root_data=None, root_label=None,
-                 size=(300, 250),
-                 style=wx.TR_DEFAULT_STYLE|wx.TR_HIDE_ROOT,
-                 on_select=None):
-        """Create FillingTree instance."""
-        wx.TreeCtrl.__init__(self, parent, size=size, style=style)
-        self.item = None
-        self.on_select = None
-        if callable(on_select):
-            self.on_select = on_select
-        self.root_label = root_label
-        self.set_root(root_data)
-
-    def set_root(self, root_data=None):
-        if root_data is None:
-            root_data = {}
-        self.root_data = root_data
-        if self.root_label is None:
-            self.root_label = self.__label__
-
-        self.item = self.root = self.AddRoot(self.root_label, -1, -1,  self.root_data)
-
-        self.SetItemHasChildren(self.root,  self.objHasChildren(self.root_data))
-        self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectionChanged, id=self.GetId())
-        self.Bind(wx.EVT_TREE_ITEM_EXPANDING, self.OnItemExpanding, id=self.GetId())
-        self.Bind(wx.EVT_TREE_ITEM_COLLAPSED, self.OnItemCollapsed, id=self.GetId())
-
-    def OnItemExpanding(self, event=None):
-        """Add children to the item."""
-        try:
-            item = event.GetItem()
-        except:
-            item = self.item
-        if self.IsExpanded(item):
-            return
-        self.addChildren(item)
-        self.SelectItem(item)
-
-    def OnItemCollapsed(self, event=None):
-        """Remove all children from the item."""
-        item = event.GetItem()
-
-    def OnSelectionChanged(self, event=None):
-        """Display information about the item."""
-        if hasattr(event, 'GetItem'):
-            self.item = event.GetItem()
-        self.display()
-
-    def objHasChildren(self, obj):
-        """Return true if object has children."""
-        children = self.objGetChildren(obj)
-        if isinstance(children, dict):
-            return len(children) > 0
-        else:
-            return False
-
-    def objGetChildren(self, obj):
-        """Return dictionary with attributes or contents of object."""
-        out = {}
-        if (obj is None or obj is False or obj is True):
-            pass
-        elif isinstance(obj, COMMONTYPES):
-            out = obj
-        elif isinstance(obj, (list, tuple)):
-            out = {}
-            for n in range(len(obj)):
-                key = '[' + str(n) + ']'
-                out[key] = obj[n]
-        else:
-            out = get_items(obj)
-        return out
-
-    def addChildren(self, item):
-        self.DeleteChildren(item)
-        obj = self.GetItemData(item)
-        for key, value in self.objGetChildren(obj).items():
-            branch = self.AppendItem(parent=item, text=key, data=value)
-            self.SetItemHasChildren(branch, self.objHasChildren(value))
-
-    def display(self):
-        item = self.item
-        if not item:
-            return
-        obj = self.GetItemData(item)
-        if wx.Platform == '__WXMSW__' and obj is None:
-            return
-
-        if self.IsExpanded(item):
-            self.addChildren(item)
-        self.SetItemHasChildren(item, self.objHasChildren(obj))
-
-        if self.on_select is not None:
-            filename, itemname = self.get_fullname(item)
-            self.on_select(obj, filename=filename,
-                           itemname=itemname,
-                           itemtype=get_itemtype(obj))
-
-    def oldget_fullname(self, item, part=''):
-        """Return a syntactically proper name for item."""
-        try:
-            name = self.GetItemText(item)
-        except:
-            print("no name ? ", item)
-            return None
-        print(f"Get Fullname1 {item=}  {name=} {part=}")
-        print(f"Get Fullname2 ", dir(item))
-
-        parent = None
-        obj = None
-        if item != self.root:
-            parent = self.GetItemParent(item)
-            obj = self.GetItemData(item)
-        # Apply dictionary syntax to dictionary items, except the root
-        # and first level children of a namepace.
-        if ((isinstance(obj, dict) or hasattr(obj, 'keys')) and
-            ((item != self.root and parent != self.root))):
-            name = f'{name}'
-        if len(part) > 0:
-             name = f'{name}/{part}'
-        # Repeat for everything but the root item
-        # and first level children of a namespace.
-        if (item != self.root and parent != self.root):
-            name = self.get_fullname(parent, part=name)
-        print(f"Get Fullname:  {name=}")
-        return name
-
-    def get_fullname(self, item):
-        """Return a syntactically proper name for item."""
-        try:
-            name = self.GetItemText(item)
-        except:
-            print("no name ? ", item)
-            return '', ''
-
-        tree = [name]
-        while item != self.root:
-            item = self.GetItemParent(item)
-            if item.IsOk() and item != self.root:
-                tree.append(self.GetItemText(item))
-
-        filename = tree.pop()
-        tree.reverse()
-        itemname = '/'.join(tree)
-        return filename, itemname
-
-
-class DimReduceWidgets():
-    """panel for selecting how to reduce array dimension to scalar"""
-    def __init__(self, parent, npts=1):
-        self.wids = wids = {}
-        self.npts = npts
-        self.min, self.max = 0, npts-1
-        wids['npts'] = SimpleText(parent, str(npts), size=(70, -1), style=wx.ALIGN_RIGHT)
-
-        fsopts = {'digits': 0, 'min_val': 0, 'max_val': npts-1, 'size':(75, -1),
-                  'action': self.onMinMax}
-        wids['min'] = FloatSpin(parent, value=0,      **fsopts)
-        wids['max'] = FloatSpin(parent, value=npts-1, **fsopts)
-        wids['fix_width'] = Check(parent, '', default=False)
-        choices = ['sum', 'mean', 'single']
-        wids['reduce'] = Choice(parent, choices, size=(100, -1),
-                                 action=self.onReduce)
-        wids['reduce'].SetSelection(0)
-
-    def onMinMax(self, event=None):
-        redval = self.wids['reduce'].GetStringSelection()
-        fix_width = self.wids['fix_width'].IsChecked()
-        if (redval in ('sum', 'mean') and fix_width):
-            newmin = int(self.wids['min'].GetValue())
-            newmax = int(self.wids['max'].GetValue())
-            if newmax != self.max and newmin == self.min:
-                delta = newmax - self.max
-                self.max = newmax
-                self.min = max(0, self.min+delta)
-                self.wids['min'].SetValue(self.min)
-            elif newmax == self.max and newmin != self.min:
-                delta = newmin - self.min
-                self.min = newmin
-                self.max = min(self.npts-1, self.max+delta)
-                self.wids['max'].SetValue(self.max)
-        else:
-            self.min = int(self.wids['min'].GetValue())
-            self.max = int(self.wids['max'].GetValue())
-        if self.min > self.max:
-            newmin, newmax = self.max, self.min
-            self.min, self.max = newmin, newmax
-            self.wids['min'].SetValue(self.min)
-            self.wids['max'].SetValue(self.max)
-
-
-    def onReduce(self, event=None):
-        redval = self.wids['reduce'].GetStringSelection()
-        self.wids['max'].Enable(redval != 'single')
-        self.wids['fix_width'].Enable(redval != 'single')
-
-    def on_enable(self, enable=True, npts=None, **kws):
-        for attr in ('npts', 'reduce', 'min', 'max', 'fix_width'):
-            self.wids[attr].Enable(enable)
-        if enable and npts is not None:
-            self.set_npts(npts)
-
-    def set_npts(self, npts):
-        self.npts = npts
-        self.wids['npts'].SetLabel(f'{npts}')
-        self.wids['min'].SetMax(npts-1)
-        self.wids['max'].SetMax(npts-1)
-        self.wids['min'].SetValue(0)
-        self.wids['max'].SetValue(npts-1)
-
-    def get_result(self):
-        result = self.wids['reduce'].GetStringSelection()
-        x0 = int(self.wids['min'].GetValue())
-        x1 = int(self.wids['max'].GetValue())
-        return (result, x0, x1)
-
-class DimReducePanel(wx.Panel):
-    """ panel with dimenision-reduction choices"""
-    def __init__(self, parent, maxdim=6):
-        wx.Panel.__init__(self, parent)
-
-        self.wids = wids = {}
-        self.maxdim = max(2, min(16, maxdim))
-        panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
-
-        def padd_text(text, dcol=1, newrow=False, right=False):
-            style = wx.ALIGN_RIGHT if right else wx.ALIGN_LEFT
-            panel.Add(SimpleText(panel, text, style=style),
-                      dcol=dcol, style=style, newrow=newrow)
-
-        padd_text('Dimension Reduction for Multidimensional Arrays', dcol=6)
-        padd_text('Dim', newrow=True)
-        padd_text('Npts', right=True)
-        padd_text('Method')
-        padd_text('Min')
-        padd_text('Max')
-        padd_text('Fix Width?')
-
-        for i in range(maxdim):
-            dw = self.wids[f'data_dim{i}'] = DimReduceWidgets(panel, npts=1)
-            for wid in dw.wids.values():
-                wid.Disable()
-            padd_text(f' {i}:', newrow=True)
-            panel.Add(dw.wids['npts'])
-            panel.Add(dw.wids['reduce'])
-            panel.Add(dw.wids['min'])
-            panel.Add(dw.wids['max'])
-            panel.Add(dw.wids['fix_width'])
-        panel.pack()
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(panel, 1, 0, LEFT|wx.EXPAND|wx.GROW, 2)
-
-        panel.SetMinSize((400, 200))
-        panel.SetSize((550, 300))
-
-    def set_datashape(self, dshape):
-        choices = []
-        for i, npts in enumerate(dshape):
-            self.enable_dimension(i, npts=npts)
-            choices.append(f'dim{i}: {npts} points')
-
-        for i in range(len(dshape), self.maxdim):
-            self.enable_dimension(i, enable=False)
-        return choices
-
-    def enable_dimension(self, idim, enable=True, npts=None):
-        wname = f'data_dim{idim}'
-        if wname in self.wids:
-            self.wids[wname].on_enable(enable=enable, npts=npts)
-
-    def get_result(self):
-        result = []
-        for i in range(self.maxdim):
-            ret = [i, self.wids[f'data_dim{i}'].wids['npts'].Enabled]
-            ret.extend(self.wids[f'data_dim{i}'].get_result())
-            result.append(ret)
-        return result
 
 
 class ArrayPlotPanel(wx.Panel):
@@ -411,6 +130,17 @@ class ArrayPlotPanel(wx.Panel):
         sizer.Add(panel,           0, 0, LEFT|wx.GROW, 2)
         sizer.Add(self.dim_reduce, 0, 0, LEFT|wx.GROW, 2)
         pack(self, sizer)
+        register_darkdetect(self.onDarkMode)
+
+    def onDarkMode(self, is_dark=None):
+        print("array panel on dark ", is_dark)
+        fgcol = get_color('text', dark=is_dark)
+        bgcol = get_color('text_bg', dark=is_dark)
+        self.SetBackgroundColour(bgcol)
+        self.SetForegroundColour(fgcol)
+        self.SetBackgroundColour(bgcol)
+        self.SetForegroundColour(fgcol)
+        wx.CallAfter(self.Refresh)
 
 
     def set_object(self, object, itemtype='?', itemname='', filename='', **kws):
@@ -423,7 +153,10 @@ class ArrayPlotPanel(wx.Panel):
             self.data_shape = object.shape
             choices = self.dim_reduce.set_datashape(object.shape)
             cur = self.wids['yarray'].GetSelection()
-            self.wids['yarray'].SetChoices(choices)
+            try:
+                self.wids['yarray'].SetChoices(choices)
+            except IndexErrror:
+                pass
             self.dim_reduce.enable_dimension(cur, enable=False, npts=None)
 
         self.wids['yarray'].Enable(isdata)
@@ -436,7 +169,6 @@ class ArrayPlotPanel(wx.Panel):
                 self.dim_reduce.enable_dimension(i, enable=(i!=sel), npts=npts)
 
     def onPlot(self, event=None, new=True):
-        # print("plot " , new, self.data_obj)
         reddim = self.dim_reduce.get_result()
         win    = self.wids['win'].GetStringSelection()
         sharey = self.wids['sharey'].IsChecked()
@@ -472,7 +204,6 @@ class ArrayPlotPanel(wx.Panel):
 
         opts['yaxes'] = self.last_yaxes
         opts['label'] = ylabel
-        print(opts)
         plot(xarr, yarr, **opts)
         pframe.Show()
         pframe.Raise()
@@ -609,7 +340,7 @@ class ArrayImagePanel(wx.Panel):
 
     def set_object(self, object, itemtype='?', itemname='', filename='', **kws):
         """fill from object"""
-        print("fill 2d obj ", itemtype, itemname, filename, object)
+        # print("fill 2d obj ", itemtype, itemname, filename, object)
 
         self.filename = filename
         self.itemname = itemname
@@ -663,11 +394,13 @@ class ArrayImagePanel(wx.Panel):
 
         xdstr   = self.wids['xdim'].GetStringSelection()
         ydstr   = self.wids['ydim'].GetStringSelection()
-        print(f"imshow  {ydim=}, {xdim=}, {xdstr=}, {ydstr=}, {win=}, {ydir=}")
+        # print(f"imshow  {ydim=}, {xdim=}, {xdstr=}, {ydstr=}, {win=}, {ydir=}")
 
         img, alabel = get_data(self.data_obj, reddim)
 
-        print("Got image ", img.shape, self.data_shape, alabel)
+        if len(img.shape) < 2:
+            print('shape too small')
+            return
         _ny, _nx = img.shape
 
         _ry, _rx = self.data_shape[ydim], self.data_shape[xdim]
@@ -691,28 +424,27 @@ class ArrayImagePanel(wx.Panel):
 
 class SitkaFrame(wx.Frame):
     """Main Window for Sitka HDF5/Zarr viewer"""
-    def __init__(self, parent=None, root_data=None,
-                 title='Sitka HDF5 Viewer', id=-1,
-                 pos=wx.DefaultPosition, size=(900, 650),
-                 style=wx.DEFAULT_FRAME_STYLE):
+    def __init__(self, parent=None, title='Sitka HDF5 Viewer',
+                 size=(900, 650),  style=wx.DEFAULT_FRAME_STYLE):
         """Create Frame instance."""
+        self.data = {}
         self.wids = {}
-        wx.Frame.__init__(self, parent, id, title, pos, size, style)
-        self.create_display(root_data, size=size)
+        wx.Frame.__init__(self, parent, title=title, size=size,
+                          style=style)
+        self.create_display(size=size)
         self.CreateStatusBar()
-        self.SetStatusText('Welcome to HDF5 Browser')
+        self.SetStatusText('Welcome to Sitka')
         self.BuildMenus()
 
 
-    def create_display(self, root_data, size=(900, 650)):
+    def create_display(self, size=(900, 650)):
         splitter = wx.SplitterWindow(self, size=size, style=wx.SP_LIVE_UPDATE)
         splitter.SetMinimumPaneSize(300)
 
         leftpanel = wx.Panel(splitter)
         rightpanel = scrolled.ScrolledPanel(splitter)
 
-        self.tree = H5ZTree(leftpanel, root_data=root_data,
-                            on_select=self.onObjectSelect)
+        self.tree = HDataTree(leftpanel, on_select=self.onSelectObject)
 
         self.info = dv.DataViewListCtrl(leftpanel, style=DV_STYLE)
         self.info.AppendTextColumn('Name', width=125)
@@ -722,8 +454,8 @@ class SitkaFrame(wx.Frame):
             this.Sortable = False
             this.Alignment = this.Renderer.Alignment = wx.ALIGN_LEFT
 
-        self.tree.SetMinSize((325, 300))
-        self.info.SetMinSize((325, 300))
+        self.tree.SetMinSize((350, 300))
+        self.info.SetMinSize((350, 300))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.tree, 1, wx.ALL|wx.GROW)
@@ -761,7 +493,6 @@ class SitkaFrame(wx.Frame):
         self.tree.SetBackgroundColour(get_color('list_bg'))
         self.tree.SetForegroundColour(get_color('list_fg'))
 
-
         self.info.SetFont(get_font())
         self.tree.SetFont(get_font())
         self.set_fontsize(14)
@@ -771,8 +502,10 @@ class SitkaFrame(wx.Frame):
         register_darkdetect(self.onDarkMode)
 
         # Display the root item.
+        if self.data is not None:
+            self.tree.set_root(self.data)
         if self.tree.root is not None:
-            self.tree.display()
+            self.tree.OnSelectionChanged()
 
     def onNBChanged(self, event=None):
         oldpage = self.nb.GetPage(event.GetOldSelection())
@@ -786,11 +519,13 @@ class SitkaFrame(wx.Frame):
             on_expose()
 
 
-    def onObjectSelect(self, object, filename='', itemname='', itemtype='?'):
+    def onSelectObject(self, object, address, itemtype='?'):
+        filename = address[0]
+        itemname = '/'.join(address[1:])
         if len(filename) < 1:
             filename = ''
         self.filename_label.SetLabel(f" Filename: {filename}")
-        if len(itemname) < 1:
+        if len(itemname) < 2:
             itemname = ''
 
         # print(f"on Object {itemtype=}, {itemname=}, {filename=}", object)
@@ -908,19 +643,22 @@ class SitkaFrame(wx.Frame):
             return
 
         fname = path.name
-        if fname in self.data:
-            dlg = wx.MessageDialog(None, f'File {fname} already exists... re-read?', 'Question',
+        if fname in self.tree.datasets:
+            dlg = wx.MessageDialog(None,
+                                   f'File {fname} already exists... re-read?',
+                                   'Question',
                                    wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
             ret = dlg.ShowModal()
             if ret == wx.ID_NO:
                 return
 
-        try:
-            self.data[fname] = h5py.File(fname, 'r')
-        except Exception:
-            pass
-        # self.filling.tree.display()
-        # self.filling.ShowNode(fname)
+        opener = FILE_SUFFIXES.get(path.suffix, h5py.File)
+        self.add_data(fname, opener(path, 'r'))
+
+    def add_data(self, name, object):
+        self.data[name] = object
+        self.tree.onRefresh()
+
 
     def onChangeDir(self, event=None):
         dlg = wx.DirDialog(None, 'Choose a Working Directory',
@@ -960,15 +698,15 @@ class SitkaFrame(wx.Frame):
 
 class Sitka_App(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     "simple app to wrap HDF5_Frame"
-    def __init__(self, with_inspect=False, root_data=None, **kws):
+    def __init__(self, with_inspect=False, **kws):
         self.with_inspect = with_inspect
-        self.root_data = root_data
         wx.App.__init__(self, **kws)
 
     def createApp(self):
-        self.frame = SitkaFrame(root_data=self.root_data)
+        self.frame = SitkaFrame()
         self.frame.Show()
         self.SetTopWindow(self.frame)
+        use_darkdetect()
         return True
 
     def OnInit(self):
@@ -977,21 +715,5 @@ class Sitka_App(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             self.ShowInspectionTool()
         return True
 
-    def set_data(self, root_data):
-        self.frame.root_data = self.root_data = root_data
-
-if __name__ == '__main__':
-    files = {}
-    for fname in sorted(glob.glob('*.h5')):
-        try:
-            obj = h5py.File(fname)
-            files[fname] = obj
-        except Exception:
-            pass
-        if len(files) > 2:
-            break
-
-    app = Sitka_App(root_data=files, with_inspect=False)
-    app.MainLoop()
-    def run(self):
-        self.MainLoop()
+    def add_data(self, name, object):
+        self.frame.add_data(name, object)
