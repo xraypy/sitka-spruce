@@ -1,6 +1,6 @@
 import wx
 
-from wxutils import (FloatSpin, GridPanel, SimpleText, Choice,
+from wxutils import (FloatSpin, GridPanel, SimpleText, Choice, HLine,
                      Check, LEFT, get_color, register_darkdetect)
 
 class DimReduceWidgets():
@@ -86,7 +86,9 @@ class DimReducePanel(wx.Panel):
             panel.Add(SimpleText(panel, text, style=style),
                       dcol=dcol, style=style, newrow=newrow)
 
-        padd_text('Dimension Reduction for Multidimensional Arrays', dcol=6)
+        panel.Add(HLine(panel, size=(500, 3)), dcol=6)
+        padd_text('Dimension Reduction for Multidimensional Arrays',
+                  dcol=6, newrow=True)
         padd_text('Dim', newrow=True)
         padd_text('Npts', right=True)
         padd_text('Method')
@@ -104,6 +106,11 @@ class DimReducePanel(wx.Panel):
             panel.Add(dw.wids['min'])
             panel.Add(dw.wids['max'])
             panel.Add(dw.wids['fix_width'])
+
+
+        panel.Add(HLine(panel, size=(500, 3)), dcol=6, newrow=True)
+
+
         panel.pack()
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, 0, LEFT|wx.EXPAND|wx.GROW, 2)
