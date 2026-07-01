@@ -6,10 +6,9 @@ sitka_spruce HDF5 and Zarr data browser
 import sys
 import time
 import glob
-import numpy as np
-
-from functools import partial
 from pathlib import Path
+
+import numpy as np
 
 import wx
 import wx.lib.scrolledpanel as scrolled
@@ -18,14 +17,10 @@ import wx.lib.agw.flatnotebook as flat_nb
 import wx.lib.mixins.inspection
 from wx.adv import AboutBox, AboutDialogInfo
 
-from wxmplot import PlotFrame, ImageFrame
+from wxmplot import ImageFrame
 
 import h5py
-
-try:
-    import zarr
-except:
-    zarr = None
+import zarr
 
 try:
     import larch
@@ -44,390 +39,28 @@ from pyshortcuts import uname, fix_filename, get_cwd
 VERSION = '0.1'
 
 from .gui_utils import Font, fontsize, get_font
-from .data  import (get_items, get_itemtype, get_attributes, get_data)
+from .data  import (get_items, get_itemtype, get_attributes, get_data,
+                    SitkaData, ARRAY_TYPES)
 from .hdatatree import HDataTree
-from .dimreduce import DimReducePanel
+from .plot1dpanel import ArrayPlot1DPanel
+from .plot2dpanel import ArrayImagePanel
 
 
 FILE_WILDCARD = 'HDF5/Zarr files(*.hdf5;*.h5;*.zarr)|*.hdf5;*.h5;*.zarr|All files (*.*)|*.*'
 
-FILE_SUFFIXES = {'hdf5': h5py.File, 'h5': h5py.File}
+FILE_SUFFIXES = {'hdf5': h5py.File, 'h5': h5py.File, 'zarr': zarr.open}
 if zarr is not None:
     FILE_SUFFIXES['zarr'] = zarr.open
 
 
 DV_STYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 
-ARRAY_TYPES = ('h5py.Dataset', 'zarr.Array', 'np.ndarray')
-GROUP_TYPES = ('h5py.Group', 'zarr.Group', 'larch.Group')
-
-
-class ArrayPlotPanel(wx.Panel):
-    """X/Y Plot Config Panel for HDF5/Zarr datasets"""
-    def __init__(self, parent, size=(500, 500)):
-        wx.Panel.__init__(self, parent)
-
-        self.SetBackgroundColour(get_color('nb_area'))
-
-        self.data_shape = None
-        self.data_obj = None
-        self.last_yaxes = 0
-        self.plotframes = {}
-        self.dim_reduce = DimReducePanel(parent=self)
-        self.wids = wids = {}
-        panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
-
-        wids['newplot'] = Button(panel, 'New Plot', size=(150, -1),
-                              action=self.onPlot)
-        wids['overplot'] = Button(panel, 'Over Plot', size=(150, -1),
-                                  action=partial(self.onPlot, new=False))
-
-        wids['sharey'] = Check(panel, 'share y-axis?', default=False)
-        wids['win'] = Choice(panel, ['1', '2', '3', '4', '5'], size=(75, -1))
-        wids['win'].SetStringSelection('1')
-
-        wids['ychoices'] =  ['dim0: 0 points']
-        wids['normchoices'] = ['1']
-        wids['xchoices'] = ['<index>']
-
-        wids['yarray'] = Choice(panel, wids['ychoices'],
-                                size=(175, -1), action=self.onYarray)
-        wids['yop'] = Choice(panel, ['+', '-', '*', '/'],
-                                   size=(75, -1), action=self.onPlot)
-        wids['yop'].SetStringSelection('/')
-
-        wids['ynorm'] = Choice(panel, wids['normchoices'],
-                                size=(175, -1), action=self.onPlot)
-
-        wids['xarray'] = Choice(panel, wids['xchoices'],
-                                size=(175, -1), action=self.onPlot)
-
-        def padd_text(text, dcol=1, newrow=True):
-            panel.Add(SimpleText(panel, text), dcol=dcol, newrow=newrow)
-
-        titleopts = {'font': get_font(larger=1),
-                     'colour': 'title_red', 'style': LEFT}
-
-        padd_text('Y array', newrow=False)
-        panel.Add(wids['yarray'])
-        panel.Add(wids['yop'])
-        panel.Add(wids['ynorm'])
-
-        padd_text('X array')
-        panel.Add(wids['xarray'], dcol=2)
-        panel.Add((5,5), newrow=True)
-        panel.Add(wids['newplot'])
-        padd_text(' window:', newrow=False)
-        panel.Add(wids['win'])
-        panel.Add((5,5), newrow=True)
-        panel.Add(wids['overplot'])
-        panel.Add(wids['sharey'], dcol=2)
-
-        panel.Add(HLine(panel, size=(500, 3)), dcol=6, newrow=True)
-        panel.pack()
-
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(panel,           0, 0, LEFT|wx.GROW, 2)
-        sizer.Add(self.dim_reduce, 0, 0, LEFT|wx.GROW, 2)
-        pack(self, sizer)
-        register_darkdetect(self.onDarkMode)
-
-    def onDarkMode(self, is_dark=None):
-        print("array panel on dark ", is_dark)
-        fgcol = get_color('text', dark=is_dark)
-        bgcol = get_color('text_bg', dark=is_dark)
-        self.SetBackgroundColour(bgcol)
-        self.SetForegroundColour(fgcol)
-        self.SetBackgroundColour(bgcol)
-        self.SetForegroundColour(fgcol)
-        wx.CallAfter(self.Refresh)
-
-
-    def set_object(self, object, itemtype='?', itemname='', filename='', **kws):
-        """fill from object"""
-        self.filename = filename
-        self.itemname = itemname
-        isdata = (itemtype in ARRAY_TYPES)
-        self.data_obj = object
-        if isdata:
-            self.data_shape = object.shape
-            choices = self.dim_reduce.set_datashape(object.shape)
-            cur = self.wids['yarray'].GetSelection()
-            try:
-                self.wids['yarray'].SetChoices(choices)
-            except IndexErrror:
-                pass
-            self.dim_reduce.enable_dimension(cur, enable=False, npts=None)
-
-        self.wids['yarray'].Enable(isdata)
-        self.Refresh()
-
-    def onYarray(self, event=None):
-        sel = self.wids['yarray'].GetSelection()
-        if self.data_shape is not None:
-            for i, npts in enumerate(self.data_shape):
-                self.dim_reduce.enable_dimension(i, enable=(i!=sel), npts=npts)
-
-    def onPlot(self, event=None, new=True):
-        reddim = self.dim_reduce.get_result()
-        win    = self.wids['win'].GetStringSelection()
-        sharey = self.wids['sharey'].IsChecked()
-        ydim   = self.wids['yarray'].GetSelection()
-        ylabel = self.wids['yarray'].GetStringSelection()
-        ynorm  = self.wids['ynorm'].GetStringSelection()
-        yop    = self.wids['yop'].GetStringSelection()
-        xarray = self.wids['xarray'].GetStringSelection()
-        ###
-        # print(f"plot  {ydim=}, {yop=}, {ynorm=}, {xarray=}, {win=}, {sharey=}")
-        yarr, alabel = get_data(self.data_obj, reddim)
-        xarr = np.arange(len(yarr))
-        if 'ynorm' == '1':
-            ynorm  = 1.0
-        if xarray == '<index>':
-            xarr = np.arange(len(yarr))
-
-        frame_opts = {'title':  f'SitkaPlot {win} '}
-        pframe = self.show_plotframe(win, **frame_opts)
-
-        plot = pframe.oplot
-        ylabel = f'{self.itemname}{alabel}'
-        opts = {'title': f'{self.filename}'}
-        if new:
-            plot = pframe.plot
-            self.last_yaxes = 1
-            opts['ylabel'] = ylabel
-        elif not sharey:
-            self.last_yaxes = ya = min(4, max(1, self.last_yaxes+1))
-            if self.last_yaxes > 1:
-                opts['yaxes_tracecolor'] = True
-                opts[f'y{ya}label'] = ylabel
-
-        opts['yaxes'] = self.last_yaxes
-        opts['label'] = ylabel
-        plot(xarr, yarr, **opts)
-        pframe.Show()
-        pframe.Raise()
-
-    def show_plotframe(self, window=1, **opts):
-        shown = False
-        if window in self.plotframes:
-            try:
-                self.plotframes[window].Raise()
-                shown = True
-            except:
-                f = self.plotframes.pop(window)
-                del f
-                shown = False
-        if not shown:
-            self.plotframes[window] = PlotFrame(self, **opts)
-            self.plotframes[window].Raise()
-        return self.plotframes[window]
-
-
-class ArrayImagePanel(wx.Panel):
-    """Image Show Config Panel for HDF5/Zarr datasets"""
-    def __init__(self, parent, size=(500, 500)):
-        wx.Panel.__init__(self, parent)
-
-        self.SetBackgroundColour(get_color('nb_area'))
-
-        self.data_shape = None
-        self.data_obj = None
-        self.xsel_cur, self.ysel_cur = 0, 1
-        self.skip_dim_proc = False
-        self.imageframes = {}
-        self.wids = wids = {}
-
-        self.dim_reduce = DimReducePanel(parent=self)
-
-        panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
-        wids['imshow_new'] = Button(panel, 'Show New Image', size=(150, -1),
-                                action=self.onImshow)
-        wids['imshow_replace'] = Button(panel, 'Replace Last Image', size=(150, -1),
-                                  action=partial(self.onImshow, new=False))
-
-        wids['plot_xchoices'] = ['<index>']
-        wids['plot_xval'] = Choice(panel, wids['plot_xchoices'],
-                                   size=(200, -1), action=self.onImshow)
-        wids['plot_ychoices'] = ['<index>']
-        wids['plot_yval'] = Choice(panel, wids['plot_ychoices'],
-                                   size=(200, -1), action=self.onImshow)
-        wids['ydir'] = Check(panel, 'Y=0 at top', default=False)
-
-
-        wids['win'] = Choice(panel, ['1', '2', '3', '4', '5'], size=(75, -1))
-        wids['win'].SetStringSelection('1')
-
-        wids['axes'] =  ['dim0: 0 points', 'dim1: 0 points']
-
-        wids['xdim'] = Choice(panel, wids['axes'],
-                              size=(175, -1), action=self.onXdim)
-        wids['ydim'] = Choice(panel, wids['axes'],
-                              size=(175, -1), action=self.onYdim)
-        wids['xdim'].SetSelection(0)
-        wids['ydim'].SetSelection(1)
-
-        def padd_text(text, dcol=1, newrow=True):
-            panel.Add(SimpleText(panel, text), dcol=dcol, newrow=newrow)
-
-        padd_text(' X (Horiz): ')
-        panel.Add(wids['xdim'])
-        padd_text(' X values: ', newrow=False)
-        panel.Add(wids['plot_xval'])
-
-        padd_text(' Y (Vert): ')
-        panel.Add(wids['ydim'])
-        padd_text(' Y values: ', newrow=False)
-        panel.Add(wids['plot_yval'])
-
-        padd_text(' ')
-        panel.Add(wids['imshow_new'])
-        padd_text(' windows:', newrow=False)
-        panel.Add(wids['win'])
-
-        padd_text(' ')
-        panel.Add(wids['imshow_replace'])
-        panel.Add(wids['ydir'])
-
-
-        panel.Add(HLine(panel, size=(500, 3)), dcol=6, newrow=True)
-
-        panel.pack()
-
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(panel, 0, 0, LEFT|wx.GROW, 2)
-        sizer.Add(self.dim_reduce, 0, 0, LEFT|wx.GROW, 2)
-        pack(self, sizer)
-
-    def onXdim(self, event=None):
-        if self.skip_dim_proc:
-            return
-        self.skip_dim_proc = True
-        xsel = self.wids['xdim'].GetSelection()
-        ysel = self.wids['ydim'].GetSelection()
-        if ysel == xsel and xsel != self.xsel_cur:
-            self.wids['ydim'].SetSelection(self.xsel_cur)
-            self.ysel_cur = self.xsel_cur
-        else:
-            self.ysel_cur = ysel
-        self.xsel_cur = xsel
-        if self.data_shape is not None:
-            for i, npts in enumerate(self.data_shape):
-                enable = i not in (self.xsel_cur, self.ysel_cur)
-                self.dim_reduce.enable_dimension(i, enable=enable, npts=npts)
-
-        self.skip_dim_proc = False
-
-    def onYdim(self, event=None):
-        if self.skip_dim_proc:
-            return
-        self.skip_dim_proc = True
-        xsel = self.wids['xdim'].GetSelection()
-        ysel = self.wids['ydim'].GetSelection()
-        if ysel == xsel and ysel != self.ysel_cur:  # y changed
-            self.wids['xdim'].SetSelection(self.ysel_cur)
-            self.xsel_cur = self.ysel_cur
-        else:
-            self.xsel_cur = xsel
-        self.ysel_cur = ysel
-
-        if self.data_shape is not None:
-            for i, npts in enumerate(self.data_shape):
-                enable = i not in (self.xsel_cur, self.ysel_cur)
-                self.dim_reduce.enable_dimension(i, enable=enable, npts=npts)
-
-        self.skip_dim_proc = False
-
-    def set_object(self, object, itemtype='?', itemname='', filename='', **kws):
-        """fill from object"""
-        # print("fill 2d obj ", itemtype, itemname, filename, object)
-
-        self.filename = filename
-        self.itemname = itemname
-        isdata = (itemtype in ARRAY_TYPES)
-        self.data_obj = object
-        if isdata:
-            self.data_shape = object.shape
-            choices = self.dim_reduce.set_datashape(object.shape)
-            xcur = self.wids['xdim'].GetSelection()
-            ycur = self.wids['ydim'].GetSelection()
-            self.wids['xdim'].SetChoices(choices)
-            self.wids['ydim'].SetChoices(choices)
-            self.wids['ydim'].SetSelection(ycur)
-            self.wids['xdim'].SetSelection(xcur)
-
-            xcur = self.wids['xdim'].GetSelection()
-            ycur = self.wids['ydim'].GetSelection()
-            self.dim_reduce.enable_dimension(xcur, enable=False, npts=None)
-            self.dim_reduce.enable_dimension(ycur, enable=False, npts=None)
-
-        self.Refresh()
-
-
-    def show_imageframe(self, window=1, **opts):
-        shown = False
-        if window in self.imageframes:
-            try:
-                self.imageframes[window].Raise()
-                shown = True
-            except:
-                f = self.imageframes.pop(window)
-                del f
-                shown = False
-        if not shown:
-            self.imageframes[window] = ImageFrame(self, **opts)
-            self.imageframes[window].Raise()
-        return self.imageframes[window]
-
-    def onImshow(self, event=None, new=True):
-        # print("imshow ", new)
-
-        reddim = self.dim_reduce.get_result()
-
-        ########
-        win    = self.wids['win'].GetStringSelection()
-        ydir   = self.wids['ydir'].IsChecked()
-        ydim   = self.wids['ydim'].GetSelection()
-        xdim   = self.wids['xdim'].GetSelection()
-        xarray  = self.wids['plot_xval'].GetStringSelection()
-        yarray  = self.wids['plot_yval'].GetStringSelection()
-
-        xdstr   = self.wids['xdim'].GetStringSelection()
-        ydstr   = self.wids['ydim'].GetStringSelection()
-        # print(f"imshow  {ydim=}, {xdim=}, {xdstr=}, {ydstr=}, {win=}, {ydir=}")
-
-        img, alabel = get_data(self.data_obj, reddim)
-
-        if len(img.shape) < 2:
-            print('shape too small')
-            return
-        _ny, _nx = img.shape
-
-        _ry, _rx = self.data_shape[ydim], self.data_shape[xdim]
-
-       # print("Got image {_nx=}  {_rx=}   {_ny=}  {_ry=}  ")
-
-        if _ry == _nx and _rx == _ny:
-            img = img.transpose()
-
-        if ydir:
-            img = img[::-1, :]
-
-        frame_opts = {'title':  f'SitkaImage {win} '}
-        iframe = self.show_imageframe(win, **frame_opts)
-
-        opts = {'title': f'{self.filename}{alabel}'}
-        iframe.display(img)
-        iframe.Show()
-        iframe.Raise()
-
-
 class SitkaFrame(wx.Frame):
     """Main Window for Sitka HDF5/Zarr viewer"""
     def __init__(self, parent=None, title='Sitka HDF5 Viewer',
                  size=(900, 650),  style=wx.DEFAULT_FRAME_STYLE):
         """Create Frame instance."""
-        self.data = {}
+        self.data = SitkaData()
         self.wids = {}
         wx.Frame.__init__(self, parent, title=title, size=size,
                           style=style)
@@ -475,7 +108,7 @@ class SitkaFrame(wx.Frame):
                                size=(550, 600))
 
         # self.mainpanel = ArrayViewPanel(splitter)
-        self.nb.AddPage(ArrayPlotPanel(self), 'X/Y Plots', True)
+        self.nb.AddPage(ArrayPlot1DPanel(self), 'X/Y Plots', True)
         self.nb.AddPage(ArrayImagePanel(self), 'Image Display', True)
         # self.nb.AddPage(ArrayTablePanel, 'Table View', True)
         self.nb.SetSelection(0)
@@ -502,8 +135,7 @@ class SitkaFrame(wx.Frame):
         register_darkdetect(self.onDarkMode)
 
         # Display the root item.
-        if self.data is not None:
-            self.tree.set_root(self.data)
+        self.tree.set_root(self.data.datasets)
         if self.tree.root is not None:
             self.tree.OnSelectionChanged()
 
@@ -643,9 +275,9 @@ class SitkaFrame(wx.Frame):
             return
 
         fname = path.name
-        if fname in self.tree.datasets:
+        if fname in self.data.datasets:
             dlg = wx.MessageDialog(None,
-                                   f'File {fname} already exists... re-read?',
+                                   f'File {fname} already exists... overwrite?',
                                    'Question',
                                    wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
             ret = dlg.ShowModal()
@@ -653,10 +285,10 @@ class SitkaFrame(wx.Frame):
                 return
 
         opener = FILE_SUFFIXES.get(path.suffix, h5py.File)
-        self.add_data(fname, opener(path, 'r'))
+        self.add_dataset(fname, opener(path, 'r'))
 
-    def add_data(self, name, object):
-        self.data[name] = object
+    def add_dataset(self, name, dataset):
+        self.data.add_dataset(name, dataset)
         self.tree.onRefresh()
 
 
