@@ -3,49 +3,54 @@ import numpy as np
 from pathlib import Path
 
 import h5py
+import zarr
 
-try:
-    import zarr
-except:
-    zarr = None
-
+import asteval
 try:
     import larch
-except:
+except ImportException:
     larch = None
 
 
+COMMONTYPES = (int, float, complex, str, bytes, bool, list, tuple, np.ndarray)
+
+ARRAY_TYPES = ('h5py.Dataset', 'zarr.Array', 'ndarray')
+GROUP_TYPES = ('h5py.Group', 'zarr.Group', 'larch.Group')
+
+
 def get_items(obj):
-    """return if object is dict-like for tree"""
+    """return whether object is dict-like for tree"""
     if (isinstance(obj, dict) or
-        (larch is not None and isinstance(obj, larch.Group)) or
-        (h5py is not None and isinstance(obj, h5py.Group))):
+        (isinstance(obj, h5py.Group)) or
+        (larch is not None and isinstance(obj, larch.Group))):
         return {key: val for key, val in obj.items()}
-    if (zarr is not None and isinstance(obj, zarr.Group)):
+    if isinstance(obj, zarr.Group):
         return {key: obj[key] for key in obj.keys()}
-    elif ((h5py is not None and isinstance(obj, h5py.Dataset)) or
-          (zarr is not None and isinstance(obj, zarr.Array))):
+    elif (isinstance(obj, h5py.Dataset) or
+          isinstance(obj, zarr.Array)):
         return obj
 
 
 def get_itemtype(obj):
-    """return if object is dict-like for tree"""
+    """return 'itemtyp for object,
+
+    is dict-like for tree
+
+    """
     itemtype = None
     if isinstance(obj, dict):
         itemtype = 'dict'
     elif larch is not None and isinstance(obj, larch.Group):
         itemtype = 'larch.Group'
-    elif h5py is not None and isinstance(obj, h5py.Group):
+    elif isinstance(obj, h5py.Group):
         itemtype = 'h5py.Group'
-    elif zarr is not None and isinstance(obj, zarr.Group):
+    elif isinstance(obj, zarr.Group):
         itemtype = 'zarr.Group'
-    elif h5py is not None and isinstance(obj, h5py.Dataset):
+    elif isinstance(obj, h5py.Dataset):
         itemtype = 'h5py.Dataset'
-    elif zarr is not None and isinstance(obj, zarr.Array):
+    elif isinstance(obj, zarr.Array):
         itemtype = 'zarr.Array'
-    elif isinstance(obj, np.ndarray):
-        itemtype = 'np.ndarray'
-    elif isinstance(obj, COMMONTYPES):
+    else:
         itemtype = obj.__class__.__name__
     return itemtype
 
@@ -94,7 +99,7 @@ def get_data(obj, reductions):
         slices[idim] = ':'
         try:
             jdim, use, method, i0, i1 = reductions[idim]
-        except IndexError:
+        except Exception:
             jdim, use, method, i0, i1 = idim, True, 'sum', 0, obj.shape(idim)
         if use:
             if method == 'single':
@@ -111,3 +116,49 @@ def get_data(obj, reductions):
         s.append(val)
     op = '[' + ','.join(reversed(s)) + ']'
     return ret, op
+
+class SitkaData:
+    """
+    Sitka Datasets and evaluation
+    """
+    def __init__(self):
+        self.datasets = {}
+        self.arrayshapes = {0: []}
+        self._asteval = asteval.Interpreter(with_numpy=True,
+                                with_import=True, with_importfrom=True)
+        self._symtab  = self._asteval.symtable
+        self._symtab['dsets'] = self.datasets
+        self._last_error = None
+
+    def add_dataset(self, name, dataset):
+        self.datasets[name] = dataset
+
+    def add_array(self, name, data):
+        """add array to interpreter, and keep track of its shape"""
+
+        # remove existing value
+        if name in self_symtab:
+            oldval = self_symtab.pop(name)
+            dshape = 0
+            if isinstance(oldval, np.ndarray):
+                dshape = oldval.shape
+            if name in self.arrayshapes[dshape]:
+                self.arrayshapes[dshape].pop(name)
+
+        # add new
+        dshape = 0
+        if isinstance(data, np.ndarray):
+            dshape = data.shape
+        if dshape not in self.arrayshapes:
+            self.arrayshapes[dshape] = []
+        self.arrayshapes[dshape].append(name)
+        self._symtab[name] = data
+
+
+    def eval(self, str):
+        out = self._asteval(str)
+        if len(self._asteval.error) > 0:
+            self._last_error = [e for e in self._asteval.error]
+            return None
+        else:
+            return out
