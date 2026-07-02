@@ -123,10 +123,15 @@ class DimReducePanel(wx.Panel):
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)
         bgcol = get_color('text_bg', dark=is_dark)
+
         self.SetBackgroundColour(bgcol)
         self.SetForegroundColour(fgcol)
         self.SetBackgroundColour(bgcol)
         self.SetForegroundColour(fgcol)
+        for i in range(maxdim):
+            dw = self.wids[f'data_dim{i}'] = DimReduceWidgets(panel, npts=1)
+            dw.wids['npts'].SetForegroundColour(fgcol)
+
         wx.CallAfter(self.Refresh)
 
 
