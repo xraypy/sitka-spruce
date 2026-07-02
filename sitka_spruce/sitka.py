@@ -15,10 +15,9 @@ import zarr
 
 from pathlib import Path
 
-from wxutils import (SimpleText, pack,  LEFT,
-                     get_color, use_darkdetect, register_darkdetect,
-                     MenuItem,
-                     flatnotebook)
+from wxutils import (SimpleText, pack,  LEFT,  get_color,
+                     use_darkdetect, register_darkdetect,
+                     MenuItem,  flatnotebook)
 
 from pyshortcuts import get_cwd
 
@@ -27,6 +26,7 @@ from .data  import get_attributes, SitkaData
 from .hdatatree import HDataTree
 from .plot1dpanel import ArrayPlot1DPanel
 from .plot2dpanel import ArrayImagePanel
+from .tablepanel import TablePanel
 
 try:
     import larch
@@ -100,9 +100,9 @@ class SitkaFrame(wx.Frame):
                                size=(550, 600))
 
         # self.mainpanel = ArrayViewPanel(splitter)
-        self.nb.AddPage(ArrayPlot1DPanel(self), 'X/Y Plots', True)
+        self.nb.AddPage(ArrayPlot1DPanel(self), 'XY Plot Display', True)
         self.nb.AddPage(ArrayImagePanel(self), 'Image Display', True)
-        # self.nb.AddPage(ArrayTablePanel, 'Table View', True)
+        self.nb.AddPage(TablePanel(self), 'Table Display', True)
         self.nb.SetSelection(0)
         self.current_nbpage = self.nb.GetSelection()
 
@@ -113,6 +113,7 @@ class SitkaFrame(wx.Frame):
         pack(rightpanel, sizer)
 
         rightpanel.SetBackgroundColour(get_color('nb_area'))
+        self.rightpanel = rightpanel
         self.nb.SetBackgroundColour(get_color('nb_area'))
         self.nb.SetForegroundColour(get_color('nb_area'))
         self.tree.SetBackgroundColour(get_color('list_bg'))
@@ -182,6 +183,8 @@ class SitkaFrame(wx.Frame):
         self.tree.SetForegroundColour(fgcol)
         self.info.SetBackgroundColour(bgcol)
         self.info.SetForegroundColour(fgcol)
+        self.rightpanel.SetBackgroundColour(get_color('nb_area'))
+
         wx.CallAfter(self.Refresh)
         #         self.text.SetBackgroundColour(bgcol)
         #         self.text.SetForegroundColour(fgcol)
