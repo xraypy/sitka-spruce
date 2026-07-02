@@ -28,9 +28,9 @@ def dtype2str(dtype):
     cast = repr
     if dtype in (bool, int, np.byte, np.bool, np.int32, np.int64):
         cast = cast_int
-    elif data.dtype in (np.complex64, np.complex128):
+    elif dtype in (np.complex64, np.complex128):
         cast = cast_complex
-    elif data.dtype in (np.float64, np.float32, np.float16):
+    elif dtype in (np.float64, np.float32, np.float16):
         cast = gformat
     return cast
 

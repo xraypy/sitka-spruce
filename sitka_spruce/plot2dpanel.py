@@ -196,9 +196,8 @@ class ArrayImagePanel(wx.Panel):
 
         _ry, _rx = self.data_shape[ydim], self.data_shape[xdim]
 
-       # print("Got image {_nx=}  {_rx=}   {_ny=}  {_ry=}  ")
-
-        if _ry == _nx and _rx == _ny:
+        # print(f"Got image {_nx=}  {_rx=}   {_ny=}  {_ry=}  {ydim=} {xdim=}")
+        if _ry == _nx and _rx == _ny or (ydim > xdim):
             img = img.transpose()
 
         if ydir:
