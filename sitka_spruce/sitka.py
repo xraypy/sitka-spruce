@@ -146,15 +146,15 @@ class SitkaFrame(wx.Frame):
 
     def onSelectObject(self, object, address, itemtype='?'):
         filename = address[0]
-        itemname = '/'.join(address[1:])
         if len(filename) < 1:
             filename = ''
-            self.filename_label.SetLabel(f" Filename: {filename}")
+        itemname = '/'.join(address[1:])
         if len(itemname) < 2:
             itemname = ''
 
-        # print(f"on Object {itemtype=}, {itemname=}, {filename=}", object)
+        self.filename_label.SetLabel(f" Filename: {filename}")
         self.itemname_label.SetLabel(f" Address: {itemname}")
+
         self.fill_info(filename, itemtype, object)
 
         for ipage in range(self.nb.GetPageCount()):
