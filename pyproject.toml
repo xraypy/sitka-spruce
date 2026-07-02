@@ -50,7 +50,6 @@ dependencies = [
    "h5py>=3.13",
    "zarr",
    "fsspec",
-   "s3fs",
    "asteval>=1.0.9",
    "darkdetect",
    "pyobjc-framework-Cocoa; platform_system == 'Darwin'",
@@ -69,6 +68,7 @@ Tracker = "https://github.com/xraypy/sitka-spruce/issues"
 
 [project.optional-dependencies]
 dev = ["build", "twine"]
+s3 =  ["s3fs"]
 doc = ["Sphinx", "jupyter_sphinx", "sphinx-copybutton", "sphinxcontrib-video"]
 test = ["pytest", "pytest-cov", "coverage"]
 all = ["sitka_spruce[dev, doc, test]"]
