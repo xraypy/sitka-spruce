@@ -6,6 +6,13 @@ from pyshortcuts import uname
 
 FONTSIZE = 12
 FONTSIZE_FW = 13
+if uname == 'darwin':
+    FONTSIZE += 1
+    FONTSIZE_FW += 1
+elif uname == 'linux':
+    FONTSIZE -= 1
+    FONTSIZE_FW -= 1
+
 
 def fontsize(fixed_width=False):
     """return best default fontsize"""

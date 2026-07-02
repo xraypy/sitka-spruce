@@ -28,34 +28,31 @@ class ArrayImagePanel(wx.Panel):
         self.dim_reduce = DimReducePanel(parent=self)
 
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
-        wids['imshow_new'] = Button(panel, 'Show New Image', size=(150, -1),
+        wids['imshow'] = Button(panel, 'Show Image', size=(200, -1),
                                 action=self.onImshow)
-        wids['imshow_replace'] = Button(panel, 'Replace Last Image', size=(150, -1),
-                                  action=partial(self.onImshow, new=False))
-
         wids['plot_xchoices'] = ['<index>']
         wids['plot_xval'] = Choice(panel, wids['plot_xchoices'],
                                    size=(200, -1), action=self.onImshow)
         wids['plot_ychoices'] = ['<index>']
         wids['plot_yval'] = Choice(panel, wids['plot_ychoices'],
                                    size=(200, -1), action=self.onImshow)
-        wids['ydir'] = Check(panel, 'Y=0 at top', default=False)
+        wids['ydir'] = Check(panel, ' ', size=(100, -1), default=False)
 
 
         wids['win'] = Choice(panel, ['1', '2', '3', '4', '5'], size=(75, -1))
         wids['win'].SetStringSelection('1')
 
-        wids['axes'] =  ['dim0: 0 points', 'dim1: 0 points']
+        wids['axes'] =  ['dim0: 0pts', 'dim1: 0pts']
 
         wids['xdim'] = Choice(panel, wids['axes'],
-                              size=(175, -1), action=self.onXdim)
+                              size=(200, -1), action=self.onXdim)
         wids['ydim'] = Choice(panel, wids['axes'],
-                              size=(175, -1), action=self.onYdim)
+                              size=(200, -1), action=self.onYdim)
         wids['xdim'].SetSelection(0)
         wids['ydim'].SetSelection(1)
 
-        def padd_text(text, dcol=1, newrow=True):
-            panel.Add(SimpleText(panel, text), dcol=dcol, newrow=newrow)
+        def padd_text(text, dcol=1, size=(100, -1), newrow=True):
+            panel.Add(SimpleText(panel, text, size=size), dcol=dcol, newrow=newrow)
 
         padd_text(' X (Horiz): ')
         panel.Add(wids['xdim'])
@@ -68,13 +65,14 @@ class ArrayImagePanel(wx.Panel):
         panel.Add(wids['plot_yval'])
 
         padd_text(' ')
-        panel.Add(wids['imshow_new'])
+        panel.Add(wids['imshow'])
         padd_text(' windows:', newrow=False)
         panel.Add(wids['win'])
 
         padd_text(' ')
-        panel.Add(wids['imshow_replace'])
-        panel.Add(wids['ydir'])
+        panel.Add((5, 5))
+        padd_text(' Y=0 at top?', size=(125, -1), newrow=False)
+        panel.Add(wids['ydir'], dcol=2)
         panel.pack()
 
         sizer = wx.BoxSizer(wx.VERTICAL)

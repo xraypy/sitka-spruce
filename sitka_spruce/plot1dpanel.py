@@ -28,33 +28,34 @@ class ArrayPlot1DPanel(wx.Panel):
         self.wids = wids = {}
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
 
-        wids['newplot'] = Button(panel, 'New Plot', size=(150, -1),
+        wids['newplot'] = Button(panel, 'New Plot', size=(200, -1),
                               action=self.onPlot)
-        wids['overplot'] = Button(panel, 'Over Plot', size=(150, -1),
+        wids['overplot'] = Button(panel, 'Over Plot', size=(200, -1),
                                   action=partial(self.onPlot, new=False))
 
-        wids['sharey'] = Check(panel, 'share y-axis?', default=False)
+        wids['sharey'] = Check(panel, ' ', size=(300, -1), default=False)
         wids['win'] = Choice(panel, ['1', '2', '3', '4', '5'], size=(75, -1))
         wids['win'].SetStringSelection('1')
 
-        wids['ychoices'] =  ['dim0: 0 points']
+        wids['ychoices'] =  ['dim0: 0pts']
         wids['normchoices'] = ['1']
         wids['xchoices'] = ['<index>']
 
         wids['yarray'] = Choice(panel, wids['ychoices'],
-                                size=(175, -1), action=self.onYarray)
+                                size=(200, -1), action=self.onYarray)
         wids['yop'] = Choice(panel, ['+', '-', '*', '/'],
                              size=(75, -1), action=self.onPlot)
         wids['yop'].SetStringSelection('/')
 
         wids['ynorm'] = Choice(panel, wids['normchoices'],
-                                size=(175, -1), action=self.onPlot)
+                                size=(200, -1), action=self.onPlot)
 
         wids['xarray'] = Choice(panel, wids['xchoices'],
-                                size=(175, -1), action=self.onPlot)
+                                size=(200, -1), action=self.onPlot)
 
-        def padd_text(text, dcol=1, newrow=True):
-            panel.Add(SimpleText(panel, text), dcol=dcol, newrow=newrow)
+        def padd_text(text, dcol=1, size=(125, -1), newrow=True):
+            panel.Add(SimpleText(panel, text, size=size, style=LEFT),
+                      dcol=dcol, newrow=newrow)
 
         titleopts = {'font': get_font(larger=1),
                      'colour': 'title_red', 'style': LEFT}
@@ -68,10 +69,11 @@ class ArrayPlot1DPanel(wx.Panel):
         panel.Add(wids['xarray'], dcol=2)
         panel.Add((5,5), newrow=True)
         panel.Add(wids['newplot'])
-        padd_text(' window:', newrow=False)
+        padd_text(' window:', size=(125, -1), newrow=False)
         panel.Add(wids['win'])
         panel.Add((5,5), newrow=True)
         panel.Add(wids['overplot'])
+        padd_text(' Share Y-axis?', size=(125, -1), newrow=False)
         panel.Add(wids['sharey'], dcol=2)
 
         panel.pack()

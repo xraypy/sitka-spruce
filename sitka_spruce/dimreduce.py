@@ -9,13 +9,15 @@ class DimReduceWidgets():
         self.wids = {}
         self.npts = npts
         self.min, self.max = 0, npts-1
-        self.wids['npts'] = SimpleText(parent, str(npts), size=(70, -1), style=wx.ALIGN_RIGHT)
+        self.wids['npts'] = SimpleText(parent, str(npts), size=(85, -1),
+                                       style=wx.ALIGN_RIGHT)
 
-        fsopts = {'digits': 0, 'min_val': 0, 'max_val': npts-1, 'size':(75, -1),
+        fsopts = {'digits': 0, 'min_val': 0, 'max_val': npts-1, 'size':(85, -1),
                   'action': self.onMinMax}
         self.wids['min'] = FloatSpin(parent, value=0,      **fsopts)
         self.wids['max'] = FloatSpin(parent, value=npts-1, **fsopts)
-        self.wids['fix_width'] = Check(parent, '', default=False)
+        self.wids['fix_width'] = Check(parent, ' ', size=(125, -1),
+                                       default=False)
         choices = ['sum', 'mean', 'single']
         self.wids['reduce'] = Choice(parent, choices, size=(100, -1),
                                      action=self.onReduce)
@@ -81,42 +83,41 @@ class DimReducePanel(wx.Panel):
         self.maxdim = max(2, min(16, maxdim))
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
 
-        def padd_text(text, dcol=1, newrow=False, right=False):
+        def padd_text(text, dcol=1, newrow=False, size=(100, -1), right=False):
             style = wx.ALIGN_RIGHT if right else wx.ALIGN_LEFT
-            panel.Add(SimpleText(panel, text, style=style),
+            panel.Add(SimpleText(panel, text, size=size, style=style),
                       dcol=dcol, style=style, newrow=newrow)
 
-        panel.Add(HLine(panel, size=(500, 3)), dcol=6)
+        panel.Add(HLine(panel, size=(625, 3)), dcol=7)
         padd_text('Dimension Reduction for Multidimensional Arrays',
-                  dcol=6, newrow=True)
-        padd_text('Dim', newrow=True)
-        padd_text('Npts', right=True)
+                  size=(550, -1), dcol=7, newrow=True)
+        padd_text('Dim', size=(60, -1), newrow=True)
+        padd_text('Npts', size=(70, -1), right=True)
         padd_text('Method')
         padd_text('Min')
         padd_text('Max')
-        padd_text('Fix Width?')
+        padd_text('Fix Width?', size=(100, -1))
 
         for i in range(maxdim):
             dw = self.wids[f'data_dim{i}'] = DimReduceWidgets(panel, npts=1)
             for wid in dw.wids.values():
                 wid.Disable()
-            padd_text(f' {i}:', newrow=True)
+            padd_text(f'  {i}', size=(60, -1), newrow=True)
             panel.Add(dw.wids['npts'])
             panel.Add(dw.wids['reduce'])
             panel.Add(dw.wids['min'])
             panel.Add(dw.wids['max'])
             panel.Add(dw.wids['fix_width'])
 
-
-        panel.Add(HLine(panel, size=(500, 3)), dcol=6, newrow=True)
+        panel.Add(HLine(panel, size=(625, 3)), dcol=7, newrow=True)
 
 
         panel.pack()
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, 0, LEFT|wx.EXPAND|wx.GROW, 2)
 
-        panel.SetMinSize((400, 200))
-        panel.SetSize((550, 300))
+        panel.SetMinSize((500, 200))
+        panel.SetSize((700, 300))
         register_darkdetect(self.onDarkMode)
 
 
@@ -139,7 +140,7 @@ class DimReducePanel(wx.Panel):
         choices = []
         for i, npts in enumerate(dshape):
             self.enable_dimension(i, npts=npts)
-            choices.append(f'dim{i}: {npts} points')
+            choices.append(f'dim{i}: {npts}pts')
 
         for i in range(len(dshape), self.maxdim):
             self.enable_dimension(i, enable=False)

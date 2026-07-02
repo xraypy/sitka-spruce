@@ -96,12 +96,12 @@ class TablePanel(wx.Panel):
         wids['show'] = Button(panel, 'Show Table', size=(150, -1),
                                  action=self.onShow)
 
-        wids['axes'] =  ['dim0: 0 points', 'dim1: 0 points']
+        wids['axes'] =  ['dim0: 0pts', 'dim1: 0pts']
 
         wids['xdim'] = Choice(panel, wids['axes'],
-                              size=(175, -1), action=self.onXdim)
+                              size=(200, -1), action=self.onXdim)
         wids['ydim'] = Choice(panel, wids['axes'],
-                              size=(175, -1), action=self.onYdim)
+                              size=(200, -1), action=self.onYdim)
         wids['xdim'].SetSelection(0)
         wids['ydim'].SetSelection(1)
 
@@ -109,21 +109,21 @@ class TablePanel(wx.Panel):
         wids['win'].SetStringSelection('1')
 
 
-        def padd_text(text, dcol=1, newrow=True):
-            panel.Add(SimpleText(panel, text), dcol=dcol, newrow=newrow)
+        def padd_text(text, dcol=1, size=(80, -1), newrow=True):
+            panel.Add(SimpleText(panel, text, size=size), dcol=dcol, newrow=newrow)
 
         titleopts = {'font': get_font(larger=1),
                      'colour': 'title_red', 'style': LEFT}
 
-        padd_text(' X : ')
+        padd_text(' X: ')
         panel.Add(wids['xdim'])
 
-        padd_text(' Y : ', newrow=False)
+        padd_text(' Y: ', newrow=False)
         panel.Add(wids['ydim'])
 
         padd_text(' ')
         panel.Add(wids['show'])
-        padd_text(' windows:', newrow=False)
+        padd_text(' Window:', size=(100, -1), newrow=False)
         panel.Add(wids['win'])
 
         panel.pack()
