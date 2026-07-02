@@ -34,13 +34,17 @@ class HDataTree(wx.TreeCtrl):
         self.SetItemHasChildren(self.root,  self.objHasChildren(data))
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectionChanged, id=self.GetId())
         self.Bind(wx.EVT_TREE_ITEM_EXPANDING, self.OnItemExpanding, id=self.GetId())
-        self.onRefresh()
+        wx.CallAfter(self.onRefresh)
 
     def onRefresh(self, evt=None):
         """ refesh data tree, preserving current selection"""
         root = self.GetRootItem()
         this = self.GetFocusedItem()
-        parents = [self.GetItemText(this)]
+        try:
+            name = self.GetItemText(this)
+        except:
+            name = ''
+        parents = [name]
         while True:
             try:
                 this = self.GetItemParent(this)
@@ -98,11 +102,12 @@ class HDataTree(wx.TreeCtrl):
             obj = self.GetItemData(self.item)
             if wx.Platform == '__WXMSW__' and obj is None:
                 return
-
-            if self.IsExpanded(self.item):
-                self.addChildren(self.item)
-                self.SetItemHasChildren(self.item, self.objHasChildren(obj))
-
+            try:
+                if self.IsExpanded(self.item):
+                    self.addChildren(self.item)
+                    self.SetItemHasChildren(self.item, self.objHasChildren(obj))
+            except Exception:
+                pass
             if self.on_select is not None:
                 self.on_select(obj, address=self.get_address(self.item),
                                itemtype=get_itemtype(obj))
