@@ -9,11 +9,30 @@ try:
 except ImportError:
     larch = None
 
+from pyshortcuts import gformat
 
 COMMONTYPES = (int, float, complex, str, bytes, bool, list, tuple, np.ndarray)
 
 ARRAY_TYPES = ('h5py.Dataset', 'zarr.Array', 'ndarray')
 GROUP_TYPES = ('h5py.Group', 'zarr.Group', 'larch.Group')
+
+
+def cast_int(val):
+    return str(int(val))
+
+def cast_complex(val):
+    return f'{gformat(val.real)}+{gformat(val.imag)}j'
+
+def dtype2str(dtype):
+    """return string casting type for datatype"""
+    cast = repr
+    if dtype in (bool, int, np.byte, np.bool, np.int32, np.int64):
+        cast = cast_int
+    elif data.dtype in (np.complex64, np.complex128):
+        cast = cast_complex
+    elif data.dtype in (np.float64, np.float32, np.float16):
+        cast = gformat
+    return cast
 
 
 def get_items(obj):
