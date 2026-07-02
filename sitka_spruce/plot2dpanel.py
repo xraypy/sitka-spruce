@@ -1,13 +1,13 @@
 from functools import partial
+import numpy as np
 
 import wx
 
 from wxmplot import ImageFrame
 
-from wxutils import (GridPanel,
-                     SimpleText, pack, Button, Choice,
-                     Check, LEFT,
-                     get_color)
+from wxutils import (GridPanel, SimpleText, pack, Button,
+                     Choice, Check, LEFT,
+                     get_color, register_darkdetect)
 
 from .dimreduce import DimReducePanel
 from .data import ARRAY_TYPES, get_data
@@ -16,7 +16,6 @@ class ArrayImagePanel(wx.Panel):
     """Image Show Config Panel for HDF5/Zarr datasets"""
     def __init__(self, parent, size=(500, 500)):
         wx.Panel.__init__(self, parent)
-
         self.SetBackgroundColour(get_color('nb_area'))
 
         self.data_shape = None
@@ -82,6 +81,17 @@ class ArrayImagePanel(wx.Panel):
         sizer.Add(panel, 0, 0, LEFT|wx.GROW, 4)
         sizer.Add(self.dim_reduce, 0, 0, LEFT|wx.GROW, 5)
         pack(self, sizer)
+        register_darkdetect(self.onDarkMode)
+
+    def onDarkMode(self, is_dark=None):
+        fgcol = get_color('text', dark=is_dark)
+        bgcol = get_color('text_bg', dark=is_dark)
+        self.SetBackgroundColour(bgcol)
+        self.SetForegroundColour(fgcol)
+        self.SetBackgroundColour(bgcol)
+        self.SetForegroundColour(fgcol)
+        wx.CallAfter(self.Refresh)
+
 
     def onXdim(self, event=None):
         if self.skip_dim_proc:
@@ -193,6 +203,8 @@ class ArrayImagePanel(wx.Panel):
 
         if ydir:
             img = img[::-1, :]
+        if img.dtype == np.bool:
+            img = img.astype(int)
 
         frame_opts = {'title':  f'SitkaImage {win} '}
         iframe = self.show_imageframe(win, **frame_opts)

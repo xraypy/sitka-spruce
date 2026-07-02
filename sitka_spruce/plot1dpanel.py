@@ -5,9 +5,8 @@ import numpy as np
 import wx
 from wxmplot import PlotFrame
 
-from wxutils import (GridPanel,
-                     SimpleText, pack, Button, Choice,
-                     Check, LEFT,
+from wxutils import (GridPanel, SimpleText, pack, Button,
+                     Choice, Check, LEFT,
                      get_color, register_darkdetect)
 
 from .dimreduce import DimReducePanel
@@ -84,7 +83,6 @@ class ArrayPlot1DPanel(wx.Panel):
         register_darkdetect(self.onDarkMode)
 
     def onDarkMode(self, is_dark=None):
-        print("array panel on dark ", is_dark)
         fgcol = get_color('text', dark=is_dark)
         bgcol = get_color('text_bg', dark=is_dark)
         self.SetBackgroundColour(bgcol)
