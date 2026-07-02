@@ -21,7 +21,7 @@ from wxutils import (SimpleText, pack,  LEFT,  get_color,
 
 from pyshortcuts import get_cwd
 
-from .gui_utils import  get_font
+from .gui_utils import  get_font, FONTSIZE
 from .data  import get_attributes, SitkaData
 from .hdatatree import HDataTree
 from .plot1dpanel import ArrayPlot1DPanel
@@ -121,7 +121,7 @@ class SitkaFrame(wx.Frame):
 
         self.info.SetFont(get_font())
         self.tree.SetFont(get_font())
-        self.set_fontsize(14)
+        self.set_fontsize(FONTSIZE)
 
         splitter.SplitVertically(leftpanel, rightpanel, 1)
         splitter.SetMinimumPaneSize(300)
