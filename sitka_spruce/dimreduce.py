@@ -151,9 +151,12 @@ class DimReducePanel(wx.Panel):
         if wname in self.wids:
             self.wids[wname].on_enable(enable=enable, npts=npts)
 
-    def get_result(self):
+    def get_result(self, ndim=None):
         result = []
-        for i in range(self.maxdim):
+        if ndim is None:
+            ndim = self.maxdim
+        ndim = min(self.maxdim, ndim)
+        for i in range(ndim):
             ret = [i, self.wids[f'data_dim{i}'].wids['npts'].Enabled]
             ret.extend(self.wids[f'data_dim{i}'].get_result())
             result.append(ret)
