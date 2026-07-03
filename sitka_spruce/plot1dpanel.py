@@ -1,5 +1,6 @@
+import time
 from functools import partial
-
+from threading import Thread
 import numpy as np
 
 import wx
@@ -11,13 +12,13 @@ from wxutils import (GridPanel, SimpleText, pack, Button,
 
 from .dimreduce import DimReducePanel
 from .gui_utils import get_font
-from .data import ARRAY_TYPES, get_data
+from .data import ARRAY_TYPES, get_data, dim_repr, datasize_repr
 
 class ArrayPlot1DPanel(wx.Panel):
     """Config Panel for 1D Plots of HDF5/Zarr datasets"""
     def __init__(self, parent, size=(500, 500)):
         wx.Panel.__init__(self, parent)
-
+        self.parent = parent
         self.SetBackgroundColour(get_color('nb_area'))
 
         self.data_shape = None
@@ -120,7 +121,6 @@ class ArrayPlot1DPanel(wx.Panel):
                 self.dim_reduce.enable_dimension(i, enable=(i!=sel), npts=npts)
 
     def onPlot(self, event=None, new=True):
-        reddim = self.dim_reduce.get_result()
         win    = self.wids['win'].GetStringSelection()
         sharey = self.wids['sharey'].IsChecked()
         ydim   = self.wids['yarray'].GetSelection()
@@ -129,19 +129,27 @@ class ArrayPlot1DPanel(wx.Panel):
         yop    = self.wids['yop'].GetStringSelection()
         xarray = self.wids['xarray'].GetStringSelection()
         ###
-        yarr, alabel = get_data(self.data_obj, reddim)
-        xarr = np.arange(len(yarr))
-        if 'ynorm' == '1':
-            ynorm  = 1.0
-        if xarray == '<index>':
-            xarr = np.arange(len(yarr))
+
+        ndim = len(self.data_obj.shape)
+        reddim = self.dim_reduce.get_result(ndim)
+        def _get_data(reddim):
+            self._yarr = get_data(self.data_obj, reddim)
+
+        data_thread = Thread(target=_get_data, args=(reddim,))
+        t0_data = time.time()
+        self.parent.status_message('fetching data....')
+        data_thread.start()
 
         frame_opts = {'title':  f'SitkaPlot {win} '}
         pframe = self.show_plotframe(win, **frame_opts)
-
-        plot = pframe.oplot
+        alabel = dim_repr(reddim)
         ylabel = f'{self.itemname}{alabel}'
         opts = {'title': f'{self.filename}'}
+
+        if 'ynorm' == '1':
+            ynorm  = 1.0
+
+        plot = pframe.oplot
         if new:
             plot = pframe.plot
             self.last_yaxes = 1
@@ -154,7 +162,20 @@ class ArrayPlot1DPanel(wx.Panel):
 
         opts['yaxes'] = self.last_yaxes
         opts['label'] = ylabel
-        plot(xarr, yarr, **opts)
+
+        data_thread.join()
+        dt_data = time.time()-t0_data
+
+        dsize = datasize_repr(self._yarr)
+        osize = datasize_repr(self.data_obj)
+
+        self.parent.status_message(f'got data ({dsize} of {osize}) in {dt_data:.2f} seconds')
+
+        xarr = np.arange(len(self._yarr))
+        if xarray == '<index>':
+            xarr = np.arange(len(self._yarr))
+
+        plot(xarr, self._yarr, **opts)
         pframe.Show()
         pframe.Raise()
 
