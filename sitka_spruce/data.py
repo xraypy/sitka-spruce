@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 
 import h5py
@@ -105,33 +106,84 @@ def get_attributes(obj):
         out[key] = val
     return out
 
+def datasize_repr(obj):
+    """return string-representation of data size"""
+    if (isinstance(obj, h5py.Dataset) or
+        isinstance(obj, np.ndarray)):
+        nbytes = obj.nbytes
+    else:
+        nbytes = sys.getsizeof(obj)
+
+    dsize = f'{(nbytes/1024.0):.1f}KB'
+    if nbytes > 9.5e8:
+        dsize = f'{(nbytes/1073741824.0):.1f}GB'
+    elif nbytes > 9.5e5:
+        dsize = f'{(nbytes/1048576.0):.1f}MB'
+    return dsize
+
+def dim_repr(reductions):
+    """return representation of dimension reductions"""
+    reps = []
+    for idim, use, method, imin, imax in reductions:
+        rep = ':'
+        if use:
+            rep = f'{imin}' if method == 'single' else f'{method}({imin},{imax})'
+        reps.append(rep)
+    return f'[{','.join(reps)}]'
 
 def get_data(obj, reductions):
     """return dataset (1d or 2d) from multidimensional array"""
-    # print("get data ", obj, obj.shape,  reductions)
-    ret = obj[()]
-    slices = {}
-    for ix in range(len(obj.shape), 0, -1):
-        idim = ix - 1
-        slices[idim] = ':'
-        try:
-            _, use, method, i0, i1 = reductions[idim]
-        except Exception:
-            _, use, method, i0, i1 = idim, True, 'sum', 0, obj.shape(idim)
+    slices = []
+    meths = []
+    ndims = len(obj.shape)
+    for idim, use, method, imin, imax in reductions[:ndims]:
+        m = None
         if use:
             if method == 'single':
-                ret = ret.take((i0), axis=idim)
-                slices[idim] = f'{i0}'
+                slices.append(slice(imin, imin+1))
             else:
-                ret = ret.take(range(i0, 1+i1), axis=idim).sum(axis=idim)
-                if method == 'mean':
-                    ret = ret/(1+i1-i0)
-                slices[idim] = f'{method}({i0},{i1})'
+                m = method
+                slices.append(slice(imin, imax))
+        else:
+            slices.append(slice(None, None))
+        meths.append(m)
 
-    s = []
-    for key, val in slices.items():
-        s.append(val)
-    op = '[' + ','.join(reversed(s)) + ']'
+    ret = obj[tuple(slices)]
+    oshape = ret.shape
+    off = 0
+    for i, meth  in enumerate(meths):
+        if meth in ('sum', 'mean'):
+            ret = ret.sum(axis=(i-off))
+            off += 1
+            if meth == 'mean':
+                ret = ret / (1.0*oshape[i])
+
+    return ret.squeeze()
+
+
+#
+#     slices = {}
+#     for ix in range(len(obj.shape), 0, -1):
+#         idim = ix - 1
+#         slices[idim] = ':'
+#         try:
+#             _, use, method, i0, i1 = reductions[idim]
+#         except Exception:
+#             _, use, method, i0, i1 = idim, True, 'sum', 0, obj.shape(idim)
+#         if use:
+#             if method == 'single':
+#                 ret = ret.take((i0), axis=idim)
+#                 slices[idim] = f'{i0}'
+#             else:
+#                 ret = ret.take(range(i0, 1+i1), axis=idim).sum(axis=idim)
+#                 if method == 'mean':
+#                     ret = ret/(1+i1-i0)
+#                 slices[idim] = f'{method}({i0},{i1})'
+#
+#     s = []
+#     for key, val in slices.items():
+#         s.append(val)
+#     op = '[' + ','.join(reversed(s)) + ']'
     return ret, op
 
 class SitkaData:
