@@ -61,6 +61,8 @@ class SitkaFrame(wx.Frame):
         self.SetStatusText('Welcome to Sitka')
         self.BuildMenus()
 
+    def status_message(self, msg):
+        self.SetStatusText(msg)
 
     def create_display(self, size=(900, 650)):
         splitter = wx.SplitterWindow(self, size=size, style=wx.SP_LIVE_UPDATE)
