@@ -15,7 +15,7 @@ from .data import ARRAY_TYPES, get_data, dim_repr, datasize_repr
 
 class ArrayImagePanel(wx.Panel):
     """Image Show Config Panel for HDF5/Zarr datasets"""
-    def __init__(self, parent, size=(500, 500)):
+    def __init__(self, parent, size=(750, 500)):
         wx.Panel.__init__(self, parent)
         self.parent = parent
 
@@ -28,7 +28,7 @@ class ArrayImagePanel(wx.Panel):
         self.imageframes = {}
         self.wids = wids = {}
 
-        self.dim_reduce = DimReducePanel(parent=self)
+        self.dim_reduce = DimReducePanel(parent=self, callback=self.onDimReduce)
 
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
         wids['imshow'] = Button(panel, 'Show Image', size=(200, -1),
@@ -51,25 +51,25 @@ class ArrayImagePanel(wx.Panel):
                               size=(200, -1), action=self.onXdim)
         wids['ydim'] = Choice(panel, wids['axes'],
                               size=(200, -1), action=self.onYdim)
-        wids['xdim'].SetSelection(0)
-        wids['ydim'].SetSelection(1)
+        wids['ydim'].SetSelection(0)
+        wids['xdim'].SetSelection(1)
 
         def padd_text(text, dcol=1, size=(100, -1), newrow=True):
             panel.Add(SimpleText(panel, text, size=size), dcol=dcol, newrow=newrow)
+
+        padd_text(' Y (Vert): ', newrow=False)
+        panel.Add(wids['ydim'])
+        padd_text(' Y values: ', newrow=False)
+        panel.Add(wids['plot_yval'])
 
         padd_text(' X (Horiz): ')
         panel.Add(wids['xdim'])
         padd_text(' X values: ', newrow=False)
         panel.Add(wids['plot_xval'])
 
-        padd_text(' Y (Vert): ')
-        panel.Add(wids['ydim'])
-        padd_text(' Y values: ', newrow=False)
-        panel.Add(wids['plot_yval'])
-
         padd_text(' ')
         panel.Add(wids['imshow'])
-        padd_text(' windows:', newrow=False)
+        padd_text(' Window:', newrow=False)
         panel.Add(wids['win'])
 
         padd_text(' ')
@@ -171,6 +171,10 @@ class ArrayImagePanel(wx.Panel):
             self.imageframes[window].Raise()
         return self.imageframes[window]
 
+    def onDimReduce(self, event=None, dim=None, reduce=None):
+        self.onImshow(new=True)
+
+
     def onImshow(self, event=None, new=True):
         # print("imshow ", new)
 
@@ -194,8 +198,9 @@ class ArrayImagePanel(wx.Panel):
         data_thread = Thread(target=_get_data, args=(reddim,))
         t0_data = time.time()
         self.parent.status_message('fetching data....')
-        data_thread.start()
 
+        data_thread.start()
+        time.sleep(0.0005)
         frame_opts = {'title':  f'SitkaImage {win} '}
         iframe = self.show_imageframe(win, **frame_opts)
 
@@ -212,22 +217,24 @@ class ArrayImagePanel(wx.Panel):
 
         self.parent.status_message(f'got data ({dsize} of {osize}) in {dt_data:.2f} seconds')
 
-        self.parent.data.add_array('_imgdat', self._img)
 
         if len(self._img.shape) < 2:
             print('shape too small')
             return
-        _ny, _nx = self._img.shape
-
-        _ry, _rx = self.data_shape[ydim], self.data_shape[xdim]
+        # _ny, _nx = self._img.shape
+        # _ry, _rx = self.data_shape[ydim], self.data_shape[xdim]
 
         # print(f"Got image {_nx=}  {_rx=}   {_ny=}  {_ry=}  {ydim=} {xdim=}")
-        if _ry == _nx and _rx == _ny or (ydim > xdim):
+        if (ydim > xdim):
             self._img = self._img.transpose()
 
+        xvals = np.arange(self._img.shape[1])
+        yvals = np.arange(self._img.shape[0])
         if ydir:
             self._img = self._img[::-1, :]
+            yvals = yvals[::-1]
 
-        iframe.display(self._img)
+        iframe.display(self._img, x=xvals, y=yvals)
         iframe.Show()
         iframe.Raise()
+        self.parent.data.add_array('_imgdat', self._img)
