@@ -38,7 +38,7 @@ class DimReduceWidgets():
     def onMinMax(self, event=None):
         redval = self.wids['reduce'].GetStringSelection()
         fix_width = self.wids['fix_width'].IsChecked()
-        is_live = self.wids['live'].IsChecked()
+
         if (redval in ('sum', 'mean') and fix_width):
             newmin = int(self.wids['min'].GetValue())
             newmax = int(self.wids['max'].GetValue())
@@ -122,7 +122,7 @@ class DimReducePanel(wx.Panel):
         padd_text('Fix Width', size=(95, -1))
         padd_text('AutoUpdate?', size=(95, -1))
 
-        for i in range(maxdim):
+        for i in range(self.maxdim):
             dw = DimReduceWidgets(panel, npts=1, options=self.dimopts,
                                   callback=partial(self.onChange, i))
             self.wids[f'data_dim{i}'] = dw
@@ -157,8 +157,8 @@ class DimReducePanel(wx.Panel):
         self.SetForegroundColour(fgcol)
         self.SetBackgroundColour(bgcol)
         self.SetForegroundColour(fgcol)
-        for i in range(maxdim):
-            dw = self.wids[f'data_dim{i}'] = DimReduceWidgets(panel, npts=1)
+        for i in range(self.maxdim):
+            dw = self.wids[f'data_dim{i}']
             dw.wids['npts'].SetForegroundColour(fgcol)
 
         wx.CallAfter(self.Refresh)

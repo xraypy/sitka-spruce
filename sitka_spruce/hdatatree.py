@@ -42,7 +42,7 @@ class HDataTree(wx.TreeCtrl):
         this = self.GetFocusedItem()
         try:
             name = self.GetItemText(this)
-        except:
+        except Exception:
             name = ''
         parents = [name]
         while True:

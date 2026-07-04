@@ -1,21 +1,14 @@
 import time
 from threading import Thread
-import numpy as np
 import wx
-import wx.lib.scrolledpanel as scrolled
 from  wx.grid import Grid
 
-from wxutils import (LEFT, pack, FRAMESTYLE)
-
 from wxutils import (GridPanel, SimpleText, pack, Button,
-                     Choice, Check, LEFT,
-                     get_color, register_darkdetect)
-
-from pyshortcuts import gformat
+                     Choice, LEFT, get_color, register_darkdetect)
 
 from .dimreduce import DimReducePanel
 from .gui_utils import get_font
-from .data import ARRAY_TYPES, get_data, dim_repr, datasize_repr
+from .data import ARRAY_TYPES, dtype2str, get_data, dim_repr, datasize_repr
 
 class DataGridFrame(wx.Frame):
     """Simple Data Grid Frame for HDF5/Zarr datasets"""
@@ -112,9 +105,6 @@ class TablePanel(wx.Panel):
 
         def padd_text(text, dcol=1, size=(80, -1), newrow=True):
             panel.Add(SimpleText(panel, text, size=size), dcol=dcol, newrow=newrow)
-
-        titleopts = {'font': get_font(larger=1),
-                     'colour': 'title_red', 'style': LEFT}
 
         padd_text(' X: ')
         panel.Add(wids['xdim'])
@@ -248,7 +238,7 @@ class TablePanel(wx.Panel):
         alabel = dim_repr(reddim)
 
         data_thread.join()
-
+        dt_data = time.time()-t0_data
         if len(data_shape) < 2:
             data_shape = (data_shape[0], 1)
 
@@ -258,6 +248,9 @@ class TablePanel(wx.Panel):
         _ny, _nx = self._griddat.shape
         _ry, _rx = data_shape[ydim], data_shape[xdim]
         _ry, _rx = data_shape[ydim], data_shape[xdim]
+
+        dsize = datasize_repr(self._img)
+        osize = datasize_repr(self.data_obj)
 
         self.parent.status_message(f'got data ({dsize} of {osize}) in {dt_data:.2f} seconds')
         self.parent.data.add_array('_tabledat', self._griddat)

@@ -183,11 +183,11 @@ class ArrayImagePanel(wx.Panel):
         ydir   = self.wids['ydir'].IsChecked()
         ydim   = self.wids['ydim'].GetSelection()
         xdim   = self.wids['xdim'].GetSelection()
-        xarray  = self.wids['plot_xval'].GetStringSelection()
-        yarray  = self.wids['plot_yval'].GetStringSelection()
+        # xarray  = self.wids['plot_xval'].GetStringSelection()
+        # yarray  = self.wids['plot_yval'].GetStringSelection()
 
-        xdstr   = self.wids['xdim'].GetStringSelection()
-        ydstr   = self.wids['ydim'].GetStringSelection()
+        # xdstr   = self.wids['xdim'].GetStringSelection()
+        # ydstr   = self.wids['ydim'].GetStringSelection()
 
         ndim = len(self.data_obj.shape)
         reddim = self.dim_reduce.get_result(ndim)

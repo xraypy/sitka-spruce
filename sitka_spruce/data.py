@@ -129,7 +129,7 @@ def dim_repr(reductions):
         if use:
             rep = f'{imin}' if method == 'single' else f'{method}({imin},{imax})'
         reps.append(rep)
-    return f'[{','.join(reps)}]'
+    return f"[{','.join(reps)}]"
 
 def get_data(obj, reductions):
     """return dataset (1d or 2d) from multidimensional array"""

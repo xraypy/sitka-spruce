@@ -11,7 +11,6 @@ from wxutils import (GridPanel, SimpleText, pack, Button,
                      get_color, register_darkdetect)
 
 from .dimreduce import DimReducePanel
-from .gui_utils import get_font
 from .data import ARRAY_TYPES, get_data, dim_repr, datasize_repr
 
 class ArrayPlot1DPanel(wx.Panel):
@@ -57,9 +56,6 @@ class ArrayPlot1DPanel(wx.Panel):
         def padd_text(text, dcol=1, size=(125, -1), newrow=True):
             panel.Add(SimpleText(panel, text, size=size, style=LEFT),
                       dcol=dcol, newrow=newrow)
-
-        titleopts = {'font': get_font(larger=1),
-                     'colour': 'title_red', 'style': LEFT}
 
         padd_text('Y array', newrow=False)
         panel.Add(wids['yarray'])
@@ -126,10 +122,9 @@ class ArrayPlot1DPanel(wx.Panel):
     def onPlot(self, event=None, new=True):
         win    = self.wids['win'].GetStringSelection()
         sharey = self.wids['sharey'].IsChecked()
-        ydim   = self.wids['yarray'].GetSelection()
-        ylabel = self.wids['yarray'].GetStringSelection()
-        ynorm  = self.wids['ynorm'].GetStringSelection()
-        yop    = self.wids['yop'].GetStringSelection()
+        # ydim   = self.wids['yarray'].GetSelection()
+        # ynorm  = self.wids['ynorm'].GetStringSelection()
+        # yop    = self.wids['yop'].GetStringSelection()
         xarray = self.wids['xarray'].GetStringSelection()
         ###
         self.parent.status_message('fetching data....')
@@ -149,8 +144,8 @@ class ArrayPlot1DPanel(wx.Panel):
         ylabel = dim_repr(reddim)
         opts = {'title': f'{self.filename}\n{self.itemname}'}
 
-        if 'ynorm' == '1':
-            ynorm  = 1.0
+        # if 'ynorm' == '1':
+        #     ynorm  = 1.0
 
         plot = pframe.oplot
         if new:

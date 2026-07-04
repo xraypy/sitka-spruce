@@ -9,7 +9,7 @@ from wxmplot.interactive import get_wxapp
 from .sitka import Sitka_App, SitkaFrame, FILE_SUFFIXES
 
 def sitka_viewer():
-    app = get_wxapp()
+    get_wxapp()
     viewer = SitkaFrame()
     viewer.Show()
     viewer.Raise()

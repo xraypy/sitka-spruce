@@ -1,6 +1,6 @@
 #
 # config for Sitka
-from pathlib import Path
+
 import yaml
 
 from platformdirs import user_config_path
