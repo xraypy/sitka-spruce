@@ -161,42 +161,30 @@ def get_data(obj, reductions):
     return ret.squeeze()
 
 
-#
-#     slices = {}
-#     for ix in range(len(obj.shape), 0, -1):
-#         idim = ix - 1
-#         slices[idim] = ':'
-#         try:
-#             _, use, method, i0, i1 = reductions[idim]
-#         except Exception:
-#             _, use, method, i0, i1 = idim, True, 'sum', 0, obj.shape(idim)
-#         if use:
-#             if method == 'single':
-#                 ret = ret.take((i0), axis=idim)
-#                 slices[idim] = f'{i0}'
-#             else:
-#                 ret = ret.take(range(i0, 1+i1), axis=idim).sum(axis=idim)
-#                 if method == 'mean':
-#                     ret = ret/(1+i1-i0)
-#                 slices[idim] = f'{method}({i0},{i1})'
-#
-#     s = []
-#     for key, val in slices.items():
-#         s.append(val)
-#     op = '[' + ','.join(reversed(s)) + ']'
-    return ret, op
-
 class SitkaData:
     """
-    Sitka Datasets and evaluation
+    Sitka Datasets and evaluation with asteval
+
+    Attributes
+    -----------
+    datasets     dict for hdf5/zarr objects
+    arrays       dict of working arrays taken from datasets or saved by user
+    arrayshapes  dict of arrayshapes to list of named arrays.
+
+
+    Methods
+    -----------
+    add_dataset   add dataset by name
+    add_array     add an array by name
+    eval          evaluate an expreesion or block of code with arrays/datasets
     """
     def __init__(self):
         self.datasets = {}
         self.arrayshapes = {0: []}
         self._asteval = asteval.Interpreter(with_numpy=True,
                                 with_import=True, with_importfrom=True)
-        self._symtab  = self._asteval.symtable
-        self._symtab['dsets'] = self.datasets
+        self.arrays  = self._asteval.symtable
+        self.arrays['datasets'] = self.datasets
         self._last_error = None
 
     def add_dataset(self, name, dataset):
@@ -206,23 +194,23 @@ class SitkaData:
         """add array to interpreter, and keep track of its shape"""
 
         # remove existing value
-        if name in self._symtab:
-            oldval = self._symtab.pop(name)
+        if name in self.arrays:
+            oldval = self.arrays.pop(name)
             dshape = 0
             if isinstance(oldval, np.ndarray):
                 dshape = oldval.shape
+            # print("add_array ", name, dshape, self.arrayshapes[dshape])
             if name in self.arrayshapes[dshape]:
                 self.arrayshapes[dshape].pop(name)
 
-        # add new
+        # add new data array
         dshape = 0
         if isinstance(data, np.ndarray):
             dshape = data.shape
         if dshape not in self.arrayshapes:
             self.arrayshapes[dshape] = []
         self.arrayshapes[dshape].append(name)
-        self._symtab[name] = data
-
+        self.arrays[name] = data
 
     def eval(self, str):
         out = self._asteval(str)
