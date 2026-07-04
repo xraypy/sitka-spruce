@@ -4,11 +4,19 @@ import wx
 from wxutils import (FloatSpin, GridPanel, SimpleText, Choice, HLine,
                      Check, LEFT, get_color, register_darkdetect)
 
+from .config import read_configfile
+
+DEFAULT_OPTIONS = {'maxdim': 5, 'method': 'single', 'point': 'mid'}
+
 class DimReduceWidgets():
     """panel for selecting how to reduce array dimension to scalar"""
-    def __init__(self, parent, npts=1, callback=None):
+    def __init__(self, parent, npts=1, options=None, callback=None):
         self.wids = {}
         self.npts = npts
+        self.options = {k: v for k, v in DEFAULT_OPTIONS.items()}
+        if options is not None:
+            self.options.update(options)
+
         self.min, self.max = 0, npts-1
         self.callback = callback
         self.wids['npts'] = SimpleText(parent, str(npts), size=(65, -1),
@@ -23,7 +31,9 @@ class DimReduceWidgets():
         choices = ['sum', 'mean', 'single']
         self.wids['reduce'] = Choice(parent, choices, size=(100, -1),
                                      action=self.onReduce)
-        self.wids['reduce'].SetSelection(0)
+        if self.options['method'] not in choices:
+            self.options['method'] = 'single'
+        self.wids['reduce'].SetStringSelection(self.options['method'])
 
     def onMinMax(self, event=None):
         redval = self.wids['reduce'].GetStringSelection()
@@ -72,8 +82,12 @@ class DimReduceWidgets():
         self.wids['npts'].SetLabel(f'{npts}')
         self.wids['min'].SetMax(npts-1)
         self.wids['max'].SetMax(npts-1)
-        self.wids['min'].SetValue(0)
         self.wids['max'].SetValue(npts-1)
+        minval = 0
+        if (self.wids['reduce'].GetStringSelection() == 'single' and
+            self.options['point'] == 'mid'):
+            minval = int(npts/2)
+        self.wids['min'].SetValue(minval)
 
     def get_result(self):
         result = self.wids['reduce'].GetStringSelection()
@@ -83,11 +97,13 @@ class DimReduceWidgets():
 
 class DimReducePanel(wx.Panel):
     """ panel with dimenision-reduction choices"""
-    def __init__(self, parent, size=(725, -1), maxdim=6, callback=None):
+    def __init__(self, parent, size=(725, -1), maxdim=5, callback=None):
         wx.Panel.__init__(self, parent, size=size)
         self.callback = callback
         self.wids = {}
-        self.maxdim = max(2, min(16, maxdim))
+        conf = read_configfile()
+        self.dimopts = conf.get('dimreduce',  DEFAULT_OPTIONS)
+        self.maxdim = max(2, min(16, int(self.dimopts.get('maxdim', 5))))
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
 
         def padd_text(text, dcol=1, newrow=False, size=(100, -1), right=False):
@@ -103,11 +119,11 @@ class DimReducePanel(wx.Panel):
         padd_text('Method')
         padd_text('Min')
         padd_text('Max')
-        padd_text('Fix Width?', size=(95, -1))
+        padd_text('Fix Width', size=(95, -1))
         padd_text('AutoUpdate?', size=(95, -1))
 
         for i in range(maxdim):
-            dw = DimReduceWidgets(panel, npts=1,
+            dw = DimReduceWidgets(panel, npts=1, options=self.dimopts,
                                   callback=partial(self.onChange, i))
             self.wids[f'data_dim{i}'] = dw
             for wid in dw.wids.values():
