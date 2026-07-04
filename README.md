@@ -1,25 +1,18 @@
 # sitka-spruce
 Visualization for complex scientific datasets in HDF5, Zarr.
 
-While many tools exist for inspecting HDF5 files, we think there is
+While several tools exist for inspecting HDF5 files, we think there is
 room for one more, especially one written in wxPython.
 
-The immediaate goals for sitka-spruce are:
+The initial goals for sitka-spruce are:
 
-  1. Support Image Displays and X/Y Plots with `wxmplot`.
-  2. Support for both HDF5 (including NeXuS), and Zarr data,
-     and maybe more data forms.
-  3. Support Table views
-  4. Being able to name and use arrays or slices for visualization
-     and processing.
+  1. Support for both HDF5 (including NeXuS), and Zarr data, and maybe more formats.
+  2. interactive image displays and x/y plots for HDF5/Zarr datasets using `wxmplot`.
+  3. Support Table views.
+  4. Being able to name and use arrays or slices for visualization and processing.
+  5. Useg Sitka as an HDF5/Zarr reader and data selector for other wxPython GUIs,
+     including Larix, general-purpose LMFIT Gui, XRD visualization.
 
+At this initial release, goals 1 through 3 are supported and ready for testing and comments.
 
-Longer term goals may include:
-
-  1. Use as an HDF5/Zarr reader for X-ray Larch GUIs.
-  2. General-purpose data fitting with lmfit.
-  3. Integration for XRD images.
-  4. XRF viewing and analysis.
-
-
-Last update 2026-June-28
+Last update 2026-July-05
