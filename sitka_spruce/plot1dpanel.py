@@ -170,6 +170,7 @@ class ArrayPlot1DPanel(wx.Panel):
         osize = datasize_repr(self.data_obj)
 
         self.parent.status_message(f'got data ({dsize} of {osize}) in {dt_data:.2f} seconds')
+        self.parent.data.add_array('_ydat', self._yarr)
 
         xarr = np.arange(len(self._yarr))
         if xarray == '<index>':
