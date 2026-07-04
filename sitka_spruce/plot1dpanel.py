@@ -147,7 +147,7 @@ class ArrayPlot1DPanel(wx.Panel):
         frame_opts = {'title':  f'SitkaPlot {win} '}
         pframe = self.show_plotframe(win, **frame_opts)
         ylabel = dim_repr(reddim)
-        opts = {'title': f'{self.filename} {self.itemname}'}
+        opts = {'title': f'{self.filename}\n{self.itemname}'}
 
         if 'ynorm' == '1':
             ynorm  = 1.0

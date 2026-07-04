@@ -204,8 +204,8 @@ class ArrayImagePanel(wx.Panel):
         frame_opts = {'title':  f'SitkaImage {win} '}
         iframe = self.show_imageframe(win, **frame_opts)
 
-        alabel = dim_repr(reddim)
-        opts = {'title': f'{self.filename}{alabel}'}
+        dlabel = dim_repr(reddim)
+        opts = {'title': f'{self.filename} {dlabel}'}
 
         data_thread.join()
         if self._img.dtype == np.bool:
@@ -217,14 +217,9 @@ class ArrayImagePanel(wx.Panel):
 
         self.parent.status_message(f'got data ({dsize} of {osize}) in {dt_data:.2f} seconds')
 
-
         if len(self._img.shape) < 2:
-            print('shape too small')
-            return
-        # _ny, _nx = self._img.shape
-        # _ry, _rx = self.data_shape[ydim], self.data_shape[xdim]
+            self._img_shape = (self._img_shape[0], 1)
 
-        # print(f"Got image {_nx=}  {_rx=}   {_ny=}  {_ry=}  {ydim=} {xdim=}")
         if (ydim > xdim):
             self._img = self._img.transpose()
 
@@ -234,7 +229,7 @@ class ArrayImagePanel(wx.Panel):
             self._img = self._img[::-1, :]
             yvals = yvals[::-1]
 
-        iframe.display(self._img, x=xvals, y=yvals)
+        iframe.display(self._img, x=xvals, y=yvals, **opts)
         iframe.Show()
         iframe.Raise()
         self.parent.data.add_array('_imgdat', self._img)
