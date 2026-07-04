@@ -38,15 +38,13 @@ VERSION = '0.1'
 FILE_WILDCARD = 'HDF5/Zarr files(*.hdf5;*.h5;*.zarr)|*.hdf5;*.h5;*.zarr|All files (*.*)|*.*'
 
 FILE_SUFFIXES = {'hdf5': h5py.File, 'h5': h5py.File, 'zarr': zarr.open}
-if zarr is not None:
-    FILE_SUFFIXES['zarr'] = zarr.open
 
 DV_STYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 
 class SitkaFrame(wx.Frame):
     """Main Window for Sitka HDF5/Zarr viewer"""
     def __init__(self, parent=None, title='Sitka HDF5 Viewer',
-                 size=(900, 650),  style=wx.DEFAULT_FRAME_STYLE):
+                 size=(1100, 650),  style=wx.DEFAULT_FRAME_STYLE):
         """Create Frame instance."""
         self.data = SitkaData()
         self.wids = {}
@@ -63,7 +61,7 @@ class SitkaFrame(wx.Frame):
         self.Refresh()
 
 
-    def create_display(self, size=(1100, 600)):
+    def create_display(self, size=(1100, 650)):
         splitter = wx.SplitterWindow(self, size=size, style=wx.SP_LIVE_UPDATE)
 
         leftpanel = wx.Panel(splitter)
@@ -80,7 +78,7 @@ class SitkaFrame(wx.Frame):
             this.Alignment = this.Renderer.Alignment = wx.ALIGN_LEFT
 
         self.tree.SetMinSize((300, 300))
-        self.info.SetMinSize((300, 300))
+        self.info.SetMinSize((300, 250))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.tree, 1, wx.ALL|wx.GROW)
@@ -96,7 +94,7 @@ class SitkaFrame(wx.Frame):
 
         self.nb = flatnotebook(rightpanel, {},
                                on_change=self.onNBChanged,
-                               size=(800, 550))
+                               size=(875, 550))
 
         # self.mainpanel = ArrayViewPanel(splitter)
         self.nb.AddPage(ArrayPlot1DPanel(self), 'XY Plot Display', True)
