@@ -55,7 +55,8 @@ dependencies = [
    "pyobjc-framework-Cocoa; platform_system == 'Darwin'",
    "pytz",
    "pyyaml>=5.0",
-   "pyshortcuts>=1.9.5"]
+   "pyshortcuts>=1.9.5",
+   "platformdirs"]
 
 
 [project.scripts]
