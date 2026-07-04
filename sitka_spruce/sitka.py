@@ -33,17 +33,13 @@ try:
 except ImportError:
     larch = None
 
-
 VERSION = '0.1'
-
-
 
 FILE_WILDCARD = 'HDF5/Zarr files(*.hdf5;*.h5;*.zarr)|*.hdf5;*.h5;*.zarr|All files (*.*)|*.*'
 
 FILE_SUFFIXES = {'hdf5': h5py.File, 'h5': h5py.File, 'zarr': zarr.open}
 if zarr is not None:
     FILE_SUFFIXES['zarr'] = zarr.open
-
 
 DV_STYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 
@@ -175,7 +171,6 @@ class SitkaFrame(wx.Frame):
             self.info.AppendItem(('datatype', itemtype))
             for key, val in get_attributes(object).items():
                 self.info.AppendItem((key, val))
-
         self.info.Refresh()
 
     def onDarkMode(self, is_dark=None):
@@ -186,11 +181,7 @@ class SitkaFrame(wx.Frame):
         self.info.SetBackgroundColour(bgcol)
         self.info.SetForegroundColour(fgcol)
         self.rightpanel.SetBackgroundColour(get_color('nb_area'))
-
         wx.CallAfter(self.Refresh)
-        #         self.text.SetBackgroundColour(bgcol)
-        #         self.text.SetForegroundColour(fgcol)
-
 
     def Raise(self):
         self.SetStatusText("Ready", 0)
