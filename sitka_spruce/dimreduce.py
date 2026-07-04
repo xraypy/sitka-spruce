@@ -1,3 +1,4 @@
+from functools import partial
 import wx
 
 from wxutils import (FloatSpin, GridPanel, SimpleText, Choice, HLine,
@@ -5,10 +6,11 @@ from wxutils import (FloatSpin, GridPanel, SimpleText, Choice, HLine,
 
 class DimReduceWidgets():
     """panel for selecting how to reduce array dimension to scalar"""
-    def __init__(self, parent, npts=1):
+    def __init__(self, parent, npts=1, callback=None):
         self.wids = {}
         self.npts = npts
         self.min, self.max = 0, npts-1
+        self.callback = callback
         self.wids['npts'] = SimpleText(parent, str(npts), size=(85, -1),
                                        style=wx.ALIGN_RIGHT)
 
@@ -16,8 +18,9 @@ class DimReduceWidgets():
                   'action': self.onMinMax}
         self.wids['min'] = FloatSpin(parent, value=0,      **fsopts)
         self.wids['max'] = FloatSpin(parent, value=npts-1, **fsopts)
-        self.wids['fix_width'] = Check(parent, ' ', size=(125, -1),
+        self.wids['fix_width'] = Check(parent, ' ', size=(75, -1),
                                        default=False)
+        self.wids['live'] = Check(parent, ' ', size=(75, -1), default=False)
         choices = ['sum', 'mean', 'single']
         self.wids['reduce'] = Choice(parent, choices, size=(100, -1),
                                      action=self.onReduce)
@@ -26,6 +29,7 @@ class DimReduceWidgets():
     def onMinMax(self, event=None):
         redval = self.wids['reduce'].GetStringSelection()
         fix_width = self.wids['fix_width'].IsChecked()
+        is_live = self.wids['live'].IsChecked()
         if (redval in ('sum', 'mean') and fix_width):
             newmin = int(self.wids['min'].GetValue())
             newmax = int(self.wids['max'].GetValue())
@@ -47,15 +51,19 @@ class DimReduceWidgets():
             self.min, self.max = newmin, newmax
             self.wids['min'].SetValue(self.min)
             self.wids['max'].SetValue(self.max)
+        if self.wids['live'].IsChecked() and callable(self.callback):
+            wx.CallAfter(self.callback, self.get_result())
 
 
     def onReduce(self, event=None):
         redval = self.wids['reduce'].GetStringSelection()
         self.wids['max'].Enable(redval != 'single')
         self.wids['fix_width'].Enable(redval != 'single')
+        if self.wids['live'].IsChecked() and callable(self.callback):
+            wx.CallAfter(self.callback, self.get_result())
 
     def on_enable(self, enable=True, npts=None, **kws):
-        for attr in ('npts', 'reduce', 'min', 'max', 'fix_width'):
+        for attr in ('npts', 'reduce', 'min', 'max', 'fix_width', 'live'):
             self.wids[attr].Enable(enable)
         if enable and npts is not None:
             self.set_npts(npts)
@@ -76,9 +84,9 @@ class DimReduceWidgets():
 
 class DimReducePanel(wx.Panel):
     """ panel with dimenision-reduction choices"""
-    def __init__(self, parent, maxdim=6):
-        wx.Panel.__init__(self, parent)
-
+    def __init__(self, parent, size=(725, -1), maxdim=6, callback=None):
+        wx.Panel.__init__(self, parent, size=size)
+        self.callback = callback
         self.wids = {}
         self.maxdim = max(2, min(16, maxdim))
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
@@ -88,7 +96,7 @@ class DimReducePanel(wx.Panel):
             panel.Add(SimpleText(panel, text, size=size, style=style),
                       dcol=dcol, style=style, newrow=newrow)
 
-        panel.Add(HLine(panel, size=(625, 3)), dcol=7)
+        panel.Add(HLine(panel, size=(725, 3)), dcol=7)
         padd_text('Dimension Reduction for Multidimensional Arrays',
                   size=(550, -1), dcol=7, newrow=True)
         padd_text('Dim', size=(60, -1), newrow=True)
@@ -97,9 +105,12 @@ class DimReducePanel(wx.Panel):
         padd_text('Min')
         padd_text('Max')
         padd_text('Fix Width?', size=(100, -1))
+        padd_text('AutoUpdate?', size=(100, -1))
 
         for i in range(maxdim):
-            dw = self.wids[f'data_dim{i}'] = DimReduceWidgets(panel, npts=1)
+            dw = DimReduceWidgets(panel, npts=1,
+                                  callback=partial(self.onChange, i))
+            self.wids[f'data_dim{i}'] = dw
             for wid in dw.wids.values():
                 wid.Disable()
             padd_text(f'  {i}', size=(60, -1), newrow=True)
@@ -108,9 +119,9 @@ class DimReducePanel(wx.Panel):
             panel.Add(dw.wids['min'])
             panel.Add(dw.wids['max'])
             panel.Add(dw.wids['fix_width'])
+            panel.Add(dw.wids['live'])
 
-        panel.Add(HLine(panel, size=(625, 3)), dcol=7, newrow=True)
-
+        panel.Add(HLine(panel, size=(725, 3)), dcol=7, newrow=True)
 
         panel.pack()
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -120,6 +131,8 @@ class DimReducePanel(wx.Panel):
         panel.SetSize((700, 300))
         register_darkdetect(self.onDarkMode)
 
+    def onChange(self, dim, reduce):
+        self.callback(dim=dim, reduce=reduce)
 
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)
