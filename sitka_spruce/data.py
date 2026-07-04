@@ -201,7 +201,7 @@ class SitkaData:
                 dshape = oldval.shape
             # print("add_array ", name, dshape, self.arrayshapes[dshape])
             if name in self.arrayshapes[dshape]:
-                self.arrayshapes[dshape].pop(name)
+                self.arrayshapes[dshape].remove(name)
 
         # add new data array
         dshape = 0
