@@ -11,15 +11,14 @@ class DimReduceWidgets():
         self.npts = npts
         self.min, self.max = 0, npts-1
         self.callback = callback
-        self.wids['npts'] = SimpleText(parent, str(npts), size=(85, -1),
+        self.wids['npts'] = SimpleText(parent, str(npts), size=(65, -1),
                                        style=wx.ALIGN_RIGHT)
 
         fsopts = {'digits': 0, 'min_val': 0, 'max_val': npts-1, 'size':(85, -1),
                   'action': self.onMinMax}
         self.wids['min'] = FloatSpin(parent, value=0,      **fsopts)
         self.wids['max'] = FloatSpin(parent, value=npts-1, **fsopts)
-        self.wids['fix_width'] = Check(parent, ' ', size=(75, -1),
-                                       default=False)
+        self.wids['fix_width'] = Check(parent, ' ', size=(75, -1), default=False)
         self.wids['live'] = Check(parent, ' ', size=(75, -1), default=False)
         choices = ['sum', 'mean', 'single']
         self.wids['reduce'] = Choice(parent, choices, size=(100, -1),
@@ -99,13 +98,13 @@ class DimReducePanel(wx.Panel):
         panel.Add(HLine(panel, size=(725, 3)), dcol=7)
         padd_text('Dimension Reduction for Multidimensional Arrays',
                   size=(550, -1), dcol=7, newrow=True)
-        padd_text('Dim', size=(60, -1), newrow=True)
-        padd_text('Npts', size=(70, -1), right=True)
+        padd_text('Dim', size=(40, -1), newrow=True)
+        padd_text('Npts', size=(65, -1), right=True)
         padd_text('Method')
         padd_text('Min')
         padd_text('Max')
-        padd_text('Fix Width?', size=(100, -1))
-        padd_text('AutoUpdate?', size=(100, -1))
+        padd_text('Fix Width?', size=(95, -1))
+        padd_text('AutoUpdate?', size=(95, -1))
 
         for i in range(maxdim):
             dw = DimReduceWidgets(panel, npts=1,
@@ -113,7 +112,7 @@ class DimReducePanel(wx.Panel):
             self.wids[f'data_dim{i}'] = dw
             for wid in dw.wids.values():
                 wid.Disable()
-            padd_text(f'  {i}', size=(60, -1), newrow=True)
+            padd_text(f' {i}', size=(35, -1), newrow=True)
             panel.Add(dw.wids['npts'])
             panel.Add(dw.wids['reduce'])
             panel.Add(dw.wids['min'])
