@@ -16,7 +16,7 @@ from .data import ARRAY_TYPES, get_data, dim_repr, datasize_repr
 
 class ArrayPlot1DPanel(wx.Panel):
     """Config Panel for 1D Plots of HDF5/Zarr datasets"""
-    def __init__(self, parent, size=(500, 500)):
+    def __init__(self, parent, size=(750, 500)):
         wx.Panel.__init__(self, parent)
         self.parent = parent
         self.SetBackgroundColour(get_color('nb_area'))
@@ -25,7 +25,7 @@ class ArrayPlot1DPanel(wx.Panel):
         self.data_obj = None
         self.last_yaxes = 0
         self.plotframes = {}
-        self.dim_reduce = DimReducePanel(parent=self)
+        self.dim_reduce = DimReducePanel(parent=self, callback=self.onDimReduce)
         self.wids = wids = {}
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
 
@@ -70,7 +70,7 @@ class ArrayPlot1DPanel(wx.Panel):
         panel.Add(wids['xarray'], dcol=2)
         panel.Add((5,5), newrow=True)
         panel.Add(wids['newplot'])
-        padd_text(' window:', size=(125, -1), newrow=False)
+        padd_text(' Window:', size=(125, -1), newrow=False)
         panel.Add(wids['win'])
         panel.Add((5,5), newrow=True)
         panel.Add(wids['overplot'])
@@ -120,6 +120,9 @@ class ArrayPlot1DPanel(wx.Panel):
             for i, npts in enumerate(self.data_shape):
                 self.dim_reduce.enable_dimension(i, enable=(i!=sel), npts=npts)
 
+    def onDimReduce(self, event=None, dim=None, reduce=None):
+        self.onPlot(new=True)
+
     def onPlot(self, event=None, new=True):
         win    = self.wids['win'].GetStringSelection()
         sharey = self.wids['sharey'].IsChecked()
@@ -129,6 +132,7 @@ class ArrayPlot1DPanel(wx.Panel):
         yop    = self.wids['yop'].GetStringSelection()
         xarray = self.wids['xarray'].GetStringSelection()
         ###
+        self.parent.status_message('fetching data....')
 
         ndim = len(self.data_obj.shape)
         reddim = self.dim_reduce.get_result(ndim)
@@ -137,14 +141,13 @@ class ArrayPlot1DPanel(wx.Panel):
 
         data_thread = Thread(target=_get_data, args=(reddim,))
         t0_data = time.time()
-        self.parent.status_message('fetching data....')
         data_thread.start()
+        time.sleep(0.0005)
 
         frame_opts = {'title':  f'SitkaPlot {win} '}
         pframe = self.show_plotframe(win, **frame_opts)
-        alabel = dim_repr(reddim)
-        ylabel = f'{self.itemname}{alabel}'
-        opts = {'title': f'{self.filename}'}
+        ylabel = dim_repr(reddim)
+        opts = {'title': f'{self.filename} {self.itemname}'}
 
         if 'ynorm' == '1':
             ynorm  = 1.0
@@ -161,7 +164,7 @@ class ArrayPlot1DPanel(wx.Panel):
                 opts[f'y{ya}label'] = ylabel
 
         opts['yaxes'] = self.last_yaxes
-        opts['label'] = ylabel
+        opts['label'] = f'{self.itemname}{ylabel}'
 
         data_thread.join()
         dt_data = time.time()-t0_data

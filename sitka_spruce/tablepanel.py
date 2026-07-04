@@ -19,7 +19,7 @@ from .data import ARRAY_TYPES, get_data, dim_repr, datasize_repr
 
 class DataGridFrame(wx.Frame):
     """Simple Data Grid Frame for HDF5/Zarr datasets"""
-    def __init__(self, parent, size=(600, 600), title='Data Grid'):
+    def __init__(self, parent, size=(800, 600), title='Data Grid'):
         wx.Frame.__init__(self, parent, title='Sitka Table',
                           size=size, style=wx.DEFAULT_FRAME_STYLE)
 
@@ -79,7 +79,7 @@ class DataGridFrame(wx.Frame):
 
 class TablePanel(wx.Panel):
     """Config Panel for Grid Display of HDF5/Zarr datasets"""
-    def __init__(self, parent, size=(500, 500)):
+    def __init__(self, parent, size=(750, 500)):
         wx.Panel.__init__(self, parent)
         self.parent = parent
         self.SetBackgroundColour(get_color('nb_area'))
@@ -89,8 +89,8 @@ class TablePanel(wx.Panel):
         self.xsel_cur, self.ysel_cur = 0, 1
         self.skip_dim_proc = False
         self.gridframes = {}
-        self.dim_reduce = DimReducePanel(parent=self)
 
+        self.dim_reduce = DimReducePanel(parent=self, callback=self.onDimReduce)
         self.wids = wids = {}
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
 
@@ -219,6 +219,9 @@ class TablePanel(wx.Panel):
             self.gridframes[window] = DataGridFrame(self, **opts)
             self.gridframes[window].Raise()
         return self.gridframes[window]
+
+    def onDimReduce(self, event=None, dim=None, reduce=None):
+        self.onShow(new=True)
 
     def onShow(self, event=None, new=True):
         reddim = self.dim_reduce.get_result()
