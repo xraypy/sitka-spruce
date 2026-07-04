@@ -54,15 +54,17 @@ class SitkaFrame(wx.Frame):
                           style=style)
         self.create_display(size=size)
         self.CreateStatusBar()
-        self.SetStatusText('Welcome to Sitka')
+        self.status_message('Welcome to Sitka')
         self.BuildMenus()
 
     def status_message(self, msg):
         self.SetStatusText(msg)
+        self.GetStatusBar().Refresh()
+        self.Refresh()
 
-    def create_display(self, size=(900, 650)):
+
+    def create_display(self, size=(1100, 600)):
         splitter = wx.SplitterWindow(self, size=size, style=wx.SP_LIVE_UPDATE)
-        splitter.SetMinimumPaneSize(300)
 
         leftpanel = wx.Panel(splitter)
         rightpanel = scrolled.ScrolledPanel(splitter)
@@ -77,8 +79,8 @@ class SitkaFrame(wx.Frame):
             this.Sortable = False
             this.Alignment = this.Renderer.Alignment = wx.ALIGN_LEFT
 
-        self.tree.SetMinSize((350, 300))
-        self.info.SetMinSize((350, 300))
+        self.tree.SetMinSize((300, 300))
+        self.info.SetMinSize((300, 300))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.tree, 1, wx.ALL|wx.GROW)
@@ -94,8 +96,7 @@ class SitkaFrame(wx.Frame):
 
         self.nb = flatnotebook(rightpanel, {},
                                on_change=self.onNBChanged,
-                               # style=FNB_STYLE,
-                               size=(550, 600))
+                               size=(800, 550))
 
         # self.mainpanel = ArrayViewPanel(splitter)
         self.nb.AddPage(ArrayPlot1DPanel(self), 'XY Plot Display', True)
@@ -122,7 +123,7 @@ class SitkaFrame(wx.Frame):
         self.set_fontsize(FONTSIZE)
 
         splitter.SplitVertically(leftpanel, rightpanel, 1)
-        splitter.SetMinimumPaneSize(300)
+        splitter.SetMinimumPaneSize(250)
         register_darkdetect(self.onDarkMode)
 
         # Display the root item.
