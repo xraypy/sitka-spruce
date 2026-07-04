@@ -1,3 +1,5 @@
+import time
+from threading import Thread
 import numpy as np
 import wx
 import wx.lib.scrolledpanel as scrolled
@@ -13,8 +15,7 @@ from pyshortcuts import gformat
 
 from .dimreduce import DimReducePanel
 from .gui_utils import get_font
-from .data import ARRAY_TYPES, get_data, dtype2str
-
+from .data import ARRAY_TYPES, get_data, dim_repr, datasize_repr
 
 class DataGridFrame(wx.Frame):
     """Simple Data Grid Frame for HDF5/Zarr datasets"""
@@ -80,7 +81,7 @@ class TablePanel(wx.Panel):
     """Config Panel for Grid Display of HDF5/Zarr datasets"""
     def __init__(self, parent, size=(500, 500)):
         wx.Panel.__init__(self, parent)
-
+        self.parent = parent
         self.SetBackgroundColour(get_color('nb_area'))
 
         self.data_shape = None
@@ -226,22 +227,42 @@ class TablePanel(wx.Panel):
         ydim   = self.wids['ydim'].GetSelection()
         xdim   = self.wids['xdim'].GetSelection()
 
-        dat, alabel = get_data(self.data_obj, reddim)
 
-        if len(dat.shape) < 2:
-            print('shape too small')
-            return
-        _ny, _nx = dat.shape
-        _ry, _rx = self.data_shape[ydim], self.data_shape[xdim]
-        _ry, _rx = self.data_shape[ydim], self.data_shape[xdim]
+        data_shape = self.data_obj.shape
+        ndim = len(data_shape)
+        reddim = self.dim_reduce.get_result(ndim)
 
-        # print(f"Got data {_nx=}  {_rx=}   {_ny=}  {_ry=}  {ydim=} {xdim=}")
-        if _ry == _nx and _rx == _ny or (ydim > xdim):
-            dat = dat.transpose()
+        def _get_data(reddim):
+            self._griddat = get_data(self.data_obj, reddim)
+
+        data_thread = Thread(target=_get_data, args=(reddim,))
+        t0_data = time.time()
+        self.parent.status_message('fetching data....')
+        data_thread.start()
 
         frame_opts = {'title':  f'SitkaGrid {win} '}
         gframe = self.show_gridframe(win, **frame_opts)
+        alabel = dim_repr(reddim)
 
-        gframe.set_data2d(dat, title=f'{self.filename}{alabel}')
+        data_thread.join()
+
+        if len(data_shape) < 2:
+            data_shape = (data_shape[0], 1)
+
+        if len(self._griddat.shape) < 2:
+            self._griddat.shape = (self._griddat.shape[0], 1)
+
+        _ny, _nx = self._griddat.shape
+        _ry, _rx = data_shape[ydim], data_shape[xdim]
+        _ry, _rx = data_shape[ydim], data_shape[xdim]
+
+        self.parent.status_message(f'got data ({dsize} of {osize}) in {dt_data:.2f} seconds')
+        self.parent.data.add_array('_tabledat', self._griddat)
+
+        # print(f"Got data {_nx=}  {_rx=}   {_ny=}  {_ry=}  {ydim=} {xdim=}")
+        if _ry == _nx and _rx == _ny or (ydim > xdim):
+            self._griddat = self._griddat.transpose()
+
+        gframe.set_data2d(self._griddat, title=f'{self.filename}{alabel}')
         gframe.Show()
         gframe.Raise()
