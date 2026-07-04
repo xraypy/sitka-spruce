@@ -4,7 +4,16 @@ from pathlib import Path
 from pyshortcuts import uname, make_shortcut, ico_ext
 from glob import glob
 
-from .sitka import Sitka_App, FILE_SUFFIXES
+from wxmplot.interactive import get_wxapp
+
+from .sitka import Sitka_App, SitkaFrame, FILE_SUFFIXES
+
+def sitka_viewer():
+    app = get_wxapp()
+    viewer = SitkaFrame()
+    viewer.Show()
+    viewer.Raise()
+    return viewer
 
 def sitka_cli():
     parser = ArgumentParser(description='Sitka Data Viewer')

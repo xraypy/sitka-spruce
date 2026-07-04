@@ -1,2 +1,2 @@
 from .sitka import SitkaFrame
-from .app import sitka_cli
+from .app import sitka_cli, sitka_viewer
