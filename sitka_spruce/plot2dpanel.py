@@ -1,4 +1,5 @@
-from functools import partial
+import time
+from threading import Thread
 import numpy as np
 
 import wx
@@ -10,12 +11,14 @@ from wxutils import (GridPanel, SimpleText, pack, Button,
                      get_color, register_darkdetect)
 
 from .dimreduce import DimReducePanel
-from .data import ARRAY_TYPES, get_data
+from .data import ARRAY_TYPES, get_data, dim_repr, datasize_repr
 
 class ArrayImagePanel(wx.Panel):
     """Image Show Config Panel for HDF5/Zarr datasets"""
     def __init__(self, parent, size=(500, 500)):
         wx.Panel.__init__(self, parent)
+        self.parent = parent
+
         self.SetBackgroundColour(get_color('nb_area'))
 
         self.data_shape = None
@@ -171,8 +174,6 @@ class ArrayImagePanel(wx.Panel):
     def onImshow(self, event=None, new=True):
         # print("imshow ", new)
 
-        reddim = self.dim_reduce.get_result()
-
         ########
         win    = self.wids['win'].GetStringSelection()
         ydir   = self.wids['ydir'].IsChecked()
@@ -183,30 +184,50 @@ class ArrayImagePanel(wx.Panel):
 
         xdstr   = self.wids['xdim'].GetStringSelection()
         ydstr   = self.wids['ydim'].GetStringSelection()
-        # print(f"imshow  {ydim=}, {xdim=}, {xdstr=}, {ydstr=}, {win=}, {ydir=}")
 
-        img, alabel = get_data(self.data_obj, reddim)
+        ndim = len(self.data_obj.shape)
+        reddim = self.dim_reduce.get_result(ndim)
 
-        if len(img.shape) < 2:
+        def _get_data(reddim):
+            self._img = get_data(self.data_obj, reddim)
+
+        data_thread = Thread(target=_get_data, args=(reddim,))
+        t0_data = time.time()
+        self.parent.status_message('fetching data....')
+        data_thread.start()
+
+        frame_opts = {'title':  f'SitkaImage {win} '}
+        iframe = self.show_imageframe(win, **frame_opts)
+
+        alabel = dim_repr(reddim)
+        opts = {'title': f'{self.filename}{alabel}'}
+
+        data_thread.join()
+        if self._img.dtype == np.bool:
+            self._img = self._img.astype(int)
+
+        dt_data = time.time()-t0_data
+        dsize = datasize_repr(self._img)
+        osize = datasize_repr(self.data_obj)
+
+        self.parent.status_message(f'got data ({dsize} of {osize}) in {dt_data:.2f} seconds')
+
+        self.parent.data.add_array('_imgdat', self._img)
+
+        if len(self._img.shape) < 2:
             print('shape too small')
             return
-        _ny, _nx = img.shape
+        _ny, _nx = self._img.shape
 
         _ry, _rx = self.data_shape[ydim], self.data_shape[xdim]
 
         # print(f"Got image {_nx=}  {_rx=}   {_ny=}  {_ry=}  {ydim=} {xdim=}")
         if _ry == _nx and _rx == _ny or (ydim > xdim):
-            img = img.transpose()
+            self._img = self._img.transpose()
 
         if ydir:
-            img = img[::-1, :]
-        if img.dtype == np.bool:
-            img = img.astype(int)
+            self._img = self._img[::-1, :]
 
-        frame_opts = {'title':  f'SitkaImage {win} '}
-        iframe = self.show_imageframe(win, **frame_opts)
-
-        opts = {'title': f'{self.filename}{alabel}'}
-        iframe.display(img)
+        iframe.display(self._img)
         iframe.Show()
         iframe.Raise()
