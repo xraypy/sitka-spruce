@@ -1,6 +1,6 @@
 import wx
 
-from wxutils import get_color, register_darkdetect
+from wxutils import get_color, register_darkdetect, DARK_THEME
 
 from .data  import get_items, get_itemtype, COMMONTYPES
 
@@ -13,12 +13,14 @@ class HDataTree(wx.TreeCtrl):
         wx.TreeCtrl.__init__(self, parent, size=size, style=style)
         self.item = None
         self.on_select = None
+        self.is_dark = DARK_THEME
         self.root = None
         if callable(on_select):
             self.on_select = on_select
         register_darkdetect(self.onDarkMode)
 
     def onDarkMode(self, is_dark=None):
+        self.is_dark = is_dark
         fgcol = get_color('text', dark=is_dark)
         bgcol = get_color('text_bg', dark=is_dark)
         self.SetBackgroundColour(bgcol)
@@ -34,7 +36,22 @@ class HDataTree(wx.TreeCtrl):
         self.SetItemHasChildren(self.root,  self.objHasChildren(data))
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectionChanged, id=self.GetId())
         self.Bind(wx.EVT_TREE_ITEM_EXPANDING, self.OnItemExpanding, id=self.GetId())
+        self.Bind(wx.EVT_KILL_FOCUS, self.onKillFocus, id=self.GetId())
+        self.Bind(wx.EVT_SET_FOCUS, self.onSetFocus, id=self.GetId())
         wx.CallAfter(self.onRefresh)
+
+    def onKillFocus(self, event=None):
+        if self.item is not None and event is not None:
+            bgcol = get_color('pt_fgsel', dark=self.is_dark)
+            self.SetItemTextColour(self.item, bgcol)
+            self.Refresh()
+
+    def onSetFocus(self, event=None):
+        if self.item is not None and event is not None:
+            bgcol = get_color('text_fg', dark=self.is_dark)
+            self.SetItemTextColour(self.item, bgcol)
+            event.Skip()
+
 
     def onRefresh(self, evt=None):
         """ refesh data tree, preserving current selection"""
@@ -108,6 +125,7 @@ class HDataTree(wx.TreeCtrl):
                     self.SetItemHasChildren(self.item, self.objHasChildren(obj))
             except Exception:
                 pass
+
             if self.on_select is not None:
                 self.on_select(obj, address=self.get_address(self.item),
                                itemtype=get_itemtype(obj))
