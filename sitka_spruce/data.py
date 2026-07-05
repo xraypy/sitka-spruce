@@ -183,8 +183,8 @@ class SitkaData:
         self.arrayshapes = {0: []}
         self._asteval = asteval.Interpreter(with_numpy=True,
                                 with_import=True, with_importfrom=True)
-        self.arrays  = self._asteval.symtable
-        self.arrays['datasets'] = self.datasets
+        self.asteval.symtable['datasets'] = self.datasets
+        self.arrays  = {}
         self._last_error = None
 
     def add_dataset(self, name, dataset):
@@ -211,6 +211,7 @@ class SitkaData:
             self.arrayshapes[dshape] = []
         self.arrayshapes[dshape].append(name)
         self.arrays[name] = data
+        self._asteval.symtable.update(self.arrays)
 
     def eval(self, str):
         out = self._asteval(str)
