@@ -18,7 +18,7 @@ class ArrayPlot1DPanel(wx.Panel):
     def __init__(self, parent, size=(750, 500)):
         wx.Panel.__init__(self, parent)
         self.parent = parent
-        self.SetBackgroundColour(get_color('nb_area'))
+        self.SetBackgroundColour(get_color('text_bg'))
 
         self.data_shape = None
         self.data_obj = None
@@ -57,7 +57,7 @@ class ArrayPlot1DPanel(wx.Panel):
             panel.Add(SimpleText(panel, text, size=size, style=LEFT),
                       dcol=dcol, newrow=newrow)
 
-        padd_text('Y array', newrow=False)
+        padd_text('Y array', newrow=True)
         panel.Add(wids['yarray'])
         panel.Add(wids['yop'])
         panel.Add(wids['ynorm'])
@@ -80,6 +80,7 @@ class ArrayPlot1DPanel(wx.Panel):
         sizer.Add(self.dim_reduce, 0, 0, LEFT|wx.GROW, 2)
         pack(self, sizer)
         register_darkdetect(self.onDarkMode)
+
 
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)

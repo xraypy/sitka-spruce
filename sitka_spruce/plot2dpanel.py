@@ -19,7 +19,7 @@ class ArrayImagePanel(wx.Panel):
         wx.Panel.__init__(self, parent)
         self.parent = parent
 
-        self.SetBackgroundColour(get_color('nb_area'))
+        self.SetBackgroundColour(get_color('text_bg'))
 
         self.data_shape = None
         self.data_obj = None
@@ -57,7 +57,7 @@ class ArrayImagePanel(wx.Panel):
         def padd_text(text, dcol=1, size=(100, -1), newrow=True):
             panel.Add(SimpleText(panel, text, size=size), dcol=dcol, newrow=newrow)
 
-        padd_text(' Y (Vert): ', newrow=False)
+        padd_text(' Y (Vert): ', newrow=True)
         panel.Add(wids['ydim'])
         padd_text(' Y values: ', newrow=False)
         panel.Add(wids['plot_yval'])
