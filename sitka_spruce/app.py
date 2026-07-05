@@ -1,21 +1,58 @@
+import os
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
 from pyshortcuts import uname, make_shortcut, ico_ext
-from glob import glob
 
 from wxmplot.interactive import get_wxapp
 
-from .sitka import Sitka_App, SitkaFrame, FILE_SUFFIXES
+from .sitka import Sitka_App, SitkaFrame, get_opener
 
-def sitka_viewer():
+def sitka_viewer(folder=None):
+    """Sitka Vewer for HDF5/Zarr files that that can be run
+    interactively from within an Python/Jupyer repl
+
+    Arguments
+    ---------
+    folder (str or None) folder to read HDF5/Zarr files from
+
+    Returns
+    -------
+    SitkaFrame a wx.Frame for the viewer.
+    """
+
     get_wxapp()
     viewer = SitkaFrame()
+    if folder is not None:
+        for fname, dset in get_sitka_files(folder).items():
+            viewer.add_dataset(fname, dataset=dset)
+
     viewer.Show()
     viewer.Raise()
     return viewer
 
+def get_sitka_files(folder=None):
+    """get sitka supported files from a foloder"""
+    files = {}
+    if folder is not None:
+        path = Path(folder)
+        if path.exists and path.is_dir():
+            for fname in os.listdir(path):
+                thispath = Path(fname)
+                opener = get_opener(thispath)
+                if opener is not None:
+                    try:
+                        dset = opener(thispath.absolute(), mode='r')
+                        files[thispath.name] = dset
+                    except Exception:
+                        print(f"Warning: could not open {fname} with {opener}")
+    return files
+
 def sitka_cli():
+    """
+    sitka command-line app
+    """
+
     parser = ArgumentParser(description='Sitka Data Viewer')
     parser.add_argument('-d', '--dir', dest='directory',
                        default=None, help="directory to find data files")
@@ -41,25 +78,10 @@ def sitka_cli():
                       terminal=False)
         return
 
-    files = {}
-    if args.directory is not None:
-        pth = Path(args.directory)
-        if pth.exists:
-            pname = pth.as_posix()
-            filelist = []
-            for ext, opener in FILE_SUFFIXES.items():
-                filelist.append((opener, sorted(glob(f'{pname}/*.{ext}'))))
-
-            for opener, flist in filelist:
-                for fname in flist:
-                    sname = Path(fname).name
-                    try:
-                        files[sname] = opener(fname)
-                    except Exception as exc:
-                        print(f"Could not open {fname} with {opener}")
-                        print(f"   exception = {exc}")
     app = Sitka_App()
-    if len(files) > 0:
-        for name, object in files.items():
-            app.add_data(name, object)
+    if args.directory is not None:
+        files = get_sitka_files(args.directory)
+        if len(files) > 0:
+            for fname, dset in files.items():
+                app.add_dataset(fname, dataset=dset)
     app.MainLoop()
