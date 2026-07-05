@@ -37,9 +37,28 @@ VERSION = '0.1'
 
 FILE_WILDCARD = 'HDF5/Zarr files(*.hdf5;*.h5;*.zarr)|*.hdf5;*.h5;*.zarr|All files (*.*)|*.*'
 
-FILE_SUFFIXES = {'hdf5': h5py.File, 'h5': h5py.File, 'zarr': zarr.open}
+FILE_OPENERS = {'hdf5': h5py.File, 'h5': h5py.File, 'zarr': zarr.open}
 
 DV_STYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
+
+def get_opener(path):
+    """get file opener for path name
+    currently returns one of h5py.File or zarr.open
+    """
+    if isinstance(path, str):
+        path = Path(path)
+
+    opener = None
+    if path.suffix in FILE_OPENERS:
+        opener = FILE_OPENERS[path.suffix]
+    elif h5py.is_hdf5(path):
+        opener = FILE_OPENERS['h5']
+    elif (path.exists() and path.is_dir() and   # home-built 'is_zarr'
+          (path/'zarr.json').exists() and
+          (path/'zarr.json').is_file()):
+        opener = FILE_OPENERS['zarr']
+    return opener
+
 
 class SitkaFrame(wx.Frame):
     """Main Window for Sitka HDF5/Zarr viewer"""
@@ -109,12 +128,12 @@ class SitkaFrame(wx.Frame):
         sizer.Add(self.nb, 1, wx.ALL|wx.GROW, 4)
         pack(rightpanel, sizer)
 
-        rightpanel.SetBackgroundColour(get_color('nb_area'))
+        rightpanel.SetBackgroundColour(get_color('text_bg'))
         self.rightpanel = rightpanel
-        self.nb.SetBackgroundColour(get_color('nb_area'))
-        self.nb.SetForegroundColour(get_color('nb_area'))
-        self.tree.SetBackgroundColour(get_color('list_bg'))
-        self.tree.SetForegroundColour(get_color('list_fg'))
+        self.nb.SetBackgroundColour(get_color('text_bg'))
+        self.nb.SetForegroundColour(get_color('text_bg'))
+        self.tree.SetBackgroundColour(get_color('text_bg'))
+        self.tree.SetForegroundColour(get_color('text_fg'))
 
         self.info.SetFont(get_font())
         self.tree.SetFont(get_font())
@@ -132,6 +151,7 @@ class SitkaFrame(wx.Frame):
     def onNBChanged(self, event=None):
         oldpage = self.nb.GetPage(event.GetOldSelection())
         newpage = self.nb.GetPage(event.GetSelection())
+
         self.current_nbpage = event.GetSelection()
         on_hide = getattr(oldpage, 'onPanelHidden', None)
         if callable(on_hide):
@@ -139,6 +159,8 @@ class SitkaFrame(wx.Frame):
         on_expose = getattr(newpage, 'onPanelExposed', None)
         if callable(on_expose):
             on_expose()
+        wx.CallAfter(self.tree.onKillFocus)
+        event.Skip()
 
 
     def onSelectObject(self, object, address, itemtype='?'):
@@ -179,7 +201,7 @@ class SitkaFrame(wx.Frame):
         self.tree.SetForegroundColour(fgcol)
         self.info.SetBackgroundColour(bgcol)
         self.info.SetForegroundColour(fgcol)
-        self.rightpanel.SetBackgroundColour(get_color('nb_area'))
+        self.rightpanel.SetBackgroundColour(bgcol)
         wx.CallAfter(self.Refresh)
 
     def Raise(self):
@@ -270,12 +292,32 @@ class SitkaFrame(wx.Frame):
             if ret == wx.ID_NO:
                 return
 
-        opener = FILE_SUFFIXES.get(path.suffix, h5py.File)
-        self.add_dataset(fname, opener(path, 'r'))
+        opener = get_opener(path)
+        if opener is not None:
+            self.add_dataset(fname, opener(path, mode='r'))
 
-    def add_dataset(self, name, dataset):
-        self.data.add_dataset(name, dataset)
-        self.tree.onRefresh()
+    def add_dataset(self, name, dataset=None):
+        """add dataset to Sitka.
+
+        Arguments
+        ----------
+        name     (str)    name for dataset, typically filename
+        dataset  (dataset or None) dataset to add
+
+        Notes
+        ------
+        If dataset is None, the name will be interpreted as a file to be opened,
+        using its suffix or file type to guess how to open the file
+
+        """
+        if dataset is None:
+            path = Path(name)
+            opener = get_opener(path)
+            if opener is not None:
+                dataset = opener(path, mode='r')
+        if dataset is not None:
+            self.data.add_dataset(name, dataset)
+            self.tree.onRefresh()
 
 
     def onChangeDir(self, event=None):
@@ -333,5 +375,5 @@ class Sitka_App(wx.App, wx.lib.mixins.inspection.InspectionMixin):
             self.ShowInspectionTool()
         return True
 
-    def add_data(self, name, object):
-        self.frame.add_data(name, object)
+    def add_dataset(self, name, dataset=None):
+        self.frame.add_dataset(name, dataset=dataset)
