@@ -75,7 +75,7 @@ class TablePanel(wx.Panel):
     def __init__(self, parent, size=(750, 500)):
         wx.Panel.__init__(self, parent)
         self.parent = parent
-        self.SetBackgroundColour(get_color('nb_area'))
+        self.SetBackgroundColour(get_color('text_bg'))
 
         self.data_shape = None
         self.data_obj = None
@@ -249,7 +249,7 @@ class TablePanel(wx.Panel):
         _ry, _rx = data_shape[ydim], data_shape[xdim]
         _ry, _rx = data_shape[ydim], data_shape[xdim]
 
-        dsize = datasize_repr(self._img)
+        dsize = datasize_repr(self._griddat)
         osize = datasize_repr(self.data_obj)
 
         self.parent.status_message(f'got data ({dsize} of {osize}) in {dt_data:.2f} seconds')
