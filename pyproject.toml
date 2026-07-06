@@ -45,17 +45,19 @@ dependencies = [
    "wxPython>=4.2.0",
    "wxutils>=2026.1.0",
    "wxmplot>=2026.1.0",
-   "matplotlib>=3.10.0",
+   "matplotlib>=3.10",
    "numpy>=2.3",
    "h5py>=3.13",
+   "hdf5plugin",
    "zarr",
    "fsspec",
    "asteval>=1.0.9",
    "darkdetect",
    "pyobjc-framework-Cocoa; platform_system == 'Darwin'",
    "pytz",
+   "packaging",
    "pyyaml>=5.0",
-   "pyshortcuts>=1.9.5",
+   "pyshortcuts>=1.9.8",
    "platformdirs"]
 
 
@@ -70,6 +72,13 @@ Tracker = "https://github.com/xraypy/sitka-spruce/issues"
 [project.optional-dependencies]
 dev = ["build", "twine"]
 s3 =  ["s3fs"]
-doc = ["Sphinx", "jupyter_sphinx", "sphinx-copybutton", "sphinxcontrib-video"]
+
+doc = ["sphinx",
+       "sphinx-copybutton",
+       "sphinx-design",
+       "sphinxcontrib-video",
+       "jupyter_sphinx",
+       "nbsphinx"]
+
 test = ["pytest", "pytest-cov", "coverage"]
 all = ["sitka_spruce[dev, doc, test]"]
