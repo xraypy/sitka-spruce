@@ -58,5 +58,5 @@ html_domain_indices = False
 html_use_index = True
 html_show_sourcelink = True
 
-latex_documents = [('index', 'wxmplot.tex', 'wxmplot documentation',
+latex_documents = [('index', 'sitka_spruce.tex', 'Sitka Spruce documentation',
                     'Matthew Newville', 'manual')]

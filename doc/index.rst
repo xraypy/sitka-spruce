@@ -7,13 +7,13 @@ Sitka Spruce: heirarchical data browser
 .. _matplotlib:  https://matplotlib.org/
 .. _wxmplot:  https://newville.github.io/wxmplot/
 
-`Sitka_spruce` is a general-purpose data browser for heirarchical
+Sitka Spruce is a general-purpose data browser for heirarchical
 datasets stored in HDF5 files or Zarr data stores.  It allows
 interactive plotting of scientific data using combining `wxPython`_ ,
 `wxmplot`_, and `matplotlib`_.
 
 
-.. image:: images/sitka_main.png
+.. image:: images/sitka_main_combined.png
    :width: 98 %
 
 
