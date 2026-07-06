@@ -96,8 +96,8 @@ class SitkaFrame(wx.Frame):
             this.Sortable = False
             this.Alignment = this.Renderer.Alignment = wx.ALIGN_LEFT
 
-        self.tree.SetMinSize((300, 300))
-        self.info.SetMinSize((300, 250))
+        self.tree.SetMinSize((250, 300))
+        self.info.SetMinSize((250, 250))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.tree, 1, wx.ALL|wx.GROW)
@@ -116,8 +116,8 @@ class SitkaFrame(wx.Frame):
                                size=(875, 550))
 
         # self.mainpanel = ArrayViewPanel(splitter)
-        self.nb.AddPage(ArrayPlot1DPanel(self), 'XY Plot Display', True)
         self.nb.AddPage(ArrayImagePanel(self), 'Image Display', True)
+        self.nb.AddPage(ArrayPlot1DPanel(self), 'XY Plot Display', True)
         self.nb.AddPage(TablePanel(self), 'Table Display', True)
         self.nb.SetSelection(0)
         self.current_nbpage = self.nb.GetSelection()
@@ -140,7 +140,7 @@ class SitkaFrame(wx.Frame):
         self.set_fontsize(FONTSIZE)
 
         splitter.SplitVertically(leftpanel, rightpanel, 1)
-        splitter.SetMinimumPaneSize(250)
+        splitter.SetMinimumPaneSize(300)
         register_darkdetect(self.onDarkMode)
 
         # Display the root item.
