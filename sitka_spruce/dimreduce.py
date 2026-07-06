@@ -63,7 +63,6 @@ class DimReduceWidgets():
         if self.wids['live'].IsChecked() and callable(self.callback):
             wx.CallAfter(self.callback, self.get_result())
 
-
     def onReduce(self, event=None):
         redval = self.wids['reduce'].GetStringSelection()
         self.wids['max'].Enable(redval != 'single')
@@ -84,9 +83,10 @@ class DimReduceWidgets():
         self.wids['max'].SetMax(npts-1)
         self.wids['max'].SetValue(npts-1)
         minval = 0
-        if (self.wids['reduce'].GetStringSelection() == 'single' and
-            self.options['point'] == 'mid'):
-            minval = int(npts/2)
+        if self.wids['reduce'].GetStringSelection() == 'single':
+            self.wids['max'].Disable()
+            if self.options['point'] == 'mid':
+                minval = int(npts/2)
         self.wids['min'].SetValue(minval)
 
     def get_result(self):
@@ -106,14 +106,23 @@ class DimReducePanel(wx.Panel):
         self.maxdim = max(2, min(16, int(self.dimopts.get('maxdim', 5))))
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
 
-        def padd_text(text, dcol=1, newrow=False, size=(100, -1), right=False):
+
+        step_sizes = ['1','2', '5', '10', '20', '50', '100']
+        self.wids['stepsize'] = Choice(panel, step_sizes, size=(100, -1),
+                                       action=self.onStepSize)
+
+        def padd_text(text, dcol=1, newrow=False, size=(80, -1), right=False):
             style = wx.ALIGN_RIGHT if right else wx.ALIGN_LEFT
             panel.Add(SimpleText(panel, text, size=size, style=style),
                       dcol=dcol, style=style, newrow=newrow)
 
         panel.Add(HLine(panel, size=(725, 3)), dcol=7)
-        padd_text('Dimension Reduction for Multidimensional Arrays',
-                  size=(550, -1), dcol=7, newrow=True)
+        padd_text('Dimension Reduction for ND Arrays',
+                  size=(275, -1), dcol=4, newrow=True)
+        panel.Add(SimpleText(panel, 'Min/Max Step Size:' , size=(150, -1), style=wx.ALIGN_RIGHT),
+                  dcol=2, style=wx.ALIGN_RIGHT, newrow=False)
+        panel.Add( self.wids['stepsize'], dcol=1)
+
         padd_text('Dim', size=(40, -1), newrow=True)
         padd_text('Npts', size=(65, -1), right=True)
         padd_text('Method')
@@ -145,6 +154,12 @@ class DimReducePanel(wx.Panel):
         panel.SetMinSize((500, 200))
         panel.SetSize((700, 300))
         register_darkdetect(self.onDarkMode)
+
+    def onStepSize(self, event=None):
+        stepsize = int(self.wids['stepsize'].GetStringSelection())
+        for i in range(self.maxdim):
+            self.wids[f'data_dim{i}'].wids['min'].SetIncrement(stepsize)
+            self.wids[f'data_dim{i}'].wids['max'].SetIncrement(stepsize)
 
     def onChange(self, dim, reduce):
         self.callback(dim=dim, reduce=reduce)
