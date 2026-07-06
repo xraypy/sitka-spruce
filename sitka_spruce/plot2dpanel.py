@@ -185,7 +185,6 @@ class ArrayImagePanel(wx.Panel):
         xdim   = self.wids['xdim'].GetSelection()
         # xarray  = self.wids['plot_xval'].GetStringSelection()
         # yarray  = self.wids['plot_yval'].GetStringSelection()
-
         # xdstr   = self.wids['xdim'].GetStringSelection()
         # ydstr   = self.wids['ydim'].GetStringSelection()
 
@@ -218,7 +217,7 @@ class ArrayImagePanel(wx.Panel):
         self.parent.status_message(f'got data ({dsize} of {osize}) in {dt_data:.2f} seconds')
 
         if len(self._img.shape) < 2:
-            self._img_shape = (self._img_shape[0], 1)
+            self._img.shape = (self._img.shape[0], 1)
 
         if (ydim > xdim):
             self._img = self._img.transpose()
