@@ -183,7 +183,7 @@ class SitkaData:
         self.arrayshapes = {0: []}
         self._asteval = asteval.Interpreter(with_numpy=True,
                                 with_import=True, with_importfrom=True)
-        self.asteval.symtable['datasets'] = self.datasets
+        self._asteval.symtable['datasets'] = self.datasets
         self.arrays  = {}
         self._last_error = None
 

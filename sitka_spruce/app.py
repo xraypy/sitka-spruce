@@ -14,22 +14,24 @@ def sitka_viewer(folder=None):
 
     Arguments
     ---------
-    folder (str or None) folder to read HDF5/Zarr files from
+    folder (str or None) folder name to read HDF5/Zarr files from
 
     Returns
     -------
     SitkaFrame a wx.Frame for the viewer.
-    """
 
+    This has a '.data' member that holds the datasets and working
+    arrays used by sitka.
+    """
     get_wxapp()
-    viewer = SitkaFrame()
+    sview = SitkaFrame()
     if folder is not None:
         for fname, dset in get_sitka_files(folder).items():
             viewer.add_dataset(fname, dataset=dset)
 
-    viewer.Show()
-    viewer.Raise()
-    return viewer
+    sview.Show()
+    sview.Raise()
+    return sview
 
 def get_sitka_files(folder=None):
     """get sitka supported files from a foloder"""
