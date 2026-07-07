@@ -42,14 +42,14 @@ classifiers = [
     ]
 
 dependencies = [
-   "wxPython>=4.2.0",
+   "wxPython>=4.2.4",
    "wxutils>=2026.1.0",
    "wxmplot>=2026.1.0",
    "matplotlib>=3.10",
    "numpy>=2.3",
    "h5py>=3.13",
    "hdf5plugin",
-   "zarr",
+   "zarr>=3.2",
    "fsspec",
    "asteval>=1.0.9",
    "darkdetect",

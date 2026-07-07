@@ -2,7 +2,6 @@
 """
 sitka_spruce HDF5 and Zarr data browser
 """
-
 import os
 
 import wx
@@ -10,6 +9,7 @@ import wx.lib.scrolledpanel as scrolled
 import wx.dataview as dv
 import wx.lib.mixins.inspection
 
+import hdf5plugin
 import h5py
 import zarr
 
