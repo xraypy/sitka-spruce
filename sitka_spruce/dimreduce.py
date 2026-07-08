@@ -151,8 +151,8 @@ class DimReducePanel(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, 0, LEFT|wx.EXPAND|wx.GROW, 2)
 
-        panel.SetMinSize((500, 200))
-        panel.SetSize((700, 300))
+        panel.SetMinSize((500, 150))
+        panel.SetSize(panel.GetBestSize())
         register_darkdetect(self.onDarkMode)
 
     def onStepSize(self, event=None):
