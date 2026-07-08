@@ -24,6 +24,13 @@ def cast_int(val):
 def cast_complex(val):
     return f'{gformat(val.real)}+{gformat(val.imag)}j'
 
+def cast_bytes(val):
+    try:
+        v = val.decode('utf-8')
+    except ValueError:
+        v = repr(val)
+    return v
+
 def dtype2str(dtype):
     """return string casting type for datatype"""
     cast = repr
@@ -33,6 +40,8 @@ def dtype2str(dtype):
         cast = cast_complex
     elif dtype in (np.float64, np.float32, np.float16):
         cast = gformat
+    elif dtype in (np.dtype(object), np.dtype(bytes)):
+        cast = cast_bytes
     return cast
 
 
@@ -131,6 +140,29 @@ def dim_repr(reductions):
         reps.append(rep)
     return f"[{','.join(reps)}]"
 
+def dim_code(reductions):
+    """return Python code representation of dimension reductions"""
+    reps = []
+    sums = []
+    off = 0
+    npts = 1.0
+    for idim, use, method, imin, imax in reductions:
+        if not use:
+            reps.append(':')
+        elif method == 'single':
+            reps.append(f'{imin}')
+        else:
+            reps.append(f'{imin}:{imax}')
+            sums.append(f'sum(axis={idim-off})')
+            if method == 'mean' and imax > (imin+1):
+                npts *= (imax-imin)
+    words = [f"[{','.join(reps)}]"]
+    words.extend(sums)
+    out = '.'.join(words)
+    if npts > 1.0:
+        out = f'{out}/{npts:.1f}'
+    return out
+
 def get_data(obj, reductions):
     """return dataset (1d or 2d) from multidimensional array"""
     slices = []
@@ -157,7 +189,6 @@ def get_data(obj, reductions):
             off += 1
             if meth == 'mean':
                 ret = ret / (1.0*oshape[i])
-
     return ret.squeeze()
 
 
@@ -185,12 +216,13 @@ class SitkaData:
                                 with_import=True, with_importfrom=True)
         self._asteval.symtable['datasets'] = self.datasets
         self.arrays  = {}
+        self.array_addrs  = {}
         self._last_error = None
 
     def add_dataset(self, name, dataset):
         self.datasets[name] = dataset
 
-    def add_array(self, name, data):
+    def add_array(self, name, data, address=None):
         """add array to interpreter, and keep track of its shape"""
 
         # remove existing value
@@ -212,6 +244,8 @@ class SitkaData:
         self.arrayshapes[dshape].append(name)
         self.arrays[name] = data
         self._asteval.symtable.update(self.arrays)
+        if address is not None:
+            self.array_addrs[name] = address
 
     def eval(self, str):
         out = self._asteval(str)
