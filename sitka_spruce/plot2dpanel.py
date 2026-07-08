@@ -7,11 +7,11 @@ import wx
 from wxmplot import ImageFrame
 
 from wxutils import (GridPanel, SimpleText, pack, Button,
-                     Choice, Check, LEFT,
+                     Choice, Check, LEFT, TextCtrl,
                      get_color, register_darkdetect)
 
 from .dimreduce import DimReducePanel
-from .data import ARRAY_TYPES, get_data, dim_repr, datasize_repr
+from .data import ARRAY_TYPES, get_data, dim_code, datasize_repr
 
 class ArrayImagePanel(wx.Panel):
     """Image Show Config Panel for HDF5/Zarr datasets"""
@@ -23,6 +23,7 @@ class ArrayImagePanel(wx.Panel):
 
         self.data_shape = None
         self.data_obj = None
+        self.access_code = None
         self.xsel_cur, self.ysel_cur = 0, 1
         self.skip_dim_proc = False
         self.imageframes = {}
@@ -33,6 +34,8 @@ class ArrayImagePanel(wx.Panel):
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
         wids['imshow'] = Button(panel, 'Show Image', size=(200, -1),
                                 action=self.onImshow)
+
+
         wids['plot_xchoices'] = ['<index>']
         wids['plot_xval'] = Choice(panel, wids['plot_xchoices'],
                                    size=(200, -1), action=self.onImshow)
@@ -53,6 +56,11 @@ class ArrayImagePanel(wx.Panel):
                               size=(200, -1), action=self.onYdim)
         wids['ydim'].SetSelection(0)
         wids['xdim'].SetSelection(1)
+
+        wids['save_array'] = Button(panel, 'Save Array', size=(125, -1),
+                                  action=self.onNameArray)
+        wids['array_name'] = TextCtrl(panel, 'imgdat', size=(200, -1))
+        wids['check_overwrite']  = Check(panel, ' ', size=(10, -1), default=True)
 
         def padd_text(text, dcol=1, size=(100, -1), newrow=True):
             panel.Add(SimpleText(panel, text, size=size), dcol=dcol, newrow=newrow)
@@ -76,6 +84,14 @@ class ArrayImagePanel(wx.Panel):
         panel.Add((5, 5))
         padd_text(' Y=0 at top?', size=(125, -1), newrow=False)
         panel.Add(wids['ydir'], dcol=2)
+
+        panel.Add(wids['save_array'], newrow=True)
+        panel.Add(wids['array_name'])
+        padd_text(' Verify Overwrite', size=(125, -1), newrow=False)
+        panel.Add(wids['check_overwrite'], dcol=1)
+
+        panel.Add((15, 15), newrow=True)
+
         panel.pack()
 
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -92,6 +108,23 @@ class ArrayImagePanel(wx.Panel):
         self.SetBackgroundColour(bgcol)
         self.SetForegroundColour(fgcol)
         wx.CallAfter(self.Refresh)
+
+    def onNameArray(self, event=None):
+        arr_name = self.wids['array_name'].GetValue()
+        check_overwrite = self.wids['check_overwrite'].IsChecked()
+        if check_overwrite and arr_name in self.parent.data.arrays:
+            ret = Popup(self, f"Overwrite Array '{arr_name}'?\n",
+                        'Verify Overwrite',
+                        style=wx.YES_NO|wx.ICON_QUESTION)
+            if ret != wx.ID_YES:
+                return
+
+        ndim = len(self.data_obj.shape)
+        reddim = self.dim_reduce.get_result(ndim)
+        _yarr = get_data(self.data_obj, reddim)
+        ylabel = dim_code(reddim)
+        access_code = f"datasets['{self.filename}']['{self.itemname}']{ylabel}"
+        self.parent.data.add_array(arr_name, _yarr, address=access_code)
 
 
     def onXdim(self, event=None):
@@ -141,17 +174,18 @@ class ArrayImagePanel(wx.Panel):
         if (itemtype in ARRAY_TYPES):
             self.data_shape = object.shape
             choices = self.dim_reduce.set_datashape(object.shape)
-            xcur = self.wids['xdim'].GetSelection()
-            ycur = self.wids['ydim'].GetSelection()
-            self.wids['xdim'].SetChoices(choices)
-            self.wids['ydim'].SetChoices(choices)
-            self.wids['ydim'].SetSelection(ycur)
-            self.wids['xdim'].SetSelection(xcur)
+            if len(choices) > 0:
+                xcur = self.wids['xdim'].GetSelection()
+                ycur = self.wids['ydim'].GetSelection()
+                self.wids['xdim'].SetChoices(choices)
+                self.wids['ydim'].SetChoices(choices)
+                self.wids['ydim'].SetSelection(ycur)
+                self.wids['xdim'].SetSelection(xcur)
 
-            xcur = self.wids['xdim'].GetSelection()
-            ycur = self.wids['ydim'].GetSelection()
-            self.dim_reduce.enable_dimension(xcur, enable=False, npts=None)
-            self.dim_reduce.enable_dimension(ycur, enable=False, npts=None)
+                xcur = self.wids['xdim'].GetSelection()
+                ycur = self.wids['ydim'].GetSelection()
+                self.dim_reduce.enable_dimension(xcur, enable=False, npts=None)
+                self.dim_reduce.enable_dimension(ycur, enable=False, npts=None)
 
         self.Refresh()
 
@@ -203,7 +237,8 @@ class ArrayImagePanel(wx.Panel):
         frame_opts = {'title':  f'SitkaImage {win} '}
         iframe = self.show_imageframe(win, **frame_opts)
 
-        dlabel = dim_repr(reddim)
+        dlabel = dim_code(reddim)
+        self.access_code = f"datasets['{self.filename}']['{self.itemname}']{dlabel}"
         opts = {'title': f'{self.filename} {dlabel}'}
 
         data_thread.join()

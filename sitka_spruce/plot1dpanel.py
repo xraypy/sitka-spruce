@@ -7,11 +7,11 @@ import wx
 from wxmplot import PlotFrame
 
 from wxutils import (GridPanel, SimpleText, pack, Button,
-                     Choice, Check, LEFT,
+                     Choice, Check, LEFT, TextCtrl, Popup,
                      get_color, register_darkdetect)
 
 from .dimreduce import DimReducePanel
-from .data import ARRAY_TYPES, get_data, dim_repr, datasize_repr
+from .data import ARRAY_TYPES, get_data, dim_code, datasize_repr
 
 class ArrayPlot1DPanel(wx.Panel):
     """Config Panel for 1D Plots of HDF5/Zarr datasets"""
@@ -22,6 +22,7 @@ class ArrayPlot1DPanel(wx.Panel):
 
         self.data_shape = None
         self.data_obj = None
+        self.access_code = None
         self.last_yaxes = 0
         self.plotframes = {}
         self.dim_reduce = DimReducePanel(parent=self, callback=self.onDimReduce)
@@ -53,6 +54,11 @@ class ArrayPlot1DPanel(wx.Panel):
         wids['xarray'] = Choice(panel, wids['xchoices'],
                                 size=(200, -1), action=self.onPlot)
 
+        wids['save_array'] = Button(panel, 'Save Array', size=(125, -1),
+                                  action=self.onNameArray)
+        wids['array_name'] = TextCtrl(panel, 'ydat', size=(200, -1))
+        wids['check_overwrite']  = Check(panel, ' ', size=(10, -1), default=True)
+
         def padd_text(text, dcol=1, size=(125, -1), newrow=True):
             panel.Add(SimpleText(panel, text, size=size, style=LEFT),
                       dcol=dcol, newrow=newrow)
@@ -73,6 +79,11 @@ class ArrayPlot1DPanel(wx.Panel):
         padd_text(' Share Y-axis?', size=(125, -1), newrow=False)
         panel.Add(wids['sharey'], dcol=2)
 
+        panel.Add(wids['save_array'], newrow=True)
+        panel.Add(wids['array_name'])
+        padd_text(' Verify Overwrite', size=(125, -1), newrow=False)
+        panel.Add(wids['check_overwrite'], dcol=1)
+        panel.Add((15, 15), newrow=True)
         panel.pack()
 
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -90,6 +101,23 @@ class ArrayPlot1DPanel(wx.Panel):
         self.SetBackgroundColour(bgcol)
         self.SetForegroundColour(fgcol)
         wx.CallAfter(self.Refresh)
+
+    def onNameArray(self, event=None):
+        arr_name = self.wids['array_name'].GetValue()
+        check_overwrite = self.wids['check_overwrite'].IsChecked()
+        if check_overwrite and arr_name in self.parent.data.arrays:
+            ret = Popup(self, f"Overwrite Array '{arr_name}'?\n",
+                        'Verify Overwrite',
+                        style=wx.YES_NO|wx.ICON_QUESTION)
+            if ret != wx.ID_YES:
+                return
+
+        ndim = len(self.data_obj.shape)
+        reddim = self.dim_reduce.get_result(ndim)
+        _yarr = get_data(self.data_obj, reddim)
+        ylabel = dim_code(reddim)
+        access_code = f"datasets['{self.filename}']['{self.itemname}']{ylabel}"
+        self.parent.data.add_array(arr_name, _yarr, address=access_code)
 
 
     def set_object(self, object, itemtype='?', itemname='', filename='', **kws):
@@ -142,7 +170,9 @@ class ArrayPlot1DPanel(wx.Panel):
 
         frame_opts = {'title':  f'SitkaPlot {win} '}
         pframe = self.show_plotframe(win, **frame_opts)
-        ylabel = dim_repr(reddim)
+        ylabel = dim_code(reddim)
+        self.access_code = f"datasets['{self.filename}']['{self.itemname}']{ylabel}"
+
         opts = {'title': f'{self.filename}\n{self.itemname}'}
 
         # if 'ynorm' == '1':
@@ -169,7 +199,7 @@ class ArrayPlot1DPanel(wx.Panel):
         osize = datasize_repr(self.data_obj)
 
         self.parent.status_message(f'got data ({dsize} of {osize}) in {dt_data:.2f} seconds')
-        self.parent.data.add_array('_ydat', self._yarr)
+        self.parent.data.add_array('_ydat', self._yarr, address=self.access_code)
 
         xarr = np.arange(len(self._yarr))
         if xarray == '<index>':
