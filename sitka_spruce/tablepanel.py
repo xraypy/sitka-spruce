@@ -3,12 +3,12 @@ from threading import Thread
 import wx
 from  wx.grid import Grid
 
-from wxutils import (GridPanel, SimpleText, pack, Button,
-                     Choice, LEFT, get_color, register_darkdetect)
+from wxutils import (GridPanel, SimpleText, pack, Button, TextCtrl,
+                     Check, Choice, LEFT, get_color, register_darkdetect)
 
 from .dimreduce import DimReducePanel
 from .gui_utils import get_font
-from .data import ARRAY_TYPES, dtype2str, get_data, dim_repr, datasize_repr
+from .data import ARRAY_TYPES, dtype2str, get_data, dim_code, datasize_repr
 
 class DataGridFrame(wx.Frame):
     """Simple Data Grid Frame for HDF5/Zarr datasets"""
@@ -61,8 +61,9 @@ class DataGridFrame(wx.Frame):
 
         cast = dtype2str(data.dtype)
         ny, nx = data.shape
-        self.grid.AppendCols(nx+1)
-        self.grid.AppendRows(ny+1)
+        self.grid.AppendCols(nx)
+        self.grid.AppendRows(ny)
+        # print("Set Grid Data ", data, data.dtype, cast)
 
         for i in range(ny):
             self.grid.SetRowLabelValue(i, f'{i}')
@@ -79,6 +80,7 @@ class TablePanel(wx.Panel):
 
         self.data_shape = None
         self.data_obj = None
+        self.access_code = None
         self.xsel_cur, self.ysel_cur = 0, 1
         self.skip_dim_proc = False
         self.gridframes = {}
@@ -102,6 +104,12 @@ class TablePanel(wx.Panel):
         wids['win'] = Choice(panel, ['1', '2', '3', '4', '5'], size=(75, -1))
         wids['win'].SetStringSelection('1')
 
+        wids['save_array'] = Button(panel, 'Save Array', size=(125, -1),
+                                  action=self.onNameArray)
+        wids['array_name'] = TextCtrl(panel, 'griddat', size=(200, -1))
+        wids['check_overwrite']  = Check(panel, ' ', size=(10, -1), default=True)
+
+
 
         def padd_text(text, dcol=1, size=(80, -1), newrow=True):
             panel.Add(SimpleText(panel, text, size=size), dcol=dcol, newrow=newrow)
@@ -116,6 +124,12 @@ class TablePanel(wx.Panel):
         panel.Add(wids['show'])
         padd_text(' Window:', size=(100, -1), newrow=False)
         panel.Add(wids['win'])
+
+        panel.Add(wids['save_array'], newrow=True)
+        panel.Add(wids['array_name'])
+        padd_text(' Verify Overwrite', size=(125, -1), newrow=False)
+        panel.Add(wids['check_overwrite'], dcol=1)
+        panel.Add((15, 15), newrow=True)
 
         panel.pack()
 
@@ -133,6 +147,10 @@ class TablePanel(wx.Panel):
         self.SetBackgroundColour(bgcol)
         self.SetForegroundColour(fgcol)
         wx.CallAfter(self.Refresh)
+
+    def onNameArray(self, event=None):
+        print(" on Name Array")
+
 
     def onXdim(self, event=None):
         if self.skip_dim_proc:
@@ -180,17 +198,18 @@ class TablePanel(wx.Panel):
         if (itemtype in ARRAY_TYPES):
             self.data_shape = object.shape
             choices = self.dim_reduce.set_datashape(object.shape)
-            xcur = self.wids['xdim'].GetSelection()
-            ycur = self.wids['ydim'].GetSelection()
-            self.wids['xdim'].SetChoices(choices)
-            self.wids['ydim'].SetChoices(choices)
-            self.wids['ydim'].SetSelection(ycur)
-            self.wids['xdim'].SetSelection(xcur)
+            if len(choices) > 0:
+                xcur = self.wids['xdim'].GetSelection()
+                ycur = self.wids['ydim'].GetSelection()
+                self.wids['xdim'].SetChoices(choices)
+                self.wids['ydim'].SetChoices(choices)
+                self.wids['ydim'].SetSelection(ycur)
+                self.wids['xdim'].SetSelection(xcur)
 
-            xcur = self.wids['xdim'].GetSelection()
-            ycur = self.wids['ydim'].GetSelection()
-            self.dim_reduce.enable_dimension(xcur, enable=False, npts=None)
-            self.dim_reduce.enable_dimension(ycur, enable=False, npts=None)
+                xcur = self.wids['xdim'].GetSelection()
+                ycur = self.wids['ydim'].GetSelection()
+                self.dim_reduce.enable_dimension(xcur, enable=False, npts=None)
+                self.dim_reduce.enable_dimension(ycur, enable=False, npts=None)
 
         self.Refresh()
 
@@ -234,7 +253,8 @@ class TablePanel(wx.Panel):
 
         frame_opts = {'title':  f'SitkaGrid {win} '}
         gframe = self.show_gridframe(win, **frame_opts)
-        alabel = dim_repr(reddim)
+        alabel = dim_code(reddim)
+        self.access_code = f"datasets['{self.filename}']['{self.itemname}']{alabel}"
 
         data_thread.join()
         dt_data = time.time()-t0_data
