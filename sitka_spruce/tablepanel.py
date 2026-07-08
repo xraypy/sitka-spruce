@@ -220,7 +220,6 @@ class TablePanel(wx.Panel):
         ydim   = self.wids['ydim'].GetSelection()
         xdim   = self.wids['xdim'].GetSelection()
 
-
         data_shape = self.data_obj.shape
         ndim = len(data_shape)
         reddim = self.dim_reduce.get_result(ndim)
@@ -240,10 +239,10 @@ class TablePanel(wx.Panel):
         data_thread.join()
         dt_data = time.time()-t0_data
         if len(data_shape) < 2:
-            data_shape = (data_shape[0], 1)
+            data_shape = (1, data_shape[0])
 
         if len(self._griddat.shape) < 2:
-            self._griddat.shape = (self._griddat.shape[0], 1)
+            self._griddat.shape = (1, self._griddat.shape[0])
 
         _ny, _nx = self._griddat.shape
         _ry, _rx = data_shape[ydim], data_shape[xdim]
