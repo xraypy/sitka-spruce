@@ -24,14 +24,15 @@ class ArrayImagePanel(wx.Panel):
         self.data_shape = None
         self.data_obj = None
         self.access_code = None
-        self.xsel_cur, self.ysel_cur = 0, 1
+        self.xsel_cur, self.ysel_cur = -1, -1
         self.skip_dim_proc = False
         self.imageframes = {}
         self.wids = wids = {}
 
-        self.dim_reduce = DimReducePanel(parent=self, callback=self.onDimReduce)
 
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
+        self.dim_reduce = DimReducePanel(parent=panel, callback=self.onDimReduce)
+
         wids['imshow'] = Button(panel, 'Show Image', size=(200, -1),
                                 action=self.onImshow)
 
@@ -63,7 +64,8 @@ class ArrayImagePanel(wx.Panel):
         wids['check_overwrite']  = Check(panel, ' ', size=(10, -1), default=True)
 
         def padd_text(text, dcol=1, size=(100, -1), newrow=True):
-            panel.Add(SimpleText(panel, text, size=size), dcol=dcol, newrow=newrow)
+            panel.Add(SimpleText(panel, text, size=size, style=LEFT),
+                      dcol=dcol, newrow=newrow)
 
         padd_text(' Y (Vert): ', newrow=True)
         panel.Add(wids['ydim'])
@@ -85,18 +87,20 @@ class ArrayImagePanel(wx.Panel):
         padd_text(' Y=0 at top?', size=(125, -1), newrow=False)
         panel.Add(wids['ydir'], dcol=2)
 
+
+        panel.Add((5, 5), newrow=True)
+        panel.Add(self.dim_reduce, dcol=5, newrow=True)
+        panel.Add((5, 5), newrow=True)
+
         panel.Add(wids['save_array'], newrow=True)
         panel.Add(wids['array_name'])
         padd_text(' Verify Overwrite', size=(125, -1), newrow=False)
         panel.Add(wids['check_overwrite'], dcol=1)
 
-        panel.Add((15, 15), newrow=True)
-
         panel.pack()
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(panel, 0, 0, LEFT|wx.GROW, 4)
-        sizer.Add(self.dim_reduce, 0, 0, LEFT|wx.GROW, 5)
+        sizer.Add(panel, 1, 0, LEFT|wx.GROW, 4)
         pack(self, sizer)
         register_darkdetect(self.onDarkMode)
 
@@ -134,6 +138,8 @@ class ArrayImagePanel(wx.Panel):
         xsel = self.wids['xdim'].GetSelection()
         ysel = self.wids['ydim'].GetSelection()
         if ysel == xsel and xsel != self.xsel_cur:
+            if self.xsel_cur < 0:
+                self.xsel_cur = 1 if xsel==0 else 0
             self.wids['ydim'].SetSelection(self.xsel_cur)
             self.ysel_cur = self.xsel_cur
         else:
@@ -152,7 +158,9 @@ class ArrayImagePanel(wx.Panel):
         self.skip_dim_proc = True
         xsel = self.wids['xdim'].GetSelection()
         ysel = self.wids['ydim'].GetSelection()
-        if ysel == xsel and ysel != self.ysel_cur:  # y changed
+        if ysel == xsel and ysel != self.ysel_cur:
+            if self.ysel_cur < 0:
+                self.ysel_cur = 1 if ysel==0 else 0
             self.wids['xdim'].SetSelection(self.ysel_cur)
             self.xsel_cur = self.ysel_cur
         else:
@@ -171,22 +179,28 @@ class ArrayImagePanel(wx.Panel):
         self.filename = filename
         self.itemname = itemname
         self.data_obj = object
+        # print(f'Plot2D  {filename=}, {itemname=} {itemtype=}')
         if (itemtype in ARRAY_TYPES):
             self.data_shape = object.shape
             choices = self.dim_reduce.set_datashape(object.shape)
+            # print(f"Choices: {choices=}")
             if len(choices) > 0:
                 xcur = self.wids['xdim'].GetSelection()
                 ycur = self.wids['ydim'].GetSelection()
+                if xcur == ycur:
+                    ycur = 1 if xcur == 0 else 0
+
                 self.wids['xdim'].SetChoices(choices)
-                self.wids['ydim'].SetChoices(choices)
-                self.wids['ydim'].SetSelection(ycur)
                 self.wids['xdim'].SetSelection(xcur)
 
-                xcur = self.wids['xdim'].GetSelection()
-                ycur = self.wids['ydim'].GetSelection()
+                self.wids['ydim'].SetChoices(choices)
+                self.wids['ydim'].SetSelection(ycur)
+
                 self.dim_reduce.enable_dimension(xcur, enable=False, npts=None)
                 self.dim_reduce.enable_dimension(ycur, enable=False, npts=None)
 
+                xcur = self.wids['xdim'].GetSelection()
+                ycur = self.wids['ydim'].GetSelection()
         self.Refresh()
 
 

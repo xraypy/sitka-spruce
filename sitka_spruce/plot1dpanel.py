@@ -25,9 +25,10 @@ class ArrayPlot1DPanel(wx.Panel):
         self.access_code = None
         self.last_yaxes = 0
         self.plotframes = {}
-        self.dim_reduce = DimReducePanel(parent=self, callback=self.onDimReduce)
         self.wids = wids = {}
+
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
+        self.dim_reduce = DimReducePanel(parent=panel, callback=self.onDimReduce)
 
         wids['newplot'] = Button(panel, 'New Plot', size=(200, -1),
                               action=self.onPlot)
@@ -79,16 +80,18 @@ class ArrayPlot1DPanel(wx.Panel):
         padd_text(' Share Y-axis?', size=(125, -1), newrow=False)
         panel.Add(wids['sharey'], dcol=2)
 
+        panel.Add((5, 5), newrow=True)
+        panel.Add(self.dim_reduce, dcol=5, newrow=True)
+        panel.Add((5, 5), newrow=True)
+
         panel.Add(wids['save_array'], newrow=True)
         panel.Add(wids['array_name'])
         padd_text(' Verify Overwrite', size=(125, -1), newrow=False)
         panel.Add(wids['check_overwrite'], dcol=1)
-        panel.Add((15, 15), newrow=True)
         panel.pack()
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(panel,           0, 0, LEFT|wx.GROW, 2)
-        sizer.Add(self.dim_reduce, 0, 0, LEFT|wx.GROW, 2)
+        sizer.Add(panel,    1, 0, LEFT|wx.GROW, 2)
         pack(self, sizer)
         register_darkdetect(self.onDarkMode)
 

@@ -85,9 +85,9 @@ class TablePanel(wx.Panel):
         self.skip_dim_proc = False
         self.gridframes = {}
 
-        self.dim_reduce = DimReducePanel(parent=self, callback=self.onDimReduce)
         self.wids = wids = {}
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
+        self.dim_reduce = DimReducePanel(parent=panel, callback=self.onDimReduce)
 
         wids['show'] = Button(panel, 'Show Table', size=(150, -1),
                                  action=self.onShow)
@@ -125,17 +125,19 @@ class TablePanel(wx.Panel):
         padd_text(' Window:', size=(100, -1), newrow=False)
         panel.Add(wids['win'])
 
+        panel.Add((5, 5), newrow=True)
+        panel.Add(self.dim_reduce, dcol=5, newrow=True)
+        panel.Add((5, 5), newrow=True)
+
         panel.Add(wids['save_array'], newrow=True)
         panel.Add(wids['array_name'])
         padd_text(' Verify Overwrite', size=(125, -1), newrow=False)
         panel.Add(wids['check_overwrite'], dcol=1)
-        panel.Add((15, 15), newrow=True)
 
         panel.pack()
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(panel, 0, 0, LEFT|wx.GROW, 4)
-        sizer.Add(self.dim_reduce, 0, 0, LEFT|wx.GROW, 5)
+        sizer.Add(panel, 1, 0, LEFT|wx.GROW, 4)
         pack(self, sizer)
         register_darkdetect(self.onDarkMode)
 
