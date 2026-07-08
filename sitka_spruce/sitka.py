@@ -17,7 +17,7 @@ from pathlib import Path
 
 from wxutils import (SimpleText, pack,  LEFT,  get_color,
                      use_darkdetect, register_darkdetect,
-                     MenuItem,  flatnotebook)
+                     MenuItem,  flatnotebook, GridPanel, Button)
 
 from pyshortcuts import get_cwd
 
@@ -84,7 +84,9 @@ class SitkaFrame(wx.Frame):
         splitter = wx.SplitterWindow(self, size=size, style=wx.SP_LIVE_UPDATE)
 
         leftpanel = wx.Panel(splitter)
-        rightpanel = scrolled.ScrolledPanel(splitter)
+        # rightpanel = scrolled.ScrolledPanel(splitter)
+        # rightpanel = scrolled.ScrolledPanel(splitter)
+        rightpanel = wx.Panel(splitter)
 
         self.tree = HDataTree(leftpanel, on_select=self.onSelectObject)
 
@@ -104,14 +106,19 @@ class SitkaFrame(wx.Frame):
         sizer.Add(self.info, 0, wx.ALL|wx.GROW)
         pack(leftpanel, sizer)
 
-        self.filename_label = SimpleText(rightpanel, '', font=get_font(larger=1),
-                                         colour='title_red', size=(500, -1),
-                                         style=LEFT|wx.ALIGN_CENTER_VERTICAL)
-        self.itemname_label = SimpleText(rightpanel, '', font=get_font(larger=1),
-                                         colour='title_red', size=(500, -1),
-                                         style=LEFT|wx.ALIGN_CENTER_VERTICAL)
 
-        self.nb = flatnotebook(rightpanel, {},
+        mpanel = GridPanel(rightpanel, ncols=4, nrows=10, pad=2, itemstyle=LEFT)
+
+        self.filename_label = SimpleText(mpanel, '', font=get_font(larger=1),
+                                         colour='title_red', size=(525, -1),
+                                         style=LEFT|wx.ALIGN_CENTER_VERTICAL)
+        self.itemname_label = SimpleText(mpanel, '', font=get_font(larger=1),
+                                         colour='title_red', size=(525, -1),
+                                         style=LEFT|wx.ALIGN_CENTER_VERTICAL)
+        self.copybtn = Button(mpanel, 'Copy Address', size=(150, -1),
+                              action=self.onCopyAddress)
+
+        self.nb = flatnotebook(mpanel, {},
                                on_change=self.onNBChanged,
                                size=(875, 550))
 
@@ -122,10 +129,14 @@ class SitkaFrame(wx.Frame):
         self.nb.SetSelection(0)
         self.current_nbpage = self.nb.GetSelection()
 
+
+        mpanel.Add(self.filename_label, dcol=3)
+        mpanel.Add(self.copybtn, dcol=1)
+        mpanel.Add(self.itemname_label, dcol=3, newrow=True)
+        mpanel.Add(self.nb, dcol=4, drow=5, newrow=True)
+        mpanel.pack()
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.filename_label, 0, wx.ALL|wx.LEFT, 4)
-        sizer.Add(self.itemname_label, 0, wx.ALL|wx.LEFT, 4)
-        sizer.Add(self.nb, 1, wx.ALL|wx.GROW, 4)
+        sizer.Add(mpanel, 1, wx.ALL|wx.LEFT, 4)
         pack(rightpanel, sizer)
 
         rightpanel.SetBackgroundColour(get_color('text_bg'))
@@ -147,6 +158,17 @@ class SitkaFrame(wx.Frame):
         self.tree.set_root(self.data.datasets)
         if self.tree.root is not None:
             self.tree.OnSelectionChanged()
+
+    def onCopyAddress(self, event=None):
+        page = self.nb.GetPage(self.current_nbpage)
+        msg = 'Could not copy data address to Clipboard'
+        if page.access_code is not None and wx.TheClipboard.Open():
+            wx.TheClipboard.SetData(wx.TextDataObject(page.access_code))
+            wx.TheClipboard.Close()
+            msg = 'Copied data address to Clipboard'
+        self.status_message(msg)
+
+
 
     def onNBChanged(self, event=None):
         oldpage = self.nb.GetPage(event.GetOldSelection())
