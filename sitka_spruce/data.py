@@ -243,12 +243,12 @@ class SitkaData:
     """
     def __init__(self):
         self.datasets = {}
-        self.arrayshapes = {0: []}
+        self.arrays  = {}
+        self.array_addrs  = {}
+        self.array_shapes = {0: []}
         self._asteval = asteval.Interpreter(with_numpy=True,
                                 with_import=True, with_importfrom=True)
         self._asteval.symtable['datasets'] = self.datasets
-        self.arrays  = {}
-        self.array_addrs  = {}
         self._last_error = None
 
     def add_dataset(self, name, dataset):
@@ -256,24 +256,24 @@ class SitkaData:
 
     def add_array(self, name, data, address=None):
         """add array to interpreter, and keep track of its shape"""
-
+        # print("Add array ", name, data, address)
         # remove existing value
         if name in self.arrays:
             oldval = self.arrays.pop(name)
             dshape = 0
             if isinstance(oldval, np.ndarray):
                 dshape = oldval.shape
-            # print("add_array ", name, dshape, self.arrayshapes[dshape])
-            if name in self.arrayshapes[dshape]:
-                self.arrayshapes[dshape].remove(name)
+            # print("add_array ", name, dshape, self.array_shapes[dshape])
+            if name in self.array_shapes[dshape]:
+                self.array_shapes[dshape].remove(name)
 
         # add new data array
         dshape = 0
         if isinstance(data, np.ndarray):
             dshape = data.shape
-        if dshape not in self.arrayshapes:
-            self.arrayshapes[dshape] = []
-        self.arrayshapes[dshape].append(name)
+        if dshape not in self.array_shapes:
+            self.array_shapes[dshape] = []
+        self.array_shapes[dshape].append(name)
         self.arrays[name] = data
         self._asteval.symtable.update(self.arrays)
         if address is not None:
