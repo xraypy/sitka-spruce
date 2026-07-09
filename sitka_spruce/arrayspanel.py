@@ -91,7 +91,7 @@ class ArraysPanel(wx.Panel):
         wx.CallAfter(self.Refresh)
 
     def onSaveArray(self, event=None):
-        name = self.wids['array_name'].GetValue()
+        name = self.wids['array_name'].GetValue().strip()
         verify = self.wids['check_overwrite'].IsChecked()
         expr = self.wids['expr'].GetValue()
         print(f"on Save Array {name=} {verify=}, {expr=}")
@@ -100,8 +100,6 @@ class ArraysPanel(wx.Panel):
         data._last_error = []
 
         ret = data.eval(expr)
-        print("Did eval ", ret, len(data._last_error))
-
         if len(data._last_error) > 0:
             print("Error evaluating expression")
         else:
@@ -109,14 +107,10 @@ class ArraysPanel(wx.Panel):
             self.wids['access_code'].SetLabel(expr)
             self.set_object()
 
-
     def onPanelExposed(self, *args, **kws):
-        print("on Array Panel exposed ", args, kws)
         self.set_object()
 
     def set_object(self, *args, **kws):
-        # print("Set object for Arrays")
-
         data = self.parent.data
         self.array_data = []
         warrays = self.wids['arrays']
