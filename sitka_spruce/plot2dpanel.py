@@ -127,7 +127,7 @@ class ArrayImagePanel(wx.Panel):
         reddim = self.dim_reduce.get_result(ndim)
         _yarr = get_data(self.data_obj, reddim)
         ylabel = dim_code(reddim)
-        access_code = f"datasets['{self.filename}']['{self.itemname}']{ylabel}"
+        access_code = f"['{self.filename}']['{self.itemname}']{ylabel}"
         self.parent.data.add_array(arr_name, _yarr, address=access_code)
 
 
@@ -266,7 +266,7 @@ class ArrayImagePanel(wx.Panel):
         iframe = self.show_imageframe(win, **frame_opts)
 
         dlabel = dim_code(reddim)
-        self.access_code = f"datasets['{self.filename}']['{self.itemname}']{dlabel}"
+        self.access_code = f"['{self.filename}']['{self.itemname}']{dlabel}"
         opts = {'title': f'{self.filename} {dlabel}'}
 
         data_thread.join()

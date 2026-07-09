@@ -256,7 +256,7 @@ class TablePanel(wx.Panel):
         frame_opts = {'title':  f'SitkaGrid {win} '}
         gframe = self.show_gridframe(win, **frame_opts)
         alabel = dim_code(reddim)
-        self.access_code = f"datasets['{self.filename}']['{self.itemname}']{alabel}"
+        self.access_code = f"['{self.filename}']['{self.itemname}']{alabel}"
 
         data_thread.join()
         dt_data = time.time()-t0_data

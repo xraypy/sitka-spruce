@@ -119,7 +119,7 @@ class ArrayPlot1DPanel(wx.Panel):
         reddim = self.dim_reduce.get_result(ndim)
         _yarr = get_data(self.data_obj, reddim)
         ylabel = dim_code(reddim)
-        access_code = f"datasets['{self.filename}']['{self.itemname}']{ylabel}"
+        access_code = f"['{self.filename}']['{self.itemname}']{ylabel}"
         self.parent.data.add_array(arr_name, _yarr, address=access_code)
 
 
@@ -174,7 +174,7 @@ class ArrayPlot1DPanel(wx.Panel):
         frame_opts = {'title':  f'SitkaPlot {win} '}
         pframe = self.show_plotframe(win, **frame_opts)
         ylabel = dim_code(reddim)
-        self.access_code = f"datasets['{self.filename}']['{self.itemname}']{ylabel}"
+        self.access_code = f"['{self.filename}']['{self.itemname}']{ylabel}"
 
         opts = {'title': f'{self.filename}\n{self.itemname}'}
 
