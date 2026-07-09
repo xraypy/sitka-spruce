@@ -92,7 +92,7 @@ class TablePanel(wx.Panel):
         wids['show'] = Button(panel, 'Show Table', size=(150, -1),
                                  action=self.onShow)
 
-        wids['axes'] =  ['dim0: 0pts', 'dim1: 0pts']
+        wids['axes'] =  ['dim0: 0 points', 'dim1: 0 points']
 
         wids['xdim'] = Choice(panel, wids['axes'],
                               size=(200, -1), action=self.onXdim)
@@ -274,7 +274,7 @@ class TablePanel(wx.Panel):
         osize = datasize_repr(self.data_obj)
 
         self.parent.status_message(f'got data ({dsize} of {osize}) in {dt_data:.2f} seconds')
-        self.parent.data.add_array('_tabledat', self._griddat)
+        self.parent.data.add_array('_tabledat', self._griddat, address=self.access_code)
 
         # print(f"Got data {_nx=}  {_rx=}   {_ny=}  {_ry=}  {ydim=} {xdim=}")
         if _ry == _nx and _rx == _ny or (ydim > xdim):
