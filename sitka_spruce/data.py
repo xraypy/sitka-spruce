@@ -2,6 +2,7 @@ import sys
 import numpy as np
 
 import h5py
+import hdf5plugin
 import zarr
 
 import asteval
@@ -17,6 +18,9 @@ COMMONTYPES = (int, float, complex, str, bytes, bool, list, tuple, np.ndarray)
 ARRAY_TYPES = ('h5py.Dataset', 'zarr.Array', 'ndarray')
 GROUP_TYPES = ('h5py.Group', 'zarr.Group', 'larch.Group')
 
+
+# reverse map of hdf5plugin filters
+HDF_FILTERS_MAP = {v: k for k, v in hdf5plugin.FILTERS.items()}
 
 def cast_int(val):
     return str(int(val))
@@ -81,6 +85,36 @@ def get_itemtype(obj):
         itemtype = obj.__class__.__name__
     return itemtype
 
+def get_hdf5_compression_info(obj):
+    """get a dict of compression information for a dataset"""
+    out = {}
+    if obj.compression is not None:
+        if obj.compression == 'unknown':  # try to use hdf5plugin to get compression
+
+            plist = obj.id.get_create_plist()
+            filters = [plist.get_filter(i) for i in range(plist.get_nfilters())]
+            comps, opts = [], []
+            for filtid, _, fopts, labbytes in filters:
+                try:
+                    label = labbytes.decode('utf-8').split(';')[0]
+                except Exception:
+                    label = None
+                if label is None and filtid in HDF_FILTERS_MAP:
+                    label = HDF_FILTERS_MAP[filtid]
+                comps.append(label)
+                opts.append(repr(fopts))
+
+            if len(comps) == 0:
+                comps = ['unknown']
+            out['compression'] = ', '.join(comps)
+            out['compression_opts'] = ', '.join(opts)
+
+        else:
+            out['compression'] = obj.compression
+            if obj.compression_opts is not None:
+                out['compression_opts'] = obj.compression_opts
+    return out
+
 def get_attributes(obj):
     """get attributes for hdf5 Groups/Datasets"""
     out = {}
@@ -91,10 +125,7 @@ def get_attributes(obj):
             out['dtype'] = str(obj.dtype)
             out['shape'] = obj.shape
             out['chunks'] = obj.chunks
-            if obj.compression is not None:
-                out['compression'] = obj.compression
-            if obj.compression_opts is not None:
-                out['compression_opts'] = obj.compression_opts
+            out.update(get_hdf5_compression_info(obj))
 
         if len(obj.attrs) > 0:
             out['_attributes_'] = 'object attibutes'
@@ -144,6 +175,7 @@ def dim_code(reductions):
     """return Python code representation of dimension reductions"""
     reps = []
     sums = []
+    saxis = []
     off = 0
     npts = 1.0
     for idim, use, method, imin, imax in reductions:
@@ -153,11 +185,16 @@ def dim_code(reductions):
             reps.append(f'{imin}')
         else:
             reps.append(f'{imin}:{imax}')
+            saxis.append(idim)
             sums.append(f'sum(axis={idim-off})')
+            off += 1
             if method == 'mean' and imax > (imin+1):
                 npts *= (imax-imin)
     words = [f"[{','.join(reps)}]"]
-    words.extend(sums)
+    if len(saxis) == 1:
+        words.append(f'sum(axis={saxis[0]})')
+    elif len(saxis) > 1:
+        words.append(f'sum(axis={tuple(saxis)})')
     out = '.'.join(words)
     if npts > 1.0:
         out = f'{out}/{npts:.1f}'
@@ -166,7 +203,8 @@ def dim_code(reductions):
 def get_data(obj, reductions):
     """return dataset (1d or 2d) from multidimensional array"""
     slices = []
-    meths = []
+    sumaxis = []
+    npts = 1.0
     ndims = len(obj.shape)
     for idim, use, method, imin, imax in reductions[:ndims]:
         m = None
@@ -176,21 +214,15 @@ def get_data(obj, reductions):
             else:
                 m = method
                 slices.append(slice(imin, imax))
+                sumaxis.append(idim)
+                npts = npts*(imax-imin)
         else:
             slices.append(slice(None, None))
-        meths.append(m)
 
     ret = obj[tuple(slices)]
-    oshape = ret.shape
-    off = 0
-    for i, meth  in enumerate(meths):
-        if meth in ('sum', 'mean'):
-            ret = ret.sum(axis=(i-off))
-            off += 1
-            if meth == 'mean':
-                ret = ret / (1.0*oshape[i])
+    if len(sumaxis):
+        ret = ret.sum(axis=tuple(sumaxis))/npts
     return ret.squeeze()
-
 
 class SitkaData:
     """
