@@ -39,21 +39,15 @@ class ArrayPlot1DPanel(wx.Panel):
         wids['win'] = Choice(panel, ['1', '2', '3', '4', '5'], size=(75, -1))
         wids['win'].SetStringSelection('1')
 
-        wids['ychoices'] =  ['dim0: 0pts']
-        wids['normchoices'] = ['1']
-        wids['xchoices'] = ['<index>']
+        wids['ychoices'] =  ['dim0: 0 points']
 
         wids['yarray'] = Choice(panel, wids['ychoices'],
                                 size=(200, -1), action=self.onYarray)
-        wids['yop'] = Choice(panel, ['+', '-', '*', '/'],
-                             size=(75, -1), action=self.onPlot)
+        wids['yop'] = Choice(panel, ['+', '-', '*', '/'], size=(75, -1))
         wids['yop'].SetStringSelection('/')
 
-        wids['ynorm'] = Choice(panel, wids['normchoices'],
-                                size=(200, -1), action=self.onPlot)
-
-        wids['xarray'] = Choice(panel, wids['xchoices'],
-                                size=(200, -1), action=self.onPlot)
+        wids['ynorm'] = Choice(panel, ['1'],   size=(200, -1))
+        wids['xarray'] = Choice(panel, ['<index>'], size=(200, -1))
 
         wids['save_array'] = Button(panel, 'Save Array', size=(125, -1),
                                   action=self.onNameArray)
@@ -147,6 +141,21 @@ class ArrayPlot1DPanel(wx.Panel):
         if self.data_shape is not None:
             for i, npts in enumerate(self.data_shape):
                 self.dim_reduce.enable_dimension(i, enable=(i!=sel), npts=npts)
+        self.update_array_choices()
+
+    def update_array_choices(self, event=None):
+        ystr = self.wids['yarray'].GetStringSelection()
+        words = ystr.replace('dim', '').replace('points', '').split()
+        yshape = (int(words[1]), )
+
+        nchoices = ['1']
+        nchoices.extend(self.parent.data.array_shapes.get(yshape, []))
+
+        xchoices = ['<index>']
+        xchoices.extend(self.parent.data.array_shapes.get(yshape, []))
+
+        self.wids['ynorm'].SetChoices(nchoices)
+        self.wids['xarray'].SetChoices(xchoices)
 
     def onDimReduce(self, event=None, dim=None, reduce=None):
         self.onPlot(new=True)
@@ -155,9 +164,9 @@ class ArrayPlot1DPanel(wx.Panel):
         win    = self.wids['win'].GetStringSelection()
         sharey = self.wids['sharey'].IsChecked()
         # ydim   = self.wids['yarray'].GetSelection()
-        # ynorm  = self.wids['ynorm'].GetStringSelection()
-        # yop    = self.wids['yop'].GetStringSelection()
-        xarray = self.wids['xarray'].GetStringSelection()
+        ynorm  = self.wids['ynorm'].GetStringSelection()
+        yop    = self.wids['yop'].GetStringSelection()
+        xarr   = self.wids['xarray'].GetStringSelection()
         ###
         self.parent.status_message('fetching data....')
 
@@ -178,8 +187,6 @@ class ArrayPlot1DPanel(wx.Panel):
 
         opts = {'title': f'{self.filename}\n{self.itemname}'}
 
-        # if 'ynorm' == '1':
-        #     ynorm  = 1.0
 
         plot = pframe.oplot
         if new:
@@ -194,9 +201,16 @@ class ArrayPlot1DPanel(wx.Panel):
 
         opts['yaxes'] = self.last_yaxes
         opts['label'] = f'{self.itemname}{ylabel}'
+        opts['xlabel'] = xarr
 
         data_thread.join()
         dt_data = time.time()-t0_data
+
+        ynorm = self.parent.data.arrays.get(ynorm, 1.0)
+        if yop == '*':   self._yarr = self._yarr * ynorm
+        elif yop == '/': self._yarr = self._yarr * ynorm
+        elif yop == '+': self._yarr = self._yarr + ynorm
+        elif yop == '-': self._yarr = self._yarr - ynorm
 
         dsize = datasize_repr(self._yarr)
         osize = datasize_repr(self.data_obj)
@@ -204,11 +218,12 @@ class ArrayPlot1DPanel(wx.Panel):
         self.parent.status_message(f'got data ({dsize} of {osize}) in {dt_data:.2f} seconds')
         self.parent.data.add_array('_ydat', self._yarr, address=self.access_code)
 
-        xarr = np.arange(len(self._yarr))
-        if xarray == '<index>':
-            xarr = np.arange(len(self._yarr))
+        xvals = self.parent.data.arrays.get(xarr, None)
+        if xarr == '<index>' or xvals is None:
+            opts['xlabel'] = 'index'
+            xvals = np.arange(len(self._yarr))
 
-        plot(xarr, self._yarr, **opts)
+        plot(xvals, self._yarr, **opts)
         pframe.Show()
         pframe.Raise()
 
