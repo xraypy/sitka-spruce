@@ -27,6 +27,7 @@ from .hdatatree import HDataTree
 from .plot1dpanel import ArrayPlot1DPanel
 from .plot2dpanel import ArrayImagePanel
 from .tablepanel import TablePanel
+from .arrayspanel import ArraysPanel
 
 try:
     import larch
@@ -126,6 +127,7 @@ class SitkaFrame(wx.Frame):
         self.nb.AddPage(ArrayImagePanel(self), 'Image Display', True)
         self.nb.AddPage(ArrayPlot1DPanel(self), 'XY Plot Display', True)
         self.nb.AddPage(TablePanel(self), 'Table Display', True)
+        self.nb.AddPage(ArraysPanel(self), 'Named Arrays', True)
         self.nb.SetSelection(0)
         self.current_nbpage = self.nb.GetSelection()
 
@@ -169,11 +171,9 @@ class SitkaFrame(wx.Frame):
         self.status_message(msg)
 
 
-
     def onNBChanged(self, event=None):
         oldpage = self.nb.GetPage(event.GetOldSelection())
         newpage = self.nb.GetPage(event.GetSelection())
-
         self.current_nbpage = event.GetSelection()
         on_hide = getattr(oldpage, 'onPanelHidden', None)
         if callable(on_hide):
