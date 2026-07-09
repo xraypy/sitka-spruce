@@ -183,7 +183,7 @@ class DimReducePanel(wx.Panel):
         choices = []
         for i, npts in enumerate(dshape):
             self.enable_dimension(i, npts=npts)
-            choices.append(f'dim{i}: {npts}pts')
+            choices.append(f'dim{i}: {npts} points')
 
         for i in range(len(dshape), self.maxdim):
             self.enable_dimension(i, enable=False)
