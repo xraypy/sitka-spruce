@@ -183,17 +183,31 @@ class ArrayImagePanel(wx.Panel):
         if (itemtype in ARRAY_TYPES):
             self.data_shape = object.shape
             choices = self.dim_reduce.set_datashape(object.shape)
-            # print(f"Choices: {choices=}")
+            # print(f"Choices: {choices=} {self.data_shape}")
             if len(choices) > 0:
                 xcur = self.wids['xdim'].GetSelection()
                 ycur = self.wids['ydim'].GetSelection()
-                if xcur == ycur:
-                    ycur = 1 if xcur == 0 else 0
-
                 self.wids['xdim'].SetChoices(choices)
-                self.wids['xdim'].SetSelection(xcur)
-
                 self.wids['ydim'].SetChoices(choices)
+                # might be overkill repetitive:
+                if xcur >= len(self.data_shape):
+                    xcur = 0
+                if ycur >= len(self.data_shape):
+                    ycur = 0
+                if xcur > len(self.data_shape):
+                    xcur = 0
+                if ycur > len(self.data_shape):
+                    ycur = 0
+                if xcur == ycur:
+                    ycur = (ycur - 1) % len(self.data_shape)
+                if self.data_shape[xcur] < 2:
+                    xcur = (xcur - 1) % len(self.data_shape)
+                if self.data_shape[ycur] < 2:
+                    ycur = (ycur - 1) % len(self.data_shape)
+                if xcur == ycur:
+                    ycur = (ycur - 1) % len(self.data_shape)
+
+                self.wids['xdim'].SetSelection(xcur)
                 self.wids['ydim'].SetSelection(ycur)
 
                 self.dim_reduce.enable_dimension(xcur, enable=False, npts=None)
