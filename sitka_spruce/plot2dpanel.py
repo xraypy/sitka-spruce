@@ -37,11 +37,9 @@ class ArrayImagePanel(wx.Panel):
                                 action=self.onImshow)
 
 
-        wids['plot_xchoices'] = ['<index>']
-        wids['plot_xval'] = Choice(panel, wids['plot_xchoices'],
+        wids['plot_xval'] = Choice(panel, ['<index>'],
                                    size=(200, -1), action=self.onImshow)
-        wids['plot_ychoices'] = ['<index>']
-        wids['plot_yval'] = Choice(panel, wids['plot_ychoices'],
+        wids['plot_yval'] = Choice(panel, ['<index>'],
                                    size=(200, -1), action=self.onImshow)
         wids['ydir'] = Check(panel, ' ', size=(100, -1), default=False)
 
@@ -49,7 +47,7 @@ class ArrayImagePanel(wx.Panel):
         wids['win'] = Choice(panel, ['1', '2', '3', '4', '5'], size=(75, -1))
         wids['win'].SetStringSelection('1')
 
-        wids['axes'] =  ['dim0: 0pts', 'dim1: 0pts']
+        wids['axes'] =  ['dim0: 0 points', 'dim1: 0 points']
 
         wids['xdim'] = Choice(panel, wids['axes'],
                               size=(200, -1), action=self.onXdim)
@@ -151,6 +149,7 @@ class ArrayImagePanel(wx.Panel):
                 self.dim_reduce.enable_dimension(i, enable=enable, npts=npts)
 
         self.skip_dim_proc = False
+        self.update_array_choices()
 
     def onYdim(self, event=None):
         if self.skip_dim_proc:
@@ -173,6 +172,25 @@ class ArrayImagePanel(wx.Panel):
                 self.dim_reduce.enable_dimension(i, enable=enable, npts=npts)
 
         self.skip_dim_proc = False
+        self.update_array_choices()
+
+    def update_array_choices(self, event=None):
+        ystr = self.wids['ydim'].GetStringSelection()
+        words = ystr.replace('dim', '').replace('points', '').split()
+        yshape = (int(words[1]), )
+
+        xstr = self.wids['xdim'].GetStringSelection()
+        words = xstr.replace('dim', '').replace('points', '').split()
+        xshape = (int(words[1]), )
+
+        xchoices = ['<index>']
+        xchoices.extend(self.parent.data.array_shapes.get(xshape, []))
+
+        ychoices = ['<index>']
+        ychoices.extend(self.parent.data.array_shapes.get(yshape, []))
+        self.wids['plot_xval'].SetChoices(xchoices)
+        self.wids['plot_yval'].SetChoices(ychoices)
+
 
     def set_object(self, object, itemtype='?', itemname='', filename='', **kws):
         """fill from object"""
@@ -183,7 +201,6 @@ class ArrayImagePanel(wx.Panel):
         if (itemtype in ARRAY_TYPES):
             self.data_shape = object.shape
             choices = self.dim_reduce.set_datashape(object.shape)
-            # print(f"Choices: {choices=} {self.data_shape}")
             if len(choices) > 0:
                 xcur = self.wids['xdim'].GetSelection()
                 ycur = self.wids['ydim'].GetSelection()
@@ -238,17 +255,12 @@ class ArrayImagePanel(wx.Panel):
 
 
     def onImshow(self, event=None, new=True):
-        # print("imshow ", new)
-
-        ########
-        win    = self.wids['win'].GetStringSelection()
-        ydir   = self.wids['ydir'].IsChecked()
-        ydim   = self.wids['ydim'].GetSelection()
-        xdim   = self.wids['xdim'].GetSelection()
-        # xarray  = self.wids['plot_xval'].GetStringSelection()
-        # yarray  = self.wids['plot_yval'].GetStringSelection()
-        # xdstr   = self.wids['xdim'].GetStringSelection()
-        # ydstr   = self.wids['ydim'].GetStringSelection()
+        win   = self.wids['win'].GetStringSelection()
+        ydir  = self.wids['ydir'].IsChecked()
+        ydim  = self.wids['ydim'].GetSelection()
+        xdim  = self.wids['xdim'].GetSelection()
+        xstr  = self.wids['plot_xval'].GetStringSelection()
+        ystr  = self.wids['plot_yval'].GetStringSelection()
 
         ndim = len(self.data_obj.shape)
         reddim = self.dim_reduce.get_result(ndim)
@@ -285,8 +297,13 @@ class ArrayImagePanel(wx.Panel):
         if (ydim > xdim):
             self._img = self._img.transpose()
 
-        xvals = np.arange(self._img.shape[1])
-        yvals = np.arange(self._img.shape[0])
+        xvals = self.parent.data.arrays.get(xstr, None)
+        yvals = self.parent.data.arrays.get(ystr, None)
+        if xstr == '<index>' or xvals is None:
+            xvals = np.arange(self._img.shape[1])
+        if ystr == '<index>' or yvals is None:
+            yvals = np.arange(self._img.shape[0])
+
         if ydir:
             self._img = self._img[::-1, :]
             yvals = yvals[::-1]
@@ -294,4 +311,4 @@ class ArrayImagePanel(wx.Panel):
         iframe.display(self._img, x=xvals, y=yvals, **opts)
         iframe.Show()
         iframe.Raise()
-        self.parent.data.add_array('_imgdat', self._img)
+        self.parent.data.add_array('_imgdat', self._img, address=self.access_code)
