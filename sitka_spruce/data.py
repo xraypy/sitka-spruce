@@ -26,7 +26,18 @@ def cast_int(val):
     return str(int(val))
 
 def cast_complex(val):
-    return f'{gformat(val.real)}+{gformat(val.imag)}j'
+    try:
+        out = f'{gformat(val.real)}+{gformat(val.imag)}j'
+    except Exception:
+        out = f'{val.real}+{val.imag}j'
+    return out
+
+def cast_float(val):
+    try:
+        out = gformat(val)
+    except Exception:
+        out = f'{val}'
+    return out
 
 def cast_bytes(val):
     try:
@@ -38,16 +49,17 @@ def cast_bytes(val):
 def dtype2str(dtype):
     """return string casting type for datatype"""
     cast = repr
-    if dtype in (bool, int, np.byte, np.bool, np.int32, np.int64):
+    if dtype in (bool, int, np.byte, np.bool, np.uint32,
+                 np.uint64, np.int32, np.int64):
         cast = cast_int
     elif dtype in (np.complex64, np.complex128):
         cast = cast_complex
     elif dtype in (np.float64, np.float32, np.float16):
-        cast = gformat
-    elif dtype in (np.dtype(object), np.dtype(bytes)):
+        cast = cast_float
+    elif (dtype in (np.dtype(object), np.dtype(bytes)) or
+          dtype.str.startswith('|S')):
         cast = cast_bytes
     return cast
-
 
 def get_items(obj):
     """return whether object is dict-like for tree"""
@@ -118,11 +130,15 @@ def get_hdf5_compression_info(obj):
 def get_attributes(obj):
     """get attributes for hdf5 Groups/Datasets"""
     out = {}
-    if h5py is not None and isinstance(obj, (h5py.Group, h5py.Dataset)):
+    if isinstance(obj, (h5py.Group, h5py.Dataset)):
         if isinstance(obj, h5py.Group):
             out['# members'] = len(obj.keys())
         if isinstance(obj, h5py.Dataset):
             out['dtype'] = str(obj.dtype)
+            if obj.shape == (1, ):
+                # print("get scalar value ", dtype2str(obj.dtype), obj[()])
+                out['value'] = dtype2str(obj.dtype)(obj[0])
+
             out['shape'] = obj.shape
             out['chunks'] = obj.chunks
             out.update(get_hdf5_compression_info(obj))
