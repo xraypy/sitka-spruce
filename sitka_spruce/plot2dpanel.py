@@ -19,7 +19,7 @@ class ArrayImagePanel(wx.Panel):
         wx.Panel.__init__(self, parent)
         self.parent = parent
 
-        self.SetBackgroundColour(get_color('text_bg'))
+        self.SetBackgroundColour(get_color('sbg'))
 
         self.data_shape = None
         self.data_obj = None
@@ -104,7 +104,7 @@ class ArrayImagePanel(wx.Panel):
 
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)
-        bgcol = get_color('text_bg', dark=is_dark)
+        bgcol = get_color('sbg', dark=is_dark)
         self.SetBackgroundColour(bgcol)
         self.SetForegroundColour(fgcol)
         self.SetBackgroundColour(bgcol)
@@ -279,7 +279,7 @@ class ArrayImagePanel(wx.Panel):
 
         dlabel = dim_code(reddim)
         self.access_code = f"['{self.filename}']['{self.itemname}']{dlabel}"
-        opts = {'title': f'{self.filename} {dlabel}'}
+        opts = {'title': f'{self.filename} {dlabel}', 'contrast_level':'0.05'}
 
         data_thread.join()
         if self._img.dtype == np.bool:

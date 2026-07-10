@@ -18,6 +18,8 @@ from pathlib import Path
 from wxutils import (SimpleText, pack,  LEFT,  get_color,
                      use_darkdetect, register_darkdetect,
                      MenuItem,  flatnotebook, GridPanel, Button)
+from wxutils.colors import add_named_color
+
 
 from pyshortcuts import get_cwd
 
@@ -41,6 +43,11 @@ FILE_WILDCARD = 'HDF5/Zarr files(*.hdf5;*.h5;*.zarr)|*.hdf5;*.h5;*.zarr|All file
 FILE_OPENERS = {'hdf5': h5py.File, 'h5': h5py.File, 'zarr': zarr.open}
 
 DV_STYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
+
+ICON_FILE = 'sitka.ico'
+ICON_DIR = Path(Path(__file__).parent, 'icons').absolute()
+
+add_named_color('sbg', (245, 250, 250, 255), ( 35,  40,  40, 255))
 
 def get_opener(path):
     """get file opener for path name
@@ -141,11 +148,11 @@ class SitkaFrame(wx.Frame):
         sizer.Add(mpanel, 1, wx.ALL|wx.LEFT, 4)
         pack(rightpanel, sizer)
 
-        rightpanel.SetBackgroundColour(get_color('text_bg'))
+        rightpanel.SetBackgroundColour(get_color('sbg'))
         self.rightpanel = rightpanel
-        self.nb.SetBackgroundColour(get_color('text_bg'))
-        self.nb.SetForegroundColour(get_color('text_bg'))
-        self.tree.SetBackgroundColour(get_color('text_bg'))
+        self.nb.SetBackgroundColour(get_color('sbg'))
+        self.nb.SetForegroundColour(get_color('sbg'))
+        self.tree.SetBackgroundColour(get_color('sbg'))
         self.tree.SetForegroundColour(get_color('text_fg'))
 
         self.info.SetFont(get_font())
@@ -156,10 +163,13 @@ class SitkaFrame(wx.Frame):
         splitter.SetMinimumPaneSize(300)
         register_darkdetect(self.onDarkMode)
 
+
         # Display the root item.
         self.tree.set_root(self.data.datasets)
         if self.tree.root is not None:
             self.tree.OnSelectionChanged()
+        # iconpath = Path(ICON_DIR, ICON_FILE).as_posix()
+        # self.SetIcon(wx.Icon(iconpath, wx.BITMAP_TYPE_ICO))
 
     def onCopyAddress(self, event=None):
         page = self.nb.GetPage(self.current_nbpage)
@@ -218,7 +228,7 @@ class SitkaFrame(wx.Frame):
 
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)
-        bgcol = get_color('text_bg', dark=is_dark)
+        bgcol = get_color('sbg', dark=is_dark)
         self.tree.SetBackgroundColour(bgcol)
         self.tree.SetForegroundColour(fgcol)
         self.info.SetBackgroundColour(bgcol)
@@ -386,9 +396,13 @@ class Sitka_App(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
     def createApp(self):
         self.frame = SitkaFrame()
-        self.frame.Show()
-        self.SetTopWindow(self.frame)
         use_darkdetect()
+        self.frame.Show()
+
+        self.SetTopWindow(self.frame)
+
+        iconpath = Path(ICON_DIR, ICON_FILE).as_posix()
+        self.frame.SetIcon(wx.Icon(iconpath, wx.BITMAP_TYPE_ICO))
         return True
 
     def OnInit(self):

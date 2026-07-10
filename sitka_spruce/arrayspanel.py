@@ -18,7 +18,7 @@ class ArraysPanel(wx.Panel):
     def __init__(self, parent, size=(750, 500)):
         wx.Panel.__init__(self, parent)
         self.parent = parent
-        self.SetBackgroundColour(get_color('text_bg'))
+        self.SetBackgroundColour(get_color('sbg'))
 
         self.access_code = ''
         self.wids = wids = {}
@@ -83,7 +83,7 @@ class ArraysPanel(wx.Panel):
 
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)
-        bgcol = get_color('text_bg', dark=is_dark)
+        bgcol = get_color('sbg', dark=is_dark)
         self.SetBackgroundColour(bgcol)
         self.SetForegroundColour(fgcol)
         self.SetBackgroundColour(bgcol)
@@ -129,7 +129,7 @@ class ArraysPanel(wx.Panel):
         try:
             ast.parse(value)
             fgcol = get_color('text')
-            bgcol = get_color('text_bg')
+            bgcol = get_color('sbg')
         except SyntaxError:
             fgcol = get_color('text_invalid')
             bgcol = get_color('text_invalid_bg')

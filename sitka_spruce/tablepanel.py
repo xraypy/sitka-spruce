@@ -32,7 +32,7 @@ class DataGridFrame(wx.Frame):
 
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)
-        bgcol = get_color('text_bg', dark=is_dark)
+        bgcol = get_color('sbg', dark=is_dark)
         self.SetBackgroundColour(bgcol)
         self.SetForegroundColour(fgcol)
         wx.CallAfter(self.Refresh)
@@ -76,7 +76,7 @@ class TablePanel(wx.Panel):
     def __init__(self, parent, size=(750, 500)):
         wx.Panel.__init__(self, parent)
         self.parent = parent
-        self.SetBackgroundColour(get_color('text_bg'))
+        self.SetBackgroundColour(get_color('sbg'))
 
         self.data_shape = None
         self.data_obj = None
@@ -143,7 +143,7 @@ class TablePanel(wx.Panel):
 
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)
-        bgcol = get_color('text_bg', dark=is_dark)
+        bgcol = get_color('sbg', dark=is_dark)
         self.SetBackgroundColour(bgcol)
         self.SetForegroundColour(fgcol)
         self.SetBackgroundColour(bgcol)

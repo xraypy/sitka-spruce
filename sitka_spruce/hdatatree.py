@@ -22,7 +22,7 @@ class HDataTree(wx.TreeCtrl):
     def onDarkMode(self, is_dark=None):
         self.is_dark = is_dark
         fgcol = get_color('text', dark=is_dark)
-        bgcol = get_color('text_bg', dark=is_dark)
+        bgcol = get_color('sbg', dark=is_dark)
         self.SetBackgroundColour(bgcol)
         self.SetForegroundColour(fgcol)
         self.SetBackgroundColour(bgcol)
