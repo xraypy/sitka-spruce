@@ -38,7 +38,20 @@ class HDataTree(wx.TreeCtrl):
         self.Bind(wx.EVT_TREE_ITEM_EXPANDING, self.OnItemExpanding, id=self.GetId())
         self.Bind(wx.EVT_KILL_FOCUS, self.onKillFocus, id=self.GetId())
         self.Bind(wx.EVT_SET_FOCUS, self.onSetFocus, id=self.GetId())
+        self.Bind(wx.EVT_RIGHT_DOWN, self.onRightDown)
         wx.CallAfter(self.onRefresh)
+
+    def onRightDown(self, event=None):
+        if self.item is not None:
+            obj = self.GetItemData(self.item)
+            addr = self.get_address(self.item)
+            if len(addr) > 0 and wx.TheClipboard.Open():
+                fname = addr.pop(0)
+                addr = '/'.join(addr)
+                addr = f"['{fname}']['{addr}']"
+                wx.TheClipboard.SetData(wx.TextDataObject(addr))
+                wx.TheClipboard.Close()
+
 
     def onKillFocus(self, event=None):
         if self.item is not None and event is not None:
