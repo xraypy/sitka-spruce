@@ -6,7 +6,8 @@ import wx.dataview as dv
 import wx.lib.scrolledpanel as scrolled
 
 from wxutils import (GridPanel, SimpleText, pack, Button, TextCtrl, HLine,
-                     Check, Choice, LEFT, get_color, register_darkdetect)
+                     Check, Choice, LEFT, get_color, register_darkdetect,
+                     FileSave, Popup)
 
 from .gui_utils import get_font
 from .data import ARRAY_TYPES, dtype2str, get_data, dim_code, datasize_repr
@@ -28,11 +29,12 @@ class ArraysPanel(wx.Panel):
         aview = self.wids['arrays'] = dv.DataViewListCtrl(panel, style=DVSTYLE)
         aview.SetFont(get_font(fixed_width=True, smaller=1))
         aview.SetMinSize((725, 250))
-        aview.AppendTextColumn(' Array Name ', width=150)
-        aview.AppendTextColumn(' Shape      ', width=125)
-        aview.AppendTextColumn(' Origin     ', width=575)
-        for col in range(3):
-            align = wx.ALIGN_RIGHT if col == 1 else wx.ALIGN_LEFT
+        aview.AppendToggleColumn(' Select', width=60, mode=dv.DATAVIEW_CELL_ACTIVATABLE)
+        aview.AppendTextColumn(' Array Name ', width=125)
+        aview.AppendTextColumn(' Shape      ', width=100)
+        aview.AppendTextColumn(' Origin     ', width=500)
+        for col in range(4):
+            align = wx.ALIGN_RIGHT if col == 2 else wx.ALIGN_LEFT
             this = aview.Columns[col]
             this.Sortable = True
             this.Alignment = this.Renderer.Alignment = align
@@ -50,6 +52,12 @@ class ArraysPanel(wx.Panel):
         wids['check_overwrite']  = Check(panel, ' ', size=(10, -1), default=True)
         wids['access_code'] = SimpleText(panel, ' ', size=(700, -1), style=LEFT)
 
+        wids['delete'] = Button(panel, 'Delete Selected Arrays', size=(300, -1),
+                              action=self.onDeleteArrays)
+
+        wids['export'] = Button(panel, 'Export Selected Arrays to HDF5', size=(300, -1),
+                                action=self.onExportArrays)
+
         def padd_text(text, dcol=1, size=(150, -1), newrow=True):
             panel.Add(SimpleText(panel, text, size=size, style=LEFT),
                       dcol=dcol, newrow=newrow)
@@ -58,6 +66,9 @@ class ArraysPanel(wx.Panel):
         panel.Add(aview, dcol=7, drow=True, newrow=True)
 
         panel.Add(wids['access_code'], dcol=7, newrow=True)
+        panel.Add((5, 5), newrow=True)
+        panel.Add(wids['export'], dcol=3, newrow=True)
+        panel.Add(wids['delete'], dcol=3)
 
         panel.Add(HLine(panel, size=(725, 3)), dcol=7)
 
@@ -93,15 +104,25 @@ class ArraysPanel(wx.Panel):
     def onSaveArray(self, event=None):
         name = self.wids['array_name'].GetValue().strip()
         verify = self.wids['check_overwrite'].IsChecked()
-        expr = self.wids['expr'].GetValue()
-        print(f"on Save Array {name=} {verify=}, {expr=}")
 
         data = self.parent.data
+        if verify and name in data.arrays:
+            ret = Popup(self, f"Overwrite Array '{name}'?\n",
+                        'Verify Overwrite',
+                        style=wx.YES_NO|wx.ICON_QUESTION)
+            if ret != wx.ID_YES:
+                return
+
+        expr = self.wids['expr'].GetValue()
+        print(f"on Save Array {name=}  {expr=}")
+
         data._last_error = []
 
         ret = data.eval(expr)
         if len(data._last_error) > 0:
-            print("Error evaluating expression")
+            Popup(self, 'Error evaluating Expression for array',
+                  f"check '{expr}'")
+
         else:
             data.add_array(name, ret, address=expr)
             self.wids['access_code'].SetLabel(expr)
@@ -118,7 +139,7 @@ class ArraysPanel(wx.Panel):
 
         for aname, arr in data.arrays.items():
             addr = data.array_addrs.get(aname, 'unknown')
-            args = [aname, repr(arr.shape), addr]
+            args = [False, aname, repr(arr.shape), addr]
             self.array_data.append(args)
             warrays.AppendItem(tuple(args))
 
@@ -137,12 +158,43 @@ class ArraysPanel(wx.Panel):
         wexpr.SetForegroundColour(fgcol)
         wexpr.SetBackgroundColour(bgcol)
 
+
     def onSelectArray(self, evt=None):
         if self.wids['arrays'] is None:
             return
         if not self.wids['arrays'].HasSelection():
             return
         item = self.wids['arrays'].GetSelectedRow()
-        address = self.array_data[item][2]
+        address = self.array_data[item][3]
         self.access_code = address
         self.wids['access_code'].SetLabel(address)
+
+    def get_arraynames(self, all=False):
+        """get list of array names, either all or selected"""
+        out = []
+        arrays = self.parent.data.arrays
+        warrays = self.wids['arrays']
+        for row in range(warrays.GetItemCount()):
+            sel = warrays.GetValue(row, 0)
+            name = warrays.GetValue(row, 1)
+            if all or sel and name in arrays:
+                out.append(name)
+        return out
+
+    def onExportArrays(self, evt=None):
+        arrays = self.get_arraynames()
+        print("export  ", arrays)
+
+
+    def onDeleteArrays(self, evt=None):
+        arrays = self.get_arraynames()
+        print("delete  ", arrays)
+        ret = Popup(self, f"Erase {len(arrays)} Array?\nThis cannot be undone.",
+                    'Verify erase',
+                    style=wx.YES_NO|wx.ICON_QUESTION)
+        if ret != wx.ID_YES:
+            return
+
+        for aname in arrays:
+            self.parent.data.arrays.pop(aname)
+        self.set_object()
