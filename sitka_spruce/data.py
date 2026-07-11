@@ -8,7 +8,7 @@ import zarr
 
 import asteval
 
-from pyshortcuts import gformat
+from pyshortcuts import gformat, isotime
 from pathlib import Path
 
 try:
@@ -355,3 +355,19 @@ class SitkaData:
             return None
         else:
             return out
+
+    def export_hdf5(self, path, arraynames):
+        """write HDF5 file with values for named arrays"""
+        f = h5py.File(path, 'a')
+        root = f.create_group('sitka_arrays')
+        root.attrs['saved_date'] = isotime()
+        for name in arraynames:
+            dat = self.arrays.get(name, None)
+            if dat is None:
+                continue
+            shape = dat.shape
+            dset = root.create_dataset(name,  data=dat,
+                                       compression='gzip',
+                                       compression_opts=2,
+                                       chunks=shape)
+            dset.attrs['origin'] = self.array_addrs.get(name, 'unknown')
