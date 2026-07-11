@@ -6,7 +6,8 @@ from pyshortcuts import uname, make_shortcut, ico_ext
 
 from wxmplot.interactive import get_wxapp
 
-from .sitka import Sitka_App, SitkaFrame, get_opener
+from .data import get_sitka_files, get_opener
+from .sitka import Sitka_App, SitkaFrame
 
 def sitka_viewer(folder=None):
     """Sitka Vewer for HDF5/Zarr files that that can be run
@@ -32,23 +33,6 @@ def sitka_viewer(folder=None):
     sview.Show()
     sview.Raise()
     return sview
-
-def get_sitka_files(folder=None):
-    """get sitka supported files from a foloder"""
-    files = {}
-    if folder is not None:
-        path = Path(folder)
-        if path.exists and path.is_dir():
-            for fname in os.listdir(path):
-                thispath = Path(path, fname)
-                opener = get_opener(thispath)
-                if opener is not None:
-                    try:
-                        dset = opener(thispath.absolute(), mode='r')
-                        files[thispath.name] = dset
-                    except Exception:
-                        print(f"Warning: could not open {fname} with {opener}")
-    return files
 
 def sitka_cli():
     """
