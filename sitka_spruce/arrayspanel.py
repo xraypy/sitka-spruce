@@ -9,6 +9,7 @@ from wxutils import (GridPanel, SimpleText, pack, Button, TextCtrl, HLine,
                      Check, Choice, LEFT, get_color, register_darkdetect,
                      FileSave, Popup)
 
+from pyshortcuts import isotime, fix_filename, get_cwd
 from .gui_utils import get_font
 from .data import ARRAY_TYPES, dtype2str, get_data, dim_code, datasize_repr
 
@@ -40,6 +41,11 @@ class ArraysPanel(wx.Panel):
             this.Alignment = this.Renderer.Alignment = align
         aview.Bind(dv.EVT_DATAVIEW_SELECTION_CHANGED, self.onSelectArray)
 
+        wids['sel_all'] = Button(panel, 'Select All', size=(125, -1),
+                                 action=self.onSelectAll)
+        wids['sel_none'] = Button(panel, 'Select None', size=(125, -1),
+                                  action=self.onSelectNone)
+
         wids['save'] = Button(panel, 'Add Array', size=(125, -1),
                               action=self.onSaveArray)
         wids['array_name'] = TextCtrl(panel, ' ', size=(200, -1))
@@ -63,6 +69,8 @@ class ArraysPanel(wx.Panel):
                       dcol=dcol, newrow=newrow)
 
         padd_text(' Named Arrays: ')
+        panel.Add(wids['sel_all'], dcol=2)
+        panel.Add(wids['sel_none'], dcol=2)
         panel.Add(aview, dcol=7, drow=True, newrow=True)
 
         panel.Add(wids['access_code'], dcol=7, newrow=True)
@@ -159,6 +167,18 @@ class ArraysPanel(wx.Panel):
         wexpr.SetBackgroundColour(bgcol)
 
 
+    def set_all_selected(self, val):
+        if self.wids['arrays'] is not None:
+            warrays = self.wids['arrays']
+            for row in range(warrays.GetItemCount()):
+                sel = warrays.SetValue(val, row, 0)
+
+    def onSelectAll(self, evt=None):
+        self.set_all_selected(True)
+
+    def onSelectNone(self, evt=None):
+        self.set_all_selected(False)
+
     def onSelectArray(self, evt=None):
         if self.wids['arrays'] is None:
             return
@@ -184,6 +204,20 @@ class ArraysPanel(wx.Panel):
     def onExportArrays(self, evt=None):
         arrays = self.get_arraynames()
         print("export  ", arrays)
+        tstamp = fix_filename(isotime(),
+                              allow_spaces=True).replace('_','').replace(' ', '_')
+        oname = fix_filename(f'Sitka_{tstamp}.h5')
+
+        path = FileSave(self, 'Save Arrays to HDF5',
+                        default_dir=get_cwd(),
+                        default_file=oname)
+
+        if path is None:
+            return
+
+        arrays = self.get_arraynames()
+        self.parent.data.export_hdf5(path, arrays)
+        self.parent.status_message(f'Wrote arrays to {path}')
 
 
     def onDeleteArrays(self, evt=None):
