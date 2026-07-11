@@ -1,26 +1,68 @@
+import os
 import sys
 import numpy as np
 
-import h5py
 import hdf5plugin
+import h5py
 import zarr
 
 import asteval
+
+from pyshortcuts import gformat
+from pathlib import Path
+
 try:
     import larch
 except ImportError:
     larch = None
 
-from pyshortcuts import gformat
+
+FILE_OPENERS = {'hdf5': h5py.File, 'h5': h5py.File, 'zarr': zarr.open}
 
 COMMONTYPES = (int, float, complex, str, bytes, bool, list, tuple, np.ndarray)
 
 ARRAY_TYPES = ('h5py.Dataset', 'zarr.Array', 'ndarray')
 GROUP_TYPES = ('h5py.Group', 'zarr.Group', 'larch.Group')
 
-
 # reverse map of hdf5plugin filters
 HDF_FILTERS_MAP = {v: k for k, v in hdf5plugin.FILTERS.items()}
+
+
+def get_opener(path):
+    """get file opener for path name
+    currently returns one of h5py.File or zarr.open
+    """
+    if isinstance(path, str):
+        path = Path(path)
+
+    opener = None
+    if path.suffix in FILE_OPENERS:
+        opener = FILE_OPENERS[path.suffix]
+    elif h5py.is_hdf5(path):
+        opener = FILE_OPENERS['h5']
+    elif (path.exists() and path.is_dir() and   # home-built 'is_zarr'
+          (path/'zarr.json').exists() and
+          (path/'zarr.json').is_file()):
+        opener = FILE_OPENERS['zarr']
+    return opener
+
+def get_sitka_files(folder=None):
+    """get sitka supported files from a foloder"""
+    files = {}
+    if folder is not None:
+        path = Path(folder)
+        if path.exists and path.is_dir():
+            for fname in os.listdir(path):
+                thispath = Path(path, fname)
+                opener = get_opener(thispath)
+                if opener is not None:
+                    try:
+                        dset = opener(thispath.absolute(), mode='r')
+                        files[thispath.name] = dset
+                    except Exception:
+                        print(f"Warning: could not open {fname} with {opener}")
+    return files
+
 
 def cast_int(val):
     return str(int(val))
@@ -40,25 +82,25 @@ def cast_float(val):
     return out
 
 def cast_bytes(val):
-    try:
-        v = val.decode('utf-8')
-    except ValueError:
-        v = repr(val)
+    if isinstance(val, bytes):
+        try:
+            v = val.decode('utf-8')
+        except ValueError:
+            v = str(val)
+    else:
+        v = str(val)
     return v
 
 def dtype2str(dtype):
     """return string casting type for datatype"""
-    cast = repr
-    if dtype in (bool, int, np.byte, np.bool, np.uint32,
-                 np.uint64, np.int32, np.int64):
+    cast = cast_bytes
+    if dtype in (bool, int, np.byte, np.bool, np.uint16, np.uint32,
+                 np.uint64, np.int16, np.int32, np.int64):
         cast = cast_int
     elif dtype in (np.complex64, np.complex128):
         cast = cast_complex
     elif dtype in (np.float64, np.float32, np.float16):
         cast = cast_float
-    elif (dtype in (np.dtype(object), np.dtype(bytes)) or
-          dtype.str.startswith('|S')):
-        cast = cast_bytes
     return cast
 
 def get_items(obj):
@@ -127,18 +169,24 @@ def get_hdf5_compression_info(obj):
                 out['compression_opts'] = obj.compression_opts
     return out
 
-def get_attributes(obj):
+def get_attributes(obj, itemname):
     """get attributes for hdf5 Groups/Datasets"""
     out = {}
     if isinstance(obj, (h5py.Group, h5py.Dataset)):
+        nodes = [itemname]
+        if '/' in itemname:
+            nodes = itemname.split('/')
+        node = nodes.pop()
+        parent = '/'.join(nodes)
+        if len(nodes) > 1:
+            out['parent'] = parent
+        out['node'] = node
         if isinstance(obj, h5py.Group):
             out['# members'] = len(obj.keys())
-        if isinstance(obj, h5py.Dataset):
-            out['dtype'] = str(obj.dtype)
+        elif isinstance(obj, h5py.Dataset):
             if obj.shape == (1, ):
-                # print("get scalar value ", dtype2str(obj.dtype), obj[()])
                 out['value'] = dtype2str(obj.dtype)(obj[0])
-
+            out['dtype'] = str(obj.dtype)
             out['shape'] = obj.shape
             out['chunks'] = obj.chunks
             out.update(get_hdf5_compression_info(obj))
@@ -149,18 +197,23 @@ def get_attributes(obj):
                 out[key] = val
 
     for key, val in out.items():
-        if isinstance(val, bytes):
-            val = val.decode('utf-8')
-        elif isinstance(val, (np.int64, np.int32)):
-            val = str(int(val))
-        elif isinstance(val, (np.float64, np.float32, np.float16)):
-            val = str(float(val))
-        elif isinstance(val, (np.complex128, np.complex64)):
-            val = str(complex(val))
-        elif not isinstance(val, str):
-            val = repr(val)
-        out[key] = val
+        out[key] = dtype2str(type(val))(val)
     return out
+#
+#         if isinstance(val, bytes):
+#             val = val.decode('utf-8')
+#         elif isinstance(val, (np.int64, np.int32, np.int16,
+#                               np.uint64, np.uint32, np.uint16)):
+#             val = str(int(val))
+#         elif isinstance(val, (np.float64, np.float32, np.float16)):
+#             val = str(float(val))
+#         elif isinstance(val, (np.complex128, np.complex64)):
+#             val = str(complex(val))
+#         elif not isinstance(val, str):
+#             val = repr(val)
+#         out[key] = val
+
+
 
 def datasize_repr(obj):
     """return string-representation of data size"""
