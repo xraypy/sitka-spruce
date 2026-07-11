@@ -3,8 +3,10 @@ from threading import Thread
 import wx
 from  wx.grid import Grid
 
-from wxutils import (GridPanel, SimpleText, pack, Button, TextCtrl,
-                     Check, Choice, LEFT, get_color, register_darkdetect)
+from wxutils import (GridPanel, SimpleText, pack, Button,
+                     TextCtrl, Popup,
+                     Check, Choice, LEFT, get_color,
+                     register_darkdetect)
 
 from .dimreduce import DimReducePanel
 from .gui_utils import get_font
@@ -79,7 +81,6 @@ class TablePanel(wx.Panel):
 
         self.data_shape = None
         self.data_obj = None
-        self.access_code = None
         self.xsel_cur, self.ysel_cur = 0, 1
         self.skip_dim_proc = False
         self.gridframes = {}
@@ -150,8 +151,21 @@ class TablePanel(wx.Panel):
         wx.CallAfter(self.Refresh)
 
     def onNameArray(self, event=None):
-        print(" on Name Array")
+        arr_name = self.wids['array_name'].GetValue()
+        check_overwrite = self.wids['check_overwrite'].IsChecked()
+        if check_overwrite and arr_name in self.parent.data.arrays:
+            ret = Popup(self, f"Overwrite Array '{arr_name}'?\n",
+                        'Verify Overwrite',
+                        style=wx.YES_NO|wx.ICON_QUESTION)
+            if ret != wx.ID_YES:
+                return
 
+        ndim = len(self.data_obj.shape)
+        reddim = self.dim_reduce.get_result(ndim)
+        _yarr = get_data(self.data_obj, reddim)
+        ylabel = dim_code(reddim)
+        access_code = f"['{self.filename}']['{self.itemname}']{ylabel}"
+        self.parent.data.add_array(arr_name, _yarr, address=access_code)
 
     def onXdim(self, event=None):
         if self.skip_dim_proc:
@@ -254,7 +268,7 @@ class TablePanel(wx.Panel):
         frame_opts = {'title':  f'SitkaGrid {win} '}
         gframe = self.show_gridframe(win, **frame_opts)
         alabel = dim_code(reddim)
-        self.access_code = f"['{self.filename}']['{self.itemname}']{alabel}"
+        self.parent.access_code = f"['{self.filename}']['{self.itemname}']{alabel}"
 
         data_thread.join()
         dt_data = time.time()-t0_data
@@ -275,7 +289,7 @@ class TablePanel(wx.Panel):
         osize = datasize_repr(self.data_obj)
 
         self.parent.status_message(f'got data ({dsize} of {osize}) in {dt_data:.2f} seconds')
-        self.parent.data.add_array('_tabledat', self._griddat, address=self.access_code)
+        self.parent.data.add_array('_tabledat', self._griddat, address=self.parent.access_code)
 
         # print(f"Got data {_nx=}  {_rx=}   {_ny=}  {_ry=}  {ydim=} {xdim=}")
         if _ry == _nx and _rx == _ny or (ydim > xdim):
