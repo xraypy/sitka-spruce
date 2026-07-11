@@ -147,10 +147,9 @@ class SitkaFrame(wx.Frame):
         # self.SetIcon(wx.Icon(iconpath, wx.BITMAP_TYPE_ICO))
 
     def onCopyAddress(self, event=None):
-        page = self.nb.GetPage(self.current_nbpage)
         msg = 'Could not copy data address to Clipboard'
-        if page.access_code is not None and wx.TheClipboard.Open():
-            wx.TheClipboard.SetData(wx.TextDataObject(page.access_code))
+        if self.access_code is not None and wx.TheClipboard.Open():
+            wx.TheClipboard.SetData(wx.TextDataObject(self.access_code))
             wx.TheClipboard.Close()
             msg = 'Copied data address to Clipboard'
         self.status_message(msg)
@@ -188,6 +187,7 @@ class SitkaFrame(wx.Frame):
 
     def fill_info(self, name, itemtype, itemname, object):
         self.file_info = (name, itemname, itemtype)
+        self.access_code = f"['{name}']['{itemname}']"
         self.info.DeleteAllItems()
         if name == 'Data':
             self.info.AppendItem(('filename', 'toplevel'))
@@ -220,7 +220,7 @@ class SitkaFrame(wx.Frame):
         fmenu = wx.Menu()
         MenuItem(self, fmenu, "Read Data File\tCtrl+O",
                  "Read Data File", self.onReadData)
-        MenuItem(self, fmenu, "Read Folder\tCtrl+F",
+        MenuItem(self, fmenu, "Read Files from Folder\tCtrl+F",
                  "Read all Files from Selected Folder",
                  self.onReadFolder)
 
