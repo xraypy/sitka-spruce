@@ -10,6 +10,7 @@ from wxutils import (GridPanel, SimpleText, pack, Button,
                      Choice, Check, LEFT, TextCtrl, Popup,
                      get_color, register_darkdetect)
 
+from .gui_utils import get_font
 from .dimreduce import DimReducePanel
 from .data import ARRAY_TYPES, get_data, dim_code, datasize_repr
 
@@ -19,7 +20,7 @@ class ArrayPlot1DPanel(wx.Panel):
         wx.Panel.__init__(self, parent)
         self.parent = parent
         self.SetBackgroundColour(get_color('sbg'))
-
+        self.SetFont(get_font())
         self.data_shape = None
         self.data_obj = None
         self.access_code = None

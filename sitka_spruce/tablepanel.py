@@ -19,7 +19,6 @@ class DataGridFrame(wx.Frame):
         self.title = SimpleText(self, title, font=get_font(larger=1),
                                 colour='title_red', size=(500, -1),
                                 style=LEFT|wx.ALIGN_CENTER_VERTICAL)
-
         self.grid = Grid(self, size=size)
         self.grid.CreateGrid(100, 100)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -59,11 +58,10 @@ class DataGridFrame(wx.Frame):
         self.grid.DeleteCols(0, ncols)
         self.grid.DeleteRows(0, nrows)
 
-        cast = dtype2str(data.dtype)
+        cast= dtype2str(data.dtype)
         ny, nx = data.shape
         self.grid.AppendCols(nx)
         self.grid.AppendRows(ny)
-        # print("Set Grid Data ", data, data.dtype, cast)
 
         for i in range(ny):
             self.grid.SetRowLabelValue(i, f'{i}')
@@ -77,6 +75,7 @@ class TablePanel(wx.Panel):
         wx.Panel.__init__(self, parent)
         self.parent = parent
         self.SetBackgroundColour(get_color('sbg'))
+        self.SetFont(get_font())
 
         self.data_shape = None
         self.data_obj = None
@@ -212,7 +211,6 @@ class TablePanel(wx.Panel):
                 ycur = self.wids['ydim'].GetSelection()
                 self.dim_reduce.enable_dimension(xcur, enable=False, npts=None)
                 self.dim_reduce.enable_dimension(ycur, enable=False, npts=None)
-
         self.Refresh()
 
 
@@ -264,7 +262,10 @@ class TablePanel(wx.Panel):
             data_shape = (1, data_shape[0])
 
         if len(self._griddat.shape) < 2:
-            self._griddat.shape = (1, self._griddat.shape[0])
+            try:
+                self._griddat.shape = (1, self._griddat.shape[0])
+            except:
+                self._griddat.shape = (1,)
 
         _ny, _nx = self._griddat.shape
         _ry, _rx = data_shape[ydim], data_shape[xdim]
