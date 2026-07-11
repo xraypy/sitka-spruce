@@ -23,7 +23,6 @@ class ArrayPlot1DPanel(wx.Panel):
         self.SetFont(get_font())
         self.data_shape = None
         self.data_obj = None
-        self.access_code = None
         self.last_yaxes = 0
         self.plotframes = {}
         self.wids = wids = {}
@@ -149,13 +148,16 @@ class ArrayPlot1DPanel(wx.Panel):
         words = ystr.replace('dim', '').replace('points', '').split()
         yshape = (int(words[1]), )
 
+        achoices = self.parent.data.array_shapes.get(yshape, [])
+        if '_ydat' in achoices:
+            achoices.remove('_ydat')
+
         nchoices = ['1']
-        nchoices.extend(self.parent.data.array_shapes.get(yshape, []))
+        nchoices.extend(achoices)
+        self.wids['ynorm'].SetChoices(nchoices)
 
         xchoices = ['<index>']
-        xchoices.extend(self.parent.data.array_shapes.get(yshape, []))
-
-        self.wids['ynorm'].SetChoices(nchoices)
+        xchoices.extend(achoices)
         self.wids['xarray'].SetChoices(xchoices)
 
     def onDimReduce(self, event=None, dim=None, reduce=None):
@@ -184,7 +186,7 @@ class ArrayPlot1DPanel(wx.Panel):
         frame_opts = {'title':  f'SitkaPlot {win} '}
         pframe = self.show_plotframe(win, **frame_opts)
         ylabel = dim_code(reddim)
-        self.access_code = f"['{self.filename}']['{self.itemname}']{ylabel}"
+        self.parent.access_code = f"['{self.filename}']['{self.itemname}']{ylabel}"
 
         opts = {'title': f'{self.filename}\n{self.itemname}'}
 
@@ -217,7 +219,6 @@ class ArrayPlot1DPanel(wx.Panel):
         osize = datasize_repr(self.data_obj)
 
         self.parent.status_message(f'got data ({dsize} of {osize}) in {dt_data:.2f} seconds')
-        self.parent.data.add_array('_ydat', self._yarr, address=self.access_code)
 
         xvals = self.parent.data.arrays.get(xarr, None)
         if xarr == '<index>' or xvals is None:
@@ -225,6 +226,7 @@ class ArrayPlot1DPanel(wx.Panel):
             xvals = np.arange(len(self._yarr))
 
         plot(xvals, self._yarr, **opts)
+        self.parent.data.add_array('_ydat', self._yarr, address=self.parent.access_code)
         pframe.Show()
         pframe.Raise()
 
