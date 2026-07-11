@@ -2,29 +2,24 @@
 """
 sitka_spruce HDF5 and Zarr data browser
 """
-import os
-
 import wx
 import wx.lib.scrolledpanel as scrolled
 import wx.dataview as dv
 import wx.lib.mixins.inspection
 
-import hdf5plugin
-import h5py
-import zarr
-
 from pathlib import Path
 
 from wxutils import (SimpleText, pack,  LEFT,  get_color,
                      use_darkdetect, register_darkdetect,
-                     MenuItem,  flatnotebook, GridPanel, Button)
+                     MenuItem,  flatnotebook, GridPanel, Button,
+                     FileOpen, FileSave, SelectWorkdir, Popup)
 from wxutils.colors import add_named_color
 
 
-from pyshortcuts import get_cwd
+from pyshortcuts import get_cwd, fix_filename
 
 from .gui_utils import  get_font, FONTSIZE
-from .data  import get_attributes, SitkaData
+from .data  import get_attributes, SitkaData, get_opener, get_sitka_files
 from .hdatatree import HDataTree
 from .plot1dpanel import ArrayPlot1DPanel
 from .plot2dpanel import ArrayImagePanel
@@ -40,7 +35,6 @@ VERSION = '0.1'
 
 FILE_WILDCARD = 'HDF5/Zarr files(*.hdf5;*.h5;*.zarr)|*.hdf5;*.h5;*.zarr|All files (*.*)|*.*'
 
-FILE_OPENERS = {'hdf5': h5py.File, 'h5': h5py.File, 'zarr': zarr.open}
 
 DV_STYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 
@@ -49,23 +43,6 @@ ICON_DIR = Path(Path(__file__).parent, 'icons').absolute()
 
 add_named_color('sbg', (245, 250, 250, 255), ( 35,  40,  40, 255))
 
-def get_opener(path):
-    """get file opener for path name
-    currently returns one of h5py.File or zarr.open
-    """
-    if isinstance(path, str):
-        path = Path(path)
-
-    opener = None
-    if path.suffix in FILE_OPENERS:
-        opener = FILE_OPENERS[path.suffix]
-    elif h5py.is_hdf5(path):
-        opener = FILE_OPENERS['h5']
-    elif (path.exists() and path.is_dir() and   # home-built 'is_zarr'
-          (path/'zarr.json').exists() and
-          (path/'zarr.json').is_file()):
-        opener = FILE_OPENERS['zarr']
-    return opener
 
 
 class SitkaFrame(wx.Frame):
@@ -92,8 +69,6 @@ class SitkaFrame(wx.Frame):
         splitter = wx.SplitterWindow(self, size=size, style=wx.SP_LIVE_UPDATE)
 
         leftpanel = wx.Panel(splitter)
-        # rightpanel = scrolled.ScrolledPanel(splitter)
-        # rightpanel = scrolled.ScrolledPanel(splitter)
         rightpanel = wx.Panel(splitter)
 
         self.tree = HDataTree(leftpanel, on_select=self.onSelectObject)
@@ -194,7 +169,6 @@ class SitkaFrame(wx.Frame):
         wx.CallAfter(self.tree.onKillFocus)
         event.Skip()
 
-
     def onSelectObject(self, object, address, itemtype='?'):
         filename = address[0]
         if len(filename) < 1:
@@ -206,24 +180,24 @@ class SitkaFrame(wx.Frame):
         self.filename_label.SetLabel(f" Filename: {filename}")
         self.itemname_label.SetLabel(f" Address: {itemname}")
 
-        self.fill_info(filename, itemtype, object)
-
+        self.fill_info(filename, itemtype, itemname, object)
         for ipage in range(self.nb.GetPageCount()):
             page = self.nb.GetPage(ipage)
             page.set_object(object, itemtype=itemtype,
                             filename=filename, itemname=itemname)
 
-
-    def fill_info(self, name, itemtype, object):
+    def fill_info(self, name, itemtype, itemname, object):
+        self.file_info = (name, itemname, itemtype)
         self.info.DeleteAllItems()
         if name == 'Data':
-            self.info.AppendItem(('name', 'toplevel'))
+            self.info.AppendItem(('filename', 'toplevel'))
         else:
-            name = Path(name).name
-            self.info.AppendItem(('name', name))
-            self.info.AppendItem(('datatype', itemtype))
-            for key, val in get_attributes(object).items():
-                self.info.AppendItem((key, val))
+             name = Path(name).name
+             self.info.AppendItem(('filename', name))
+             self.info.AppendItem(('datatype', itemtype))
+             attrs = get_attributes(object, itemname)
+             for key, val in attrs.items():
+                 self.info.AppendItem((key, val))
         self.info.Refresh()
 
     def onDarkMode(self, is_dark=None):
@@ -244,12 +218,18 @@ class SitkaFrame(wx.Frame):
     def BuildMenus(self):
         menuBar = wx.MenuBar()
         fmenu = wx.Menu()
-        MenuItem(self, fmenu, "&Read Data File\tCtrl+O",
+        MenuItem(self, fmenu, "Read Data File\tCtrl+O",
                  "Read Data File", self.onReadData)
-        fmenu.AppendSeparator()
-        MenuItem(self, fmenu, 'Show wxPython Inspector\tCtrl+I',
-                 'Debug wxPython App', self.onWxInspect)
+        MenuItem(self, fmenu, "Read Folder\tCtrl+F",
+                 "Read all Files from Selected Folder",
+                 self.onReadFolder)
 
+        fmenu.AppendSeparator()
+        MenuItem(self, fmenu, "Export Attributes to TSV File",
+                 "Export Info and Attributes to tab-separated File",
+                 self.onExportInfo)
+
+        fmenu.AppendSeparator()
         self.Bind(wx.EVT_CLOSE,  self.onExit)
         MenuItem(self, fmenu, 'E&xit', 'Exit', self.onExit)
         menuBar.Append(fmenu, '&File')
@@ -257,6 +237,12 @@ class SitkaFrame(wx.Frame):
         omenu = wx.Menu()
         MenuItem(self, omenu,  "Increase Font Size", "", self.onIncreaseFont)
         MenuItem(self, omenu,  "Decrease Font Size", "", self.onDecreaseFont)
+
+        omenu.AppendSeparator()
+        MenuItem(self, omenu, 'Show wxPython Inspector\tCtrl+I',
+                 'Debug wxPython App', self.onWxInspect)
+
+
         menuBar.Append(omenu, 'Options')
 
         #hmenu = wx.Menu()
@@ -279,10 +265,15 @@ class SitkaFrame(wx.Frame):
             obj.SetFont(fn)
 
         set_fsize(self, fsize)
-
         set_fsize(self.tree,  fsize)
         set_fsize(self.info,  fsize)
+        self.info.Refresh()
         set_fsize(self.nb,  fsize)
+        for ipage in range(self.nb.GetPageCount()):
+            page = self.nb.GetPage(ipage)
+            set_fsize(page,  fsize)
+        self.nb.Refresh()
+
 
     def onWxInspect(self, event=None):
         wx.GetApp().ShowInspectionTool()
@@ -302,31 +293,36 @@ class SitkaFrame(wx.Frame):
             self.subframes[name].Show()
 
     def onReadData(self, event=None):
-        dlg = wx.FileDialog(self, message='Open Data File',
-                            defaultDir=get_cwd(),
-                            wildcard=FILE_WILDCARD,
-                            style=wx.FD_OPEN|wx.FD_CHANGE_DIR)
-        path = None
-        if dlg.ShowModal() == wx.ID_OK:
-            path = Path(dlg.GetPath()).absolute()
-            dlg.Destroy()
-
+        path = FileOpen(self, 'Open Data File', default_dir=get_cwd(),
+                        wildcard=FILE_WILDCARD)
         if path is None:
             return
 
         fname = path.name
         if fname in self.data.datasets:
-            dlg = wx.MessageDialog(None,
-                                   f'File {fname} already exists... overwrite?',
-                                   'Question',
-                                   wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
-            ret = dlg.ShowModal()
+            ret = Popup(self,
+                       f'File {fname} already exists... overwrite?',
+                       f'Overwrite {fname}',
+                       style=wx.YES_NO|wx.NO_DEFAULT|wx.ICON_QUESTION)
             if ret == wx.ID_NO:
                 return
 
         opener = get_opener(path)
         if opener is not None:
             self.add_dataset(fname, opener(path, mode='r'))
+
+    def onReadFolder(self, event=None):
+        path = None
+        dlg = wx.DirDialog(self, 'Select Folder',
+                       style=wx.DD_DEFAULT_STYLE|wx.DD_CHANGE_DIR)
+
+        if  dlg.ShowModal() != wx.ID_OK:
+            return
+
+        folder = Path(dlg.GetPath()).absolute().as_posix()
+        dlg.Destroy()
+        for fname, dset in get_sitka_files(folder).items():
+            self.add_dataset(fname, dataset=dset)
 
     def add_dataset(self, name, dataset=None):
         """add dataset to Sitka.
@@ -351,16 +347,28 @@ class SitkaFrame(wx.Frame):
             self.data.add_dataset(name, dataset)
             self.tree.onRefresh()
 
-
     def onChangeDir(self, event=None):
-        dlg = wx.DirDialog(None, 'Choose a Working Directory',
-                           defaultPath = get_cwd(),
-                           style = wx.DD_DEFAULT_STYLE)
+        path = SelectWorkdir(self)
 
-        if dlg.ShowModal() == wx.ID_OK:
-            os.chdir(dlg.GetPath())
-            dlg.Destroy()
-        return get_cwd()
+    def onExportInfo(self, event=None):
+        (filename, itemname, itemtype) =  self.file_info
+        oname = fix_filename(f'{filename}_{itemname}_info.tsv')
+
+        path = FileSave(self, 'Save Attribute Table to Tab-separated File',
+                        default_dir=get_cwd(),
+                        default_file=oname)
+
+        if path is None:
+            return
+
+        out = ['Name\t Value', '----\t-------']
+        for row in range(self.info.GetItemCount()):
+            out.append(f'{self.info.GetValue(row, 0)}\t{self.info.GetValue(row, 1)}')
+
+        out.append('')
+        with open(path, 'w') as fh:
+            fh.write('\n'.join(out))
+        self.status_message(f'Wrote attributes to {path}')
 
     def onAbout(self, event=None):
         about_msg =  """HDF5 Viewer"""
@@ -371,10 +379,9 @@ class SitkaFrame(wx.Frame):
 
 
     def onExit(self, event=None):
-        dlg = wx.MessageDialog(None, 'Really Quit?', 'Question',
-                               wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
-        ret = dlg.ShowModal()
-
+        ret = Popup(self,
+                    'Really Quit?', '',
+                    style=wx.YES_NO|wx.NO_DEFAULT|wx.ICON_QUESTION)
         if ret == wx.ID_YES:
             try:
                 for a in self.GetChildren():
