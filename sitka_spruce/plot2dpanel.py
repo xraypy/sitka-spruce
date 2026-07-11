@@ -7,7 +7,7 @@ import wx
 from wxmplot import ImageFrame
 
 from wxutils import (GridPanel, SimpleText, pack, Button,
-                     Choice, Check, LEFT, TextCtrl,
+                     Choice, Check, LEFT, TextCtrl, Popup,
                      get_color, register_darkdetect)
 
 from .gui_utils import get_font
@@ -24,7 +24,6 @@ class ArrayImagePanel(wx.Panel):
         self.SetFont(get_font())
         self.data_shape = None
         self.data_obj = None
-        self.access_code = None
         self.xsel_cur, self.ysel_cur = -1, -1
         self.skip_dim_proc = False
         self.imageframes = {}
@@ -279,7 +278,7 @@ class ArrayImagePanel(wx.Panel):
         iframe = self.show_imageframe(win, **frame_opts)
 
         dlabel = dim_code(reddim)
-        self.access_code = f"['{self.filename}']['{self.itemname}']{dlabel}"
+        self.parent.access_code = f"['{self.filename}']['{self.itemname}']{dlabel}"
         opts = {'title': f'{self.filename} {dlabel}', 'contrast_level':'0.05'}
 
         data_thread.join()
@@ -312,4 +311,4 @@ class ArrayImagePanel(wx.Panel):
         iframe.display(self._img, x=xvals, y=yvals, **opts)
         iframe.Show()
         iframe.Raise()
-        self.parent.data.add_array('_imgdat', self._img, address=self.access_code)
+        self.parent.data.add_array('_imgdat', self._img, address=self.parent.access_code)
