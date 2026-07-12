@@ -41,7 +41,7 @@ DV_STYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 ICON_FILE = 'sitka.ico'
 ICON_DIR = Path(Path(__file__).parent, 'icons').absolute()
 
-add_named_color('sbg', (245, 250, 250, 255), ( 35,  40,  40, 255))
+add_named_color('sbg', (240, 245, 245, 255), ( 20,  30,  30, 255))
 
 
 
@@ -239,6 +239,9 @@ class SitkaFrame(wx.Frame):
         MenuItem(self, omenu,  "Decrease Font Size", "", self.onDecreaseFont)
 
         omenu.AppendSeparator()
+        MenuItem(self, omenu, 'Copy Address to Clipboard\tCtrl+C',
+                 'Copy Current Address to to Clipboard', self.onCopyAddress)
+
         MenuItem(self, omenu, 'Show wxPython Inspector\tCtrl+I',
                  'Debug wxPython App', self.onWxInspect)
 
