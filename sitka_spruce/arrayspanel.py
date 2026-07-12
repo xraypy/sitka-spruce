@@ -1,6 +1,8 @@
 import ast
 import time
 from threading import Thread
+
+import numpy as np
 import wx
 import wx.dataview as dv
 import wx.lib.scrolledpanel as scrolled
@@ -46,6 +48,9 @@ class ArraysPanel(wx.Panel):
         wids['sel_none'] = Button(panel, 'Select None', size=(125, -1),
                                   action=self.onSelectNone)
 
+        wids['plot'] = Button(panel, 'Plot Current', size=(125, -1),
+                                  action=self.onPlot)
+
         wids['save'] = Button(panel, 'Add Array', size=(125, -1),
                               action=self.onSaveArray)
         wids['array_name'] = TextCtrl(panel, ' ', size=(200, -1))
@@ -70,7 +75,8 @@ class ArraysPanel(wx.Panel):
 
         padd_text(' Named Arrays: ')
         panel.Add(wids['sel_all'], dcol=2)
-        panel.Add(wids['sel_none'], dcol=2)
+        panel.Add(wids['sel_none'], dcol=1)
+        panel.Add(wids['plot'], dcol=1)
         panel.Add(aview, dcol=7, drow=True, newrow=True)
 
         panel.Add(wids['access_code'], dcol=7, newrow=True)
@@ -189,6 +195,36 @@ class ArraysPanel(wx.Panel):
         self.access_code = address
         self.wids['access_code'].SetLabel(address)
 
+    def onPlot(self, evt=None):
+        if self.wids['arrays'] is None:
+            return
+        if not self.wids['arrays'].HasSelection():
+            return
+        item = self.wids['arrays'].GetSelectedRow()
+        name = self.array_data[item][1]
+        array = self.parent.data.arrays.get(name, None)
+        if array is not None:
+            title = self.parent.data.array_addrs.get(name, name)
+            if len(array.shape) == 1:
+                for ipage in range(self.parent.nb.GetPageCount()):
+                    page = self.parent.nb.GetPage(ipage)
+                    if hasattr(page, 'show_plotframe'):
+                        frame = page.show_plotframe(window=1)
+                        _x = np.arange(len(array))
+                        frame.plot(_x, array, label=name, ylabel=name,
+                                       title=title)
+                        frame.Show()
+                        frame.Raise()
+
+            elif len(array.shape) == 2:
+                for ipage in range(self.parent.nb.GetPageCount()):
+                    page = self.parent.nb.GetPage(ipage)
+                    if hasattr(page, 'show_imageframe'):
+                        frame = page.show_imageframe(window=1)
+                        frame.display(array, title=f'{name}: {title}')
+                        frame.Show()
+                        frame.Raise()
+
     def get_arraynames(self, all=False):
         """get list of array names, either all or selected"""
         out = []
@@ -222,7 +258,6 @@ class ArraysPanel(wx.Panel):
 
     def onDeleteArrays(self, evt=None):
         arrays = self.get_arraynames()
-        print("delete  ", arrays)
         ret = Popup(self, f"Erase {len(arrays)} Array?\nThis cannot be undone.",
                     'Verify erase',
                     style=wx.YES_NO|wx.ICON_QUESTION)
