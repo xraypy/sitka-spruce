@@ -58,7 +58,9 @@ class ArrayImagePanel(wx.Panel):
 
         wids['save_array'] = Button(panel, 'Save Array', size=(125, -1),
                                   action=self.onNameArray)
-        wids['array_name'] = TextCtrl(panel, 'imgdat', size=(200, -1))
+        wids['array_name'] = TextCtrl(panel, 'imgdat', size=(200, -1),
+                                      act_on_losefocus=False,
+                                      action=self.onNameArray)
         wids['check_overwrite']  = Check(panel, ' ', size=(10, -1), default=True)
 
         def padd_text(text, dcol=1, size=(100, -1), newrow=True):
@@ -275,7 +277,7 @@ class ArrayImagePanel(wx.Panel):
         data_thread.start()
         time.sleep(0.0005)
         frame_opts = {'title':  f'SitkaImage {win} '}
-        iframe = self.show_imageframe(win, **frame_opts)
+        iframe = self.show_imageframe(int(win), **frame_opts)
 
         dlabel = dim_code(reddim)
         self.parent.access_code = f"['{self.filename}']['{self.itemname}']{dlabel}"

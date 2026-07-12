@@ -51,7 +51,9 @@ class ArrayPlot1DPanel(wx.Panel):
 
         wids['save_array'] = Button(panel, 'Save Array', size=(125, -1),
                                   action=self.onNameArray)
-        wids['array_name'] = TextCtrl(panel, 'ydat', size=(200, -1))
+        wids['array_name'] = TextCtrl(panel, 'ydat', size=(200, -1),
+                                      act_on_losefocus=False,
+                                      action=self.onNameArray)
         wids['check_overwrite']  = Check(panel, ' ', size=(10, -1), default=True)
 
         def padd_text(text, dcol=1, size=(125, -1), newrow=True):
@@ -184,7 +186,7 @@ class ArrayPlot1DPanel(wx.Panel):
         time.sleep(0.0005)
 
         frame_opts = {'title':  f'SitkaPlot {win} '}
-        pframe = self.show_plotframe(win, **frame_opts)
+        pframe = self.show_plotframe(int(win), **frame_opts)
         ylabel = dim_code(reddim)
         self.parent.access_code = f"['{self.filename}']['{self.itemname}']{ylabel}"
 
