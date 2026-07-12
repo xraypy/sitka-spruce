@@ -106,7 +106,9 @@ class TablePanel(wx.Panel):
 
         wids['save_array'] = Button(panel, 'Save Array', size=(125, -1),
                                   action=self.onNameArray)
-        wids['array_name'] = TextCtrl(panel, 'griddat', size=(200, -1))
+        wids['array_name'] = TextCtrl(panel, 'griddat', size=(200, -1),
+                                      act_on_losefocus=False,
+                                      action=self.onNameArray)
         wids['check_overwrite']  = Check(panel, ' ', size=(10, -1), default=True)
 
 
