@@ -16,7 +16,7 @@
 .. _h5web:    https://github.com/silx-kit/h5web
 .. _hdf5view: https://tgwoodcock.github.io/hdf5view/
 .. _argos:    https://github.com/titusjan/argos
-
+.. _silx:     https://github.com/silx-kit/silx
 .. _github:   https://github.com/xraypy/sitka-spruce
 .. _PyPI:     https://pypi.python.org/pypi/sitka-spruce
 
