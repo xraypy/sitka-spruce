@@ -98,9 +98,6 @@ class ArraysPanel(wx.Panel):
         panel.pack()
         panel.SetSize((725, 600))
 
-        print(" array panel size ", panel.GetSize(),  panel.GetBestSize())
-
-
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, 0, LEFT|wx.GROW, 4)
         pack(self, sizer)
