@@ -25,10 +25,10 @@
 .. _Anaconda Python:    https://www.anaconda.com/
 .. _Miniconda Python:   https://github.com/conda-forge/miniforge/releases
 
-.. _GetSitka.sh:   https://raw.githubusercontent.com/xraypy/sitka-spruce/master/installers/GetSitka.sh
-.. _GetSitka.bat:  https://raw.githubusercontent.com/xraypysitka-spruce/master/installers/GetSitka.bat
+.. _GetSitka.sh:  https://raw.githubusercontent.com/xraypy/sitka-spruce/refs/heads/main/installers/GetSitka.sh
+.. _GetSitka.bat: https://raw.githubusercontent.com/xraypy/sitka-spruce/refs/heads/main/installers/GetSitka.bat
+.. _get_sitka_examples.py: https://raw.githubusercontent.com/xraypy/sitka-spruce/refs/heads/main/examples/get_sitka_examples.py
 
-.. _SitkaExamples: https://millenia.cars.aps.anl.gov/xraylarch/downloads/sitka_examples/
 
 .. _WXMPLOT Interactive Image Display:  https://newville.github.io/wxmplot/overview.html#user-interaction-and-configuring-image-and-contour-displays
 .. _WXMPLOT Interactive Plot Display: https://newville.github.io/wxmplot/overview.html#user-interaction-and-configuring-line-plots

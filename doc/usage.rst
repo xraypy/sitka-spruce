@@ -124,7 +124,8 @@ section of the Window.
 
 .. note::
 
-   The examples shown throughout this document can be downloaded from `SitkaExamples`_.
+   The examples shown throughout this document can retrieved by
+   downloading and running the `get_sitka_examples.py`_ script.
 
 
 Overview of the main Sitka Window
