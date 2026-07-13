@@ -1,4 +1,3 @@
-import os
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
@@ -6,7 +5,7 @@ from pyshortcuts import uname, make_shortcut, ico_ext
 
 from wxmplot.interactive import get_wxapp
 
-from .data import get_sitka_files, get_opener
+from .data import get_sitka_files
 from .sitka import Sitka_App, SitkaFrame
 
 def sitka_viewer(folder=None):
@@ -28,8 +27,7 @@ def sitka_viewer(folder=None):
     sview = SitkaFrame()
     if folder is not None:
         for fname, dset in get_sitka_files(folder).items():
-            viewer.add_dataset(fname, dataset=dset)
-
+            sview.add_dataset(fname, dataset=dset)
     sview.Show()
     sview.Raise()
     return sview

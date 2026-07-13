@@ -3,7 +3,6 @@
 sitka_spruce HDF5 and Zarr data browser
 """
 import wx
-import wx.lib.scrolledpanel as scrolled
 import wx.dataview as dv
 import wx.lib.mixins.inspection
 
@@ -310,7 +309,6 @@ class SitkaFrame(wx.Frame):
             self.add_dataset(fname, opener(path, mode='r'))
 
     def onReadFolder(self, event=None):
-        path = None
         dlg = wx.DirDialog(self, 'Select Folder',
                        style=wx.DD_DEFAULT_STYLE|wx.DD_CHANGE_DIR)
 
@@ -346,7 +344,7 @@ class SitkaFrame(wx.Frame):
             self.tree.onRefresh()
 
     def onChangeDir(self, event=None):
-        path = SelectWorkdir(self)
+        SelectWorkdir(self)
 
     def onExportInfo(self, event=None):
         (filename, itemname, itemtype) =  self.file_info

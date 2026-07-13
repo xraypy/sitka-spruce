@@ -276,12 +276,10 @@ def get_data(obj, reductions):
     npts = 1.0
     ndims = len(obj.shape)
     for idim, use, method, imin, imax in reductions[:ndims]:
-        m = None
         if use:
             if method == 'single':
                 slices.append(slice(imin, imin+1))
             else:
-                m = method
                 slices.append(slice(imin, imax))
                 sumaxis.append(idim)
                 npts = npts*(imax-imin)

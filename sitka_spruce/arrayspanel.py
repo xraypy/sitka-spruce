@@ -1,19 +1,14 @@
 import ast
-import time
-from threading import Thread
-
 import numpy as np
 import wx
 import wx.dataview as dv
-import wx.lib.scrolledpanel as scrolled
 
 from wxutils import (GridPanel, SimpleText, pack, Button, TextCtrl, HLine,
-                     Check, Choice, LEFT, get_color, register_darkdetect,
+                     Check, LEFT, get_color, register_darkdetect,
                      FileSave, Popup)
 
 from pyshortcuts import isotime, fix_filename, get_cwd
 from .gui_utils import get_font
-from .data import ARRAY_TYPES, dtype2str, get_data, dim_code, datasize_repr
 
 DVSTYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 
@@ -177,7 +172,7 @@ class ArraysPanel(wx.Panel):
         if self.wids['arrays'] is not None:
             warrays = self.wids['arrays']
             for row in range(warrays.GetItemCount()):
-                sel = warrays.SetValue(val, row, 0)
+                warrays.SetValue(val, row, 0)
 
     def onSelectAll(self, evt=None):
         self.set_all_selected(True)

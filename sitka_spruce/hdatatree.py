@@ -43,7 +43,6 @@ class HDataTree(wx.TreeCtrl):
 
     def onRightDown(self, event=None):
         if self.item is not None:
-            obj = self.GetItemData(self.item)
             addr = self.get_address(self.item)
             if len(addr) > 0 and wx.TheClipboard.Open():
                 fname = addr.pop(0)

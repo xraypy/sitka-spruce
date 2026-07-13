@@ -280,7 +280,7 @@ class TablePanel(wx.Panel):
         if len(self._griddat.shape) < 2:
             try:
                 self._griddat.shape = (1, self._griddat.shape[0])
-            except:
+            except Exception:
                 self._griddat.shape = (1,)
 
         _ny, _nx = self._griddat.shape

@@ -212,10 +212,14 @@ class ArrayPlot1DPanel(wx.Panel):
         dt_data = time.time()-t0_data
 
         ynorm = self.parent.data.arrays.get(ynorm, 1.0)
-        if yop == '*':   self._yarr = self._yarr * ynorm
-        elif yop == '/': self._yarr = self._yarr * ynorm
-        elif yop == '+': self._yarr = self._yarr + ynorm
-        elif yop == '-': self._yarr = self._yarr - ynorm
+        if yop == '*':
+            self._yarr = self._yarr * ynorm
+        elif yop == '/':
+            self._yarr = self._yarr * ynorm
+        elif yop == '+':
+            self._yarr = self._yarr + ynorm
+        elif yop == '-':
+            self._yarr = self._yarr - ynorm
 
         dsize = datasize_repr(self._yarr)
         osize = datasize_repr(self.data_obj)
