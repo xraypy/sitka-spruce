@@ -38,7 +38,7 @@ class HDataTree(wx.TreeCtrl):
         self.Bind(wx.EVT_TREE_ITEM_EXPANDING, self.OnItemExpanding, id=self.GetId())
         self.Bind(wx.EVT_KILL_FOCUS, self.onKillFocus, id=self.GetId())
         self.Bind(wx.EVT_SET_FOCUS, self.onSetFocus, id=self.GetId())
-        self.Bind(wx.EVT_RIGHT_DOWN, self.onRightDown)
+        # self.Bind(wx.EVT_RIGHT_DOWN, self.onRightDown)
         wx.CallAfter(self.onRefresh)
 
     def onRightDown(self, event=None):
@@ -54,14 +54,14 @@ class HDataTree(wx.TreeCtrl):
 
     def onKillFocus(self, event=None):
         if self.item is not None and event is not None:
-            bgcol = get_color('pt_fgsel', dark=self.is_dark)
-            self.SetItemTextColour(self.item, bgcol)
+            #bgcol = get_color('pt_fgsel', dark=self.is_dark)
+            #self.SetItemTextColour(self.item, bgcol)
             self.Refresh()
 
     def onSetFocus(self, event=None):
         if self.item is not None and event is not None:
-            bgcol = get_color('text_fg', dark=self.is_dark)
-            self.SetItemTextColour(self.item, bgcol)
+            #bgcol = get_color('text_fg', dark=self.is_dark)
+            #self.SetItemTextColour(self.item, bgcol)
             event.Skip()
 
 
