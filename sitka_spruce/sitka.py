@@ -45,12 +45,13 @@ add_named_color('sbg', (240, 245, 245, 255), ( 20,  30,  30, 255))
 
 class SitkaFrame(wx.Frame):
     """Main Window for Sitka HDF5/Zarr viewer"""
-    def __init__(self, parent=None,
+    def __init__(self, parent=None, with_inspect=False,
                  title='Sitka Hierarchical Data Viewer for HDF5 and Zarr',
                  size=(1100, 675),  style=wx.DEFAULT_FRAME_STYLE):
         """Create Frame instance."""
         self.data = SitkaData()
         self.wids = {}
+        self.with_inspect = with_inspect
         wx.Frame.__init__(self, parent, title=title, size=size,
                           style=style)
         self.create_display(size=size)
@@ -224,8 +225,6 @@ class SitkaFrame(wx.Frame):
                  self.onReadFolder)
 
         fmenu.AppendSeparator()
-
-        fmenu.AppendSeparator()
         self.Bind(wx.EVT_CLOSE,  self.onExit)
         MenuItem(self, fmenu, 'E&xit', 'Exit', self.onExit)
         menuBar.Append(fmenu, '&File')
@@ -241,8 +240,10 @@ class SitkaFrame(wx.Frame):
                  "Export Info and Attributes to tab-separated File",
                  self.onExportInfo)
 
-        MenuItem(self, omenu, 'Show wxPython Inspector\tCtrl+I',
-                 'Debug wxPython App', self.onWxInspect)
+        if self.with_inspect:
+            omenu.AppendSeparator()
+            MenuItem(self, omenu, 'Show wxPython Inspector\tCtrl+I',
+                     'Debug wxPython App', self.onWxInspect)
 
 
         menuBar.Append(omenu, 'Options')
@@ -399,7 +400,7 @@ class Sitka_App(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         wx.App.__init__(self, **kws)
 
     def createApp(self):
-        self.frame = SitkaFrame()
+        self.frame = SitkaFrame(with_inspect=self.with_inspect)
         use_darkdetect()
         self.frame.Show()
 
@@ -411,8 +412,6 @@ class Sitka_App(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
     def OnInit(self):
         self.createApp()
-        if self.with_inspect:
-            self.ShowInspectionTool()
         return True
 
     def add_dataset(self, name, dataset=None):

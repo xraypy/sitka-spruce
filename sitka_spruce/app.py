@@ -42,6 +42,8 @@ def sitka_cli():
                        default=None, help="directory to find data files")
     parser.add_argument('-m', '--makeicon', action='store_true', default=False,
                             help="make desktop shortcut")
+    parser.add_argument('-i', '--inspect', action='store_true', default=False,
+                            help="enable wxInspect")
     args = parser.parse_args()
 
     if args.makeicon:
@@ -62,7 +64,7 @@ def sitka_cli():
                       terminal=False)
         return
 
-    app = Sitka_App()
+    app = Sitka_App(with_inspect=args.inspect)
     if args.directory is not None:
         files = get_sitka_files(args.directory)
         if len(files) > 0:
