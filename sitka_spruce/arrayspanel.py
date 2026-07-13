@@ -25,7 +25,8 @@ class ArraysPanel(wx.Panel):
 
 
         aview = self.wids['arrays'] = dv.DataViewListCtrl(panel, style=DVSTYLE)
-        aview.SetFont(get_font(fixed_width=True, smaller=1))
+        # aview.SetFont(get_font(fixed_width=True, smaller=1))
+        aview.SetFont(get_font(fixed_width=False, smaller=1))
         aview.SetMinSize((725, 250))
         aview.AppendToggleColumn(' Select', width=60, mode=dv.DATAVIEW_CELL_ACTIVATABLE)
         aview.AppendTextColumn(' Array Name ', width=125)
