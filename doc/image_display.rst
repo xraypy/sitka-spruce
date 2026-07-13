@@ -19,7 +19,7 @@ for Y (the vertical axis) and X (the horizontal axis). The choices for
 dimensions and number of points will be automatically updated for each
 dataset, following the shape values (shown in the Info section).
 
-For data arrays that have 3- or more dimenions, changing the
+For data arrays that have 3- or more dimensions, changing the
 selections for the Y and X dimensions will automatically change how
 the contents of the **Dimension Reduction** is presented.  See
 :ref:`dimreduce_panel` for information about how you can use this.
@@ -40,8 +40,8 @@ multiple images at a time.  Each of these will look like:
 .. image:: images/sitka_imshow2.png
    :width: 98 %
 
-These image diplays are fully interactive, and allowing zooming,
-rotating, flipping, and smoothing.  Axes, grid lines, and scalebars
+These image displays are fully interactive, and allowing zooming,
+rotating, flipping, and smoothing.  Axes, grid lines, and scale bars
 can be configured and shown after the image is displayed.  The image
 can be copied to the system clipboard with Ctrl-C.  A wide selection
 of color table can be used.  The upper and lower levels can be

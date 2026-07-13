@@ -22,7 +22,7 @@ The choices for dimensions and number of points will be automatically
 updated for each dataset, following the shape values (shown in the
 Info section).
 
-For data arrays that have 2- or more dimenions, changing the
+For data arrays that have 2- or more dimensions, changing the
 selections for the Y Array will automatically change how the contents
 of the **Dimension Reduction** is presented.  See
 :ref:`dimreduce_panel` for information about how you can use this.
@@ -44,8 +44,7 @@ these), or you can use "Over Plot" to plot with the existing XY Plot.
 The checkbox for "Share Y axis" will control whether the Y-scale for
 multiple plot traces should be shared or independent.
 
-
-As with the image diplays, thes plots are fully interactive, and
+As with the image displays, thes plots are fully interactive, and
 allowing zooming, panning.  The plots can be configured and can be
 copied to the system clipboard with Ctrl-C.  A wide selection of color
 themes are available, and colors, linetypes, text, and sizes for most

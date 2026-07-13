@@ -144,9 +144,9 @@ familiar to anyone who has used one of the other HDF5 viewers (see
     the Groups and Datasets (or Arrays), including datatype, shape,
     chunking, compression, and the list of attributes saved in the
     Group or Dataset.
-  * The Right-hand panel has a notebook inferface with pages for
+  * The Right-hand panel has a notebook interface with pages for
     **Image Display**, **XY Plot Display**, **Table Display**, and
-    **Named Arrays**.  The frirst three of the pages help you select
+    **Named Arrays**.  The first three of the pages help you select
     and display multi-dimensional arrays, and have similar forms, with
     the sections shown in the screenshot above.
   * An **Array Selection** panel in the upper section of the
@@ -163,7 +163,7 @@ familiar to anyone who has used one of the other HDF5 viewers (see
 
 
 Plots and Table displays for selected data arrays will be shown in
-separate windows.  Each of the notebook pages will be disccussed in
+separate windows.  Each of the notebook pages will be discussed in
 detail in a separate section:
 
   * :ref:`image_display`

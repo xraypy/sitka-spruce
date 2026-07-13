@@ -4,11 +4,11 @@
 
 
 ========================================================
-Sitka Spruce: heirarchical data browser
+Sitka Spruce: hierarchical data browser
 ========================================================
 
 
-Sitka Spruce is a general-purpose data browser for heirarchical
+Sitka Spruce is a general-purpose data browser for hierarchical
 datasets stored in HDF5 files or Zarr folders.  It allows interactive
 plotting of scientific data using combining `wxPython`_ , `wxmplot`_,
 and `matplotlib`_.
