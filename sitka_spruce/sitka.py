@@ -46,7 +46,7 @@ add_named_color('sbg', (240, 245, 245, 255), ( 20,  30,  30, 255))
 class SitkaFrame(wx.Frame):
     """Main Window for Sitka HDF5/Zarr viewer"""
     def __init__(self, parent=None, title='Sitka HDF5 Viewer',
-                 size=(1100, 650),  style=wx.DEFAULT_FRAME_STYLE):
+                 size=(1100, 675),  style=wx.DEFAULT_FRAME_STYLE):
         """Create Frame instance."""
         self.data = SitkaData()
         self.wids = {}
@@ -101,7 +101,7 @@ class SitkaFrame(wx.Frame):
 
         self.nb = flatnotebook(mpanel, {},
                                on_change=self.onNBChanged,
-                               size=(875, 550))
+                               size=(875, 625))
 
         # self.mainpanel = ArrayViewPanel(splitter)
         self.nb.AddPage(ArrayImagePanel(self), 'Image Display', True)

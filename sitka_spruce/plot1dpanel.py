@@ -16,8 +16,8 @@ from .data import ARRAY_TYPES, get_data, dim_code, datasize_repr
 
 class ArrayPlot1DPanel(wx.Panel):
     """Config Panel for 1D Plots of HDF5/Zarr datasets"""
-    def __init__(self, parent, size=(750, 500)):
-        wx.Panel.__init__(self, parent)
+    def __init__(self, parent, size=(750, 600)):
+        wx.Panel.__init__(self, parent, size=size)
         self.parent = parent
         self.SetBackgroundColour(get_color('sbg'))
         self.SetFont(get_font())
@@ -54,7 +54,7 @@ class ArrayPlot1DPanel(wx.Panel):
         wids['array_name'] = TextCtrl(panel, 'ydat', size=(200, -1),
                                       act_on_losefocus=False,
                                       action=self.onNameArray)
-        wids['check_overwrite']  = Check(panel, ' ', size=(10, -1), default=True)
+        wids['check_overwrite']  = Check(panel, ' ', size=(30, -1), default=True)
 
         def padd_text(text, dcol=1, size=(125, -1), newrow=True):
             panel.Add(SimpleText(panel, text, size=size, style=LEFT),

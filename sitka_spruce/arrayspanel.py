@@ -14,8 +14,8 @@ DVSTYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 
 class ArraysPanel(wx.Panel):
     """Panel for Named Arrays"""
-    def __init__(self, parent, size=(750, 500)):
-        wx.Panel.__init__(self, parent)
+    def __init__(self, parent, size=(750, 600)):
+        wx.Panel.__init__(self, parent, size=size)
         self.parent = parent
         self.SetBackgroundColour(get_color('sbg'))
 
@@ -56,7 +56,7 @@ class ArraysPanel(wx.Panel):
         wids['expr'].Bind(wx.EVT_TEXT_ENTER, self.onExpr)
         wids['expr'].Bind(wx.EVT_KILL_FOCUS, self.onExpr)
 
-        wids['check_overwrite']  = Check(panel, ' ', size=(10, -1), default=True)
+        wids['check_overwrite']  = Check(panel, ' ', size=(30, -1), default=True)
         wids['access_code'] = SimpleText(panel, ' ', size=(700, -1), style=LEFT)
 
         wids['delete'] = Button(panel, 'Delete Selected Arrays', size=(300, -1),
@@ -69,7 +69,7 @@ class ArraysPanel(wx.Panel):
             panel.Add(SimpleText(panel, text, size=size, style=LEFT),
                       dcol=dcol, newrow=newrow)
 
-        padd_text(' Named Arrays: ')
+        padd_text(' Named Arrays: ', newrow=False)
         panel.Add(wids['sel_all'], dcol=2)
         panel.Add(wids['sel_none'], dcol=1)
         panel.Add(wids['plot'], dcol=1)
@@ -80,7 +80,7 @@ class ArraysPanel(wx.Panel):
         panel.Add(wids['export'], dcol=3, newrow=True)
         panel.Add(wids['delete'], dcol=3)
 
-        panel.Add(HLine(panel, size=(725, 3)), dcol=7)
+        panel.Add(HLine(panel, size=(725, 3)), dcol=7, newrow=True)
 
         panel.Add((5, 5), newrow=True)
 
@@ -96,6 +96,10 @@ class ArraysPanel(wx.Panel):
         panel.Add(wids['check_overwrite'])
 
         panel.pack()
+        panel.SetSize((725, 600))
+
+        print(" array panel size ", panel.GetSize(),  panel.GetBestSize())
+
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, 0, LEFT|wx.GROW, 4)

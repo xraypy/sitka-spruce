@@ -109,14 +109,14 @@ class TablePanel(wx.Panel):
         wids['array_name'] = TextCtrl(panel, 'griddat', size=(200, -1),
                                       act_on_losefocus=False,
                                       action=self.onNameArray)
-        wids['check_overwrite']  = Check(panel, ' ', size=(10, -1), default=True)
+        wids['check_overwrite']  = Check(panel, ' ', size=(30, -1), default=True)
 
 
 
         def padd_text(text, dcol=1, size=(80, -1), newrow=True):
             panel.Add(SimpleText(panel, text, size=size), dcol=dcol, newrow=newrow)
 
-        padd_text(' X: ')
+        padd_text(' X: ', newrow=False)
         panel.Add(wids['xdim'])
 
         padd_text(' Y: ', newrow=False)
