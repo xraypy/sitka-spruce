@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Motivation for Sitka Spruce &#8212; Sitka Spruce: Heirarchical Data Browser</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    
+    <script src="_static/documentation_options.js?v=10f1778b"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="The Named Arrays Page" href="arrays_page.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="arrays_page.html" title="The Named Arrays Page"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Sitka Spruce</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Motivation for Sitka Spruce</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="motivation-for-sitka-spruce">
+<span id="motivation"></span><h1>Motivation for Sitka Spruce<a class="headerlink" href="#motivation-for-sitka-spruce" title="Link to this heading">¶</a></h1>
+<p>There are several applications for viewing HDF5 files, and many of the
+these are written in Python.  An incomplete list includes:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://www.hdfgroup.org/download-hdfview/">hdfview</a> from the HDF Group, perhaps the default HDF5 Viewerr.
+This iA Java-based standalone application, and can be used to edit
+HDF5 files.  The graphics and interactivity are very limited.</p></li>
+<li><p><a class="reference external" href="https://tgwoodcock.github.io/hdf5view/">hdf5view</a>  a Python application using Python/Qt.</p></li>
+<li><p><a class="reference external" href="https://github.com/titusjan/argos">argos</a>     a Python application, also using Python/Qt.</p></li>
+<li><p><a class="reference external" href="https://github.com/silx-kit/silx">silx</a>      a Python libray with a viewing application, also using Python/Qt.</p></li>
+<li><p><a class="reference external" href="https://github.com/nexpy/nexpy">nexpy</a>     a Python libraray and viewing application,
+specifically for <a class="reference external" href="https://github.com/nexpy/nexusformat">NeXuS</a> data, an important subset of HDF5, also
+using Python/Qt.</p></li>
+<li><p><a class="reference external" href="https://myhdf5.hdfgroup.org/">myhdf5</a>    a web-based browser for HDF5 files.</p></li>
+<li><p><a class="reference external" href="https://github.com/silx-kit/h5web">h5web</a>     the base code for <a class="reference external" href="https://myhdf5.hdfgroup.org/">myhdf5</a>, that also incldues an
+interface from Jupyter Lab.</p></li>
+</ul>
+</div></blockquote>
+<p>Many of these tools are very good, and some have features that you may
+prefer over Sitka Spruce.  But we also note that the sheer number of
+viewers available (including 3 separate projects implementating of
+“general HDF5 viewers” with Python/Qt), there must be both a need for
+such tools, and an expectation (or at least optimism) that creating
+another viewer is worthwhile.</p>
+<p>Several of these projects (nexpy, silx, h5web) are also somewhat
+associated with synchrotron data, which makes heavy use of HDF5 and
+<a class="reference external" href="https://github.com/nexpy/nexusformat">NeXuS</a>.  Though we work in that same field, and many of these tools
+are very good, we hope we will be forgiven for thinking that there is
+room for one more viewer.</p>
+<p>The main features and points of emphasis that we think differentiate
+Sitka Spruce from existing tools include:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>using <a class="reference external" href="https://newville.github.io/wxmplot/">wxmplot</a> for data visualization. This gives high-quality
+graphics from matplotlib and very good interactivity for both line
+plots and 2D images.</p></li>
+<li><p>by using <a class="reference external" href="https://www.wxpython.org/">wxPython</a>, we plan to use Sitka as a reader for tools
+in the <a class="reference external" href="https://xraypy.github.io/xraylarch/">xraylarch</a> family, including the Larix application for
+XAS data. This is expected in the near future, but after the
+initial release.</p></li>
+<li><p>support for working with data in both HDF5 with <a class="reference external" href="https://code.google.com/p/h5py/">h5py</a> and
+<a class="reference external" href="https://zarr.dev/">zarr</a>.  The initial release supports Zarr Local File Storage,
+but not other stores.</p></li>
+<li><p>we aim to make it very easy to extract data from the complex data
+files for downstream analysis by exporting either selected data or
+the full addresses to data components.</p></li>
+<li><p>we aim to make a GUI that can be used as a general-purpose,
+standalone app for all users and also as an interactive
+application from a Python shell or Jupyter notebook, improving
+accessing data within HDF5 files for exploratory data analysis.</p></li>
+<li><p>for the initial release, we are not explicity or specifically
+supporting NeXuS, but this high on the list of things to consider.</p></li>
+</ul>
+</div></blockquote>
+<p>We welcome feedback, comments, suggestions, and collaboration on all
+of these topics or any other differences with othe visualization or
+data processing tools.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/sitka_logo.png" alt="Logo of Sitka Spruce"/>
+            </a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="arrays_page.html"
+                          title="previous chapter">The Named Arrays Page</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/motivation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="arrays_page.html" title="The Named Arrays Page"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Sitka Spruce</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Motivation for Sitka Spruce</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026-07-13, Matthew Newville, The University of Chicago.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

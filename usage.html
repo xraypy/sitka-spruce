@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Using Sitka &#8212; Sitka Spruce: Heirarchical Data Browser</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    
+    <script src="_static/documentation_options.js?v=10f1778b"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="The Image Display Page" href="image_display.html" />
+    <link rel="prev" title="Downloading and Installation" href="installation.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="image_display.html" title="The Image Display Page"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Downloading and Installation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Sitka Spruce</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Using Sitka</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="using-sitka">
+<h1>Using Sitka<a class="headerlink" href="#using-sitka" title="Link to this heading">¶</a></h1>
+<p>In this section, we’ll give information for starting the Sitka GUI,
+loading, and using datafiles.</p>
+<section id="running-the-sitka-gui">
+<h2>Running the Sitka GUI<a class="headerlink" href="#running-the-sitka-gui" title="Link to this heading">¶</a></h2>
+<p>Sitka can be used as a stand-alone GUI application or from a Python
+REPL or Jupyter Notebook.</p>
+<section id="using-the-command-line-sitka-program">
+<h3>Using the command-line <cite>sitka</cite> program<a class="headerlink" href="#using-the-command-line-sitka-program" title="Link to this heading">¶</a></h3>
+<p>To run sitka from a command-line terminal, use</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sitka
+</pre></div>
+</div>
+<p>You can use the ‘-d’ option to specify a directory from which to read
+datasets, as with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sitka<span class="w"> </span>-d<span class="w"> </span>/home/User/data
+</pre></div>
+</div>
+</section>
+<section id="creating-and-using-a-desktop-shortcut">
+<h3>Creating and Using a Desktop shortcut<a class="headerlink" href="#creating-and-using-a-desktop-shortcut" title="Link to this heading">¶</a></h3>
+<p>If you have created the desktop shortcut (see
+<a class="reference internal" href="installation.html#desktop-shortcut"><span class="std std-ref">Creating the Desktop Shortcut</span></a>), then clicking on that should launch the main
+Sitka application.</p>
+</section>
+<section id="running-sitka-from-a-python-shell-or-jupyter-notebook">
+<h3>Running Sitka from a Python shell or  Jupyter Notebook<a class="headerlink" href="#running-sitka-from-a-python-shell-or-jupyter-notebook" title="Link to this heading">¶</a></h3>
+<p>You can run the Sitka viewer from within a Python shell or Jupyter
+notebook that is connected to your computer (that is, supports drawing
+to your local screen) to get an interactive graphical exploration of
+your data.  To do this, use:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sitka_spruce</span><span class="w"> </span><span class="kn">import</span> <span class="n">sitka_viewer</span>
+<span class="n">sview</span> <span class="o">=</span> <span class="n">sitka_viewer</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You can also optionally specify a directory
+from which to read datasets with</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">sview</span> <span class="o">=</span> <span class="n">sitka_viewer</span><span class="p">(</span><span class="n">folder</span><span class="o">=</span><span class="s1">&#39;/home/User/data&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will launch the Sitka GUI application in a Window outside of the
+Python shell or Jupyter notebook.</p>
+<p>The Sitka Viewer will allow the shell or notebook to remain active while the
+viewer also runs. That is, you can load and visualize data as with the
+standalone application.  You can also use the shell or notebook to
+access the data in the Sitka Viewer, either adding datasets to the GUI
+or pulling arrays from the GUI into the shell.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1">##</span>
+<span class="c1"># import an HDF5 file from the shell, and add it to the Sitka Viewer</span>
+<span class="c1"># this allows you to fully explore the data arrays in the file</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+<span class="n">myfile</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;myhdf5_file.h5&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">sview</span><span class="o">.</span><span class="n">add_dataset</span><span class="p">(</span><span class="s1">&#39;myhdf5_file.h5&#39;</span><span class="p">,</span> <span class="n">myfile</span><span class="p">)</span>
+
+<span class="c1">##</span>
+<span class="c1"># Sitka allows you to copy addresses and slices to the System</span>
+<span class="c1"># Clipboard, so you can paste them into your shell/notebook</span>
+<span class="c1"># Doing &lt;Ctrl-V&gt;  might paste</span>
+<span class="c1">#     [&#39;myeiger_file.h5&#39;][&#39;/entry/data/data&#39;][10:20,:,:].sum(axis=0)</span>
+<span class="c1"># into the shell, and you can use that to access the data as</span>
+<span class="n">myimage</span> <span class="o">=</span> <span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;myeiger_file.h5&#39;</span><span class="p">][</span><span class="s1">&#39;/entry/data/data&#39;</span><span class="p">][</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1">##</span>
+<span class="c1"># list all datasets in the viewer, no matter how they were read</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dset</span> <span class="ow">in</span> <span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dset</span><span class="p">)</span>
+
+<span class="c1">##</span>
+<span class="c1"># list all &quot;named arrays&quot; saved during data exploration</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1">##</span>
+<span class="c1"># take an example array and run your analysis pipeline on it</span>
+<span class="n">myarray</span> <span class="o">=</span> <span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="s1">&#39;spectra1&#39;</span><span class="p">]</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">my_analysistool</span><span class="w"> </span><span class="kn">import</span> <span class="n">analyze</span>
+<span class="n">result</span>  <span class="o">=</span> <span class="n">analyze</span><span class="p">(</span><span class="n">myarray</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>With this approach, you can quickly load and explore your datasets and
+extract and use the arrays you want for downstream processing.</p>
+</section>
+</section>
+<section id="basic-usage-of-the-sitka-gui">
+<h2>Basic Usage of the Sitka GUI<a class="headerlink" href="#basic-usage-of-the-sitka-gui" title="Link to this heading">¶</a></h2>
+<p>On Startup the Sitka GUI will look like this:</p>
+<a class="reference internal image-reference" href="_images/sitka_start.png"><img alt="_images/sitka_start.png" src="_images/sitka_start.png" style="width: 98%;" />
+</a>
+<p>with an empty panel in the upper left.  To reading in an HDF5 file or
+Zarr directory store using the File -&gt; Read Data File or use Ctrl-O
+(Option-O on MacOS).  The file name will be shown in the Data Tree
+section of the Window.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The examples shown throughout this document can retrieved by
+downloading and running the <a class="reference external" href="https://raw.githubusercontent.com/xraypy/sitka-spruce/refs/heads/main/examples/get_sitka_examples.py">get_sitka_examples.py</a> script.</p>
+</div>
+<section id="overview-of-the-main-sitka-window">
+<h3>Overview of the main Sitka Window<a class="headerlink" href="#overview-of-the-main-sitka-window" title="Link to this heading">¶</a></h3>
+<a class="reference internal image-reference" href="_images/sitka_main_annotated.png"><img alt="_images/sitka_main_annotated.png" src="_images/sitka_main_annotated.png" style="width: 98%;" />
+</a>
+<p>The main window is broken into several sections, as shown above.  This should be
+familiar to anyone who has used one of the other HDF5 viewers (see
+<a class="reference internal" href="motivation.html#motivation"><span class="std std-ref">Motivation for Sitka Spruce</span></a> for a partial list).</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>A <strong>Data Tree</strong> in the upper left lets you browse through the
+Tree-like structure of the hierarchical datasets.</p></li>
+<li><p>An <strong>Info Section</strong> in the lower left will show information about
+the Groups and Datasets (or Arrays), including datatype, shape,
+chunking, compression, and the list of attributes saved in the
+Group or Dataset.</p></li>
+<li><p>The Right-hand panel has a notebook interface with pages for
+<strong>Image Display</strong>, <strong>XY Plot Display</strong>, <strong>Table Display</strong>, and
+<strong>Named Arrays</strong>.  The first three of the pages help you select
+and display multi-dimensional arrays, and have similar forms, with
+the sections shown in the screenshot above.</p></li>
+<li><p>An <strong>Array Selection</strong> panel in the upper section of the
+notebook page allows you to select one more dimensions of the Array
+data.</p></li>
+<li><p>A <strong>Dimension Reduction</strong> panel in the middle section of the
+notebook page allows you to select how to “reduce” other dimensions
+of the dataset, either selecting a single element or a range of
+values to sum. See <a class="reference internal" href="#dimreduce-panel"><span class="std std-ref">The Dimension Reduction Panel</span></a> for more details.</p></li>
+<li><p>An <strong>Array Saving</strong> panel at the bottom of the notebook page allows
+you give a name to the array selected, which can then be shown
+or exported later. See <a class="reference internal" href="#save-arrays"><span class="std std-ref">Saving Arrays by Name</span></a> and <a class="reference internal" href="#copy-address"><span class="std std-ref">Copying the Array Address</span></a>
+for details.</p></li>
+</ul>
+</div></blockquote>
+<p>Plots and Table displays for selected data arrays will be shown in
+separate windows.  Each of the notebook pages will be discussed in
+detail in a separate section:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="image_display.html#image-display"><span class="std std-ref">The Image Display Page</span></a></p></li>
+<li><p><a class="reference internal" href="xyplot_display.html#xyplot-display"><span class="std std-ref">The XY Plot Display Page</span></a></p></li>
+<li><p><a class="reference internal" href="table_display.html#table-display"><span class="std std-ref">The Table Display Page</span></a></p></li>
+<li><p><a class="reference internal" href="arrays_page.html#arrays-page"><span class="std std-ref">The Named Arrays Page</span></a></p></li>
+</ul>
+</div></blockquote>
+<p>In the following sections we discuss common features for many of these
+panels.</p>
+</section>
+<section id="saving-arrays-by-name">
+<span id="save-arrays"></span><h3>Saving Arrays by Name<a class="headerlink" href="#saving-arrays-by-name" title="Link to this heading">¶</a></h3>
+<p>For the Notebook Panels, the array data selected for plotting can be
+saved to a named array.  In the lower panel, simply typing a name
+(which must follow the valid conventions for a Python variable: A
+letter or underscore followed by any number of letters, numbers, or
+underscore) and hitting return or the Save Array button will save the
+array.  By default, this will ask to verify overwriting an existing
+array.</p>
+</section>
+<section id="copying-the-array-address">
+<span id="copy-address"></span><h3>Copying the Array Address<a class="headerlink" href="#copying-the-array-address" title="Link to this heading">¶</a></h3>
+<p>As you browse through Groups and Datasets and as you build arrays for
+plotting or display, you may find data components, slices, and
+addresses that you want to use for downstream processing.  Using
+Ctrl-C (Option-C on macOS), or hitting the “Copy Address” button above
+the Notebook pages will copy the Python syntax for the array address
+to the system clipboard.  For an image display that sums over a
+selected number of frames, the copied address may look like</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;myeiger_file.h5&#39;</span><span class="p">][</span><span class="s1">&#39;/entry/data/data&#39;</span><span class="p">][</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If your are using Sitka from A Jupyter notebook or Python shell, you
+may need to pre-pend the address to the Sitka datasets, as with</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">myimage</span> <span class="o">=</span> <span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;myeiger_file.h5&#39;</span><span class="p">][</span><span class="s1">&#39;/entry/data/data&#39;</span><span class="p">][</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="exporting-group-dataset-metadata">
+<span id="export-info"></span><h3>Exporting Group/Dataset Metadata<a class="headerlink" href="#exporting-group-dataset-metadata" title="Link to this heading">¶</a></h3>
+<p>Just as you can copy array addresses, you can also export the values
+in the Info section for any Group or Dataset.  Using Ctrl-E (Option-E
+on macOS) will bring up a dialog to save the data shown in the table
+in the Info section to a tab-separated file.</p>
+</section>
+<section id="the-dimension-reduction-panel">
+<span id="dimreduce-panel"></span><h3>The Dimension Reduction Panel<a class="headerlink" href="#the-dimension-reduction-panel" title="Link to this heading">¶</a></h3>
+<p>The dimension reduction panel assists you in converting
+multi-dimensional datasets into 1- and 2-dimensional arrays for XY
+plots, image display, and table display.</p>
+<p>This panel might looks like this:</p>
+<a class="reference internal image-reference" href="_images/sitka_dimreduce.png"><img alt="_images/sitka_dimreduce.png" src="_images/sitka_dimreduce.png" style="width: 98%;" />
+</a>
+<p>Here, dimensions 0 and 1 must have been selected as the Y or X arrays
+for image or table display.  The remaining dimension has 2048 points.
+The settings here will select a <strong>single</strong> value, pixel 1024 out
+of 2048.  The Method selection of <strong>single</strong> can be changed to <strong>sum</strong>
+or <strong>mean</strong>, and then a Min and Max value be chosen to sum over that
+slice of the array dimension.</p>
+<p>If choosing a slice range for <strong>sum</strong> or <strong>mean</strong>, you can check the
+“Fix Width” box.  With this checked, changing either the Min or Max
+value (with the arrows or by typing in a number) will update both
+values to try to preserve their difference.  You can change to step
+taken by the arrow keys with the Min/Max Step Size selection.
+Finally, if you check the “Auto Update” box, then changing the Min or
+Max value will update the display to reflect the newly sliced data.</p>
+</section>
+<section id="a-note-on-speed-of-array-selection">
+<h3>A note on speed of Array Selection<a class="headerlink" href="#a-note-on-speed-of-array-selection" title="Link to this heading">¶</a></h3>
+<p>HDF5 and Zarr hold data in chunks of binary data on disk, with
+optional compression.  These settings are displayed in the Info
+section.</p>
+<p>Extracting data from HDF5 and Zarr may no be instantaneous.  In
+certain cases, it may even appear to be “slow”.  The extraction speed
+can depend greatly on the chunking and compression used, and the data
+size.  We will assert that the speed of extracting data from HDF5
+files is fully within the HDF5 library, and not because “Python is
+slow” or “matplotlib is slow” or “wxPython is slow”.  If you have
+suggestions for speeding up data extraction or display, we’ll be happy
+to hear them.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/sitka_logo.png" alt="Logo of Sitka Spruce"/>
+            </a></p>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Using Sitka</a><ul>
+<li><a class="reference internal" href="#running-the-sitka-gui">Running the Sitka GUI</a><ul>
+<li><a class="reference internal" href="#using-the-command-line-sitka-program">Using the command-line <cite>sitka</cite> program</a></li>
+<li><a class="reference internal" href="#creating-and-using-a-desktop-shortcut">Creating and Using a Desktop shortcut</a></li>
+<li><a class="reference internal" href="#running-sitka-from-a-python-shell-or-jupyter-notebook">Running Sitka from a Python shell or  Jupyter Notebook</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#basic-usage-of-the-sitka-gui">Basic Usage of the Sitka GUI</a><ul>
+<li><a class="reference internal" href="#overview-of-the-main-sitka-window">Overview of the main Sitka Window</a></li>
+<li><a class="reference internal" href="#saving-arrays-by-name">Saving Arrays by Name</a></li>
+<li><a class="reference internal" href="#copying-the-array-address">Copying the Array Address</a></li>
+<li><a class="reference internal" href="#exporting-group-dataset-metadata">Exporting Group/Dataset Metadata</a></li>
+<li><a class="reference internal" href="#the-dimension-reduction-panel">The Dimension Reduction Panel</a></li>
+<li><a class="reference internal" href="#a-note-on-speed-of-array-selection">A note on speed of Array Selection</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="installation.html"
+                          title="previous chapter">Downloading and Installation</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="image_display.html"
+                          title="next chapter">The Image Display Page</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/usage.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="image_display.html" title="The Image Display Page"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Downloading and Installation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Sitka Spruce</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Using Sitka</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026-07-13, Matthew Newville, The University of Chicago.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

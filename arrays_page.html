@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The Named Arrays Page &#8212; Sitka Spruce: Heirarchical Data Browser</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    
+    <script src="_static/documentation_options.js?v=10f1778b"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Motivation for Sitka Spruce" href="motivation.html" />
+    <link rel="prev" title="The Table Display Page" href="table_display.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="motivation.html" title="Motivation for Sitka Spruce"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="table_display.html" title="The Table Display Page"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Sitka Spruce</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">The Named Arrays Page</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="the-named-arrays-page">
+<span id="arrays-page"></span><h1>The Named Arrays Page<a class="headerlink" href="#the-named-arrays-page" title="Link to this heading">¶</a></h1>
+<p>The Named Arrays page will contain a list of arrays saved in the Sitka
+session, and will look like</p>
+<a class="reference internal image-reference" href="_images/sitka_arrayspage.png"><img alt="_images/sitka_arrayspage.png" src="_images/sitka_arrayspage.png" style="width: 98%;" />
+</a>
+<p>Each of the named Array can be highlighted, or multiple arrays can be
+selected at a time.  The <strong>Plot Current</strong> button will show the
+highlighted array (as a simple plot or image display).</p>
+<p>Note that this list may contain arrays named <cite>_imgdat</cite>, <cite>_ydat</cite>, and
+<cite>_tabledat</cite>.  These arrays are automatically written as the last data
+used by the Image Display page, the XY Display page and the Table
+Display page.</p>
+<p>You can use the <strong>Export Selected Arrays to HDF5</strong> to export the
+selected arrays to a simple HDF5 file (and so easily read into later
+Sitka sessions) or use <strong>Delete Selected Arrays</strong> to remove them.</p>
+<p>At the bottom, you can also create a new array directly.  Here you
+give a name (which must follow the valid conventions for a Python
+variable: A letter or underscore followed by any number of letters,
+numbers, or underscore), and an mathematical expression to evaluate
+for the array value.  This uses an <a class="reference external" href="https://lmfit.github.io/asteval/">asteval</a> Interpreter, and so uses
+Python conventions, the built-in math functions from the <cite>math</cite> module
+and <cite>numpy</cite>, and also contains the other named arrays.  Example
+expressions would include</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>‘0.01 * arange(4096)’, maybe to set an X-axis for XYPlots</p></li>
+<li><p>‘linspace(-2, 2, 501)’, as another form to set an X-axis for XYPlots</p></li>
+<li><p>‘image1 - image2’ to take the difference of two images.</p></li>
+<li><p>‘sin(ydat/10)’  you can use any trig functions from numpy.</p></li>
+<li><p>‘gradient(ydat)/gradient(xdat)’ to take the derivative ‘dy/dx’.</p></li>
+</ul>
+</div></blockquote>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/sitka_logo.png" alt="Logo of Sitka Spruce"/>
+            </a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="table_display.html"
+                          title="previous chapter">The Table Display Page</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="motivation.html"
+                          title="next chapter">Motivation for Sitka Spruce</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/arrays_page.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="motivation.html" title="Motivation for Sitka Spruce"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="table_display.html" title="The Table Display Page"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Sitka Spruce</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">The Named Arrays Page</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026-07-13, Matthew Newville, The University of Chicago.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

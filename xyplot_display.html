@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The XY Plot Display Page &#8212; Sitka Spruce: Heirarchical Data Browser</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    
+    <script src="_static/documentation_options.js?v=10f1778b"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="The Table Display Page" href="table_display.html" />
+    <link rel="prev" title="The Image Display Page" href="image_display.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="table_display.html" title="The Table Display Page"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="image_display.html" title="The Image Display Page"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Sitka Spruce</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">The XY Plot Display Page</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="the-xy-plot-display-page">
+<span id="xyplot-display"></span><h1>The XY Plot Display Page<a class="headerlink" href="#the-xy-plot-display-page" title="Link to this heading">¶</a></h1>
+<p>The XY Plot Display page will look like</p>
+<a class="reference internal image-reference" href="_images/sitka_xyplotpage.png"><img alt="_images/sitka_xyplotpage.png" src="_images/sitka_xyplotpage.png" style="width: 98%;" />
+</a>
+<p>and allow you make images or false-color maps of the multi-dimensional
+data.</p>
+<p>In the top <strong>Array Selection</strong> section, you can select the dimension
+for Y Array data.</p>
+<p>The choices for dimensions and number of points will be automatically
+updated for each dataset, following the shape values (shown in the
+Info section).</p>
+<p>For data arrays that have 2- or more dimensions, changing the
+selections for the Y Array will automatically change how the contents
+of the <strong>Dimension Reduction</strong> is presented.  See
+<a class="reference internal" href="usage.html#dimreduce-panel"><span class="std std-ref">The Dimension Reduction Panel</span></a> for information about how you can use this.</p>
+<p>If you have named 1-D arrays of the same length as the Y array data,
+these will be included in the drop-down lists for the “Normalization
+Array” and the “X Array”.  The Normalization Array (defaulting to the
+constant “1”) can be used to multiply, divide, add, or subtract from
+the selected Y array.  The choice for the X Array will be used for the
+X-axis of the plot, defaulting to the array index.</p>
+<a class="reference internal image-reference" href="_images/sitka_plot.png"><img alt="_images/sitka_plot.png" src="_images/sitka_plot.png" style="width: 98%;" />
+</a>
+<p>To show the plot for your selected arrays, you can either use “New
+Plot” to show in a new plot window (and you can select up to 10 of
+these), or you can use “Over Plot” to plot with the existing XY Plot.
+The checkbox for “Share Y axis” will control whether the Y-scale for
+multiple plot traces should be shared or independent.</p>
+<p>As with the image displays, thes plots are fully interactive, and
+allowing zooming, panning.  The plots can be configured and can be
+copied to the system clipboard with Ctrl-C.  A wide selection of color
+themes are available, and colors, linetypes, text, and sizes for most
+elements can be changed after displayed.  For more details using this
+image display, see <a class="reference external" href="https://newville.github.io/wxmplot/overview.html#user-interaction-and-configuring-line-plots">WXMPLOT Interactive Plot Display</a></p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/sitka_logo.png" alt="Logo of Sitka Spruce"/>
+            </a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="image_display.html"
+                          title="previous chapter">The Image Display Page</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="table_display.html"
+                          title="next chapter">The Table Display Page</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/xyplot_display.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="table_display.html" title="The Table Display Page"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="image_display.html" title="The Image Display Page"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Sitka Spruce</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">The XY Plot Display Page</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026-07-13, Matthew Newville, The University of Chicago.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>
