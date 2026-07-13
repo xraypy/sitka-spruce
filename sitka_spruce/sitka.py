@@ -45,7 +45,8 @@ add_named_color('sbg', (240, 245, 245, 255), ( 20,  30,  30, 255))
 
 class SitkaFrame(wx.Frame):
     """Main Window for Sitka HDF5/Zarr viewer"""
-    def __init__(self, parent=None, title='Sitka HDF5 Viewer',
+    def __init__(self, parent=None,
+                 title='Sitka Hierarchical Data Viewer for HDF5 and Zarr',
                  size=(1100, 675),  style=wx.DEFAULT_FRAME_STYLE):
         """Create Frame instance."""
         self.data = SitkaData()
