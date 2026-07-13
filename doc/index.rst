@@ -21,11 +21,12 @@ For goals and motivation for Sitka, see :ref:`motivation`.
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    installation
    usage
+   image_display
+   xyplot_display
+   table_display
+   arrays_page
    motivation
-   plot1d_panel
-   image_panel
-   table_panel

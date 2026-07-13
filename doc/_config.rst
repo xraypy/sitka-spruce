@@ -17,6 +17,8 @@
 .. _hdf5view: https://tgwoodcock.github.io/hdf5view/
 .. _argos:    https://github.com/titusjan/argos
 .. _silx:     https://github.com/silx-kit/silx
+.. _nexpy:    https://github.com/nexpy/nexpy
+.. _NeXuS:    https://github.com/nexpy/nexusformat
 .. _github:   https://github.com/xraypy/sitka-spruce
 .. _PyPI:     https://pypi.python.org/pypi/sitka-spruce
 
@@ -25,3 +27,8 @@
 
 .. _GetSitka.sh:   https://raw.githubusercontent.com/xraypy/sitka-spruce/master/installers/GetSitka.sh
 .. _GetSitka.bat:  https://raw.githubusercontent.com/xraypysitka-spruce/master/installers/GetSitka.bat
+
+.. _SitkaExamples: https://millenia.cars.aps.anl.gov/xraylarch/downloads/sitka_examples/
+
+.. _WXMPLOT Interactive Image Display:  https://newville.github.io/wxmplot/overview.html#user-interaction-and-configuring-image-and-contour-displays
+.. _WXMPLOT Interactive Plot Display: https://newville.github.io/wxmplot/overview.html#user-interaction-and-configuring-line-plots
