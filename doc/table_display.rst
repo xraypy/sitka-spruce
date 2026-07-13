@@ -23,3 +23,7 @@ For data arrays that have 3- or more dimenions, changing the
 selections for the Y and X dimensions will automatically change how
 the contents of the **Dimension Reduction** is presented.  See
 :ref:`dimreduce_panel` for information about how you can use this.
+
+
+.. image:: images/sitka_tableview.png
+   :width: 98 %

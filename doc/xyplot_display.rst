@@ -15,23 +15,34 @@ and allow you make images or false-color maps of the multi-dimensional
 data.
 
 In the top **Array Selection** section, you can select the dimension
-for Y (the vertical axis) and X (the horizontal axis). The choices for
-dimensions and number of points will be automatically updated for each
-dataset, following the shape values (shown in the Info section).
+for Y Array data.
 
-For data arrays that have 3- or more dimenions, changing the
-selections for the Y and X dimensions will automatically change how
-the contents of the **Dimension Reduction** is presented.  See
+
+The choices for dimensions and number of points will be automatically
+updated for each dataset, following the shape values (shown in the
+Info section).
+
+For data arrays that have 2- or more dimenions, changing the
+selections for the Y Array will automatically change how the contents
+of the **Dimension Reduction** is presented.  See
 :ref:`dimreduce_panel` for information about how you can use this.
 
-If you have named 1-D arrays of the appropriate length, these will be
-included in the drop-down lists for the "Y values" or "X values", to
-give dimensions to the resulting image.  By default, the array index
-will be used.
+If you have named 1-D arrays of the same length as the Y array data,
+these will be included in the drop-down lists for the "Normalization
+Array" and the "X Array".  The Normalization Array (defaulting to the
+constant "1") can be used to multiply, divide, add, or subtract from
+the selected Y array.  The choice for the X Array will be used for the
+X-axis of the plot, defaulting to the array index.
 
-To show an image for your selected arrays, but the "Show Image"
-button.  You can also select the window display number to show
-multiple images at a time.  Each of these will look like:
+.. image:: images/sitka_plot.png
+   :width: 98 %
+
+
+To show the plot for your selected arrays, you can either use "New
+Plot" to show in a new plot window (and you can select up to 10 of
+these), or you can use "Over Plot" to plot with the existing XY Plot.
+The checkbox for "Share Y axis" will control whether the Y-scale for
+multiple plot traces should be shared or independent.
 
 
 As with the image diplays, thes plots are fully interactive, and
