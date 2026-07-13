@@ -14,6 +14,8 @@ elif uname == 'linux':
     FONTSIZE_FW -= 1
 
 
+WIN_CHOICES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+
 def fontsize(fixed_width=False):
     """return best default fontsize"""
     font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)

@@ -9,7 +9,7 @@ from wxutils import (GridPanel, SimpleText, pack, Button,
                      register_darkdetect)
 
 from .dimreduce import DimReducePanel
-from .gui_utils import get_font
+from .gui_utils import get_font, WIN_CHOICES
 from .data import ARRAY_TYPES, dtype2str, get_data, dim_code, datasize_repr
 
 class DataGridFrame(wx.Frame):
@@ -101,7 +101,7 @@ class TablePanel(wx.Panel):
         wids['xdim'].SetSelection(0)
         wids['ydim'].SetSelection(1)
 
-        wids['win'] = Choice(panel, ['1', '2', '3', '4', '5'], size=(75, -1))
+        wids['win'] = Choice(panel, WIN_CHOICES, size=(75, -1))
         wids['win'].SetStringSelection('1')
 
         wids['save_array'] = Button(panel, 'Save Array', size=(125, -1),

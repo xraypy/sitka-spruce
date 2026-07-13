@@ -44,7 +44,6 @@ ICON_DIR = Path(Path(__file__).parent, 'icons').absolute()
 add_named_color('sbg', (240, 245, 245, 255), ( 20,  30,  30, 255))
 
 
-
 class SitkaFrame(wx.Frame):
     """Main Window for Sitka HDF5/Zarr viewer"""
     def __init__(self, parent=None, title='Sitka HDF5 Viewer',
@@ -225,9 +224,6 @@ class SitkaFrame(wx.Frame):
                  self.onReadFolder)
 
         fmenu.AppendSeparator()
-        MenuItem(self, fmenu, "Export Attributes to TSV File",
-                 "Export Info and Attributes to tab-separated File",
-                 self.onExportInfo)
 
         fmenu.AppendSeparator()
         self.Bind(wx.EVT_CLOSE,  self.onExit)
@@ -241,6 +237,9 @@ class SitkaFrame(wx.Frame):
         omenu.AppendSeparator()
         MenuItem(self, omenu, 'Copy Address to Clipboard\tCtrl+C',
                  'Copy Current Address to to Clipboard', self.onCopyAddress)
+        MenuItem(self, omenu, "Export Attributes to TSV File\tCtrl+E",
+                 "Export Info and Attributes to tab-separated File",
+                 self.onExportInfo)
 
         MenuItem(self, omenu, 'Show wxPython Inspector\tCtrl+I',
                  'Debug wxPython App', self.onWxInspect)
@@ -248,10 +247,6 @@ class SitkaFrame(wx.Frame):
 
         menuBar.Append(omenu, 'Options')
 
-        #hmenu = wx.Menu()
-        #MenuItem(self, hmenu, '&About',
-        #         'Information about this program',  self.onAbout)
-        #menuBar.Append(hmenu, '&Help')
         self.SetMenuBar(menuBar)
 
     def onIncreaseFont(self, event=None):
@@ -301,7 +296,7 @@ class SitkaFrame(wx.Frame):
         if path is None:
             return
 
-        fname = path.name
+        fname = Path(path).name
         if fname in self.data.datasets:
             ret = Popup(self,
                        f'File {fname} already exists... overwrite?',

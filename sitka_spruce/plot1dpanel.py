@@ -10,7 +10,7 @@ from wxutils import (GridPanel, SimpleText, pack, Button,
                      Choice, Check, LEFT, TextCtrl, Popup,
                      get_color, register_darkdetect)
 
-from .gui_utils import get_font
+from .gui_utils import get_font, WIN_CHOICES
 from .dimreduce import DimReducePanel
 from .data import ARRAY_TYPES, get_data, dim_code, datasize_repr
 
@@ -36,7 +36,7 @@ class ArrayPlot1DPanel(wx.Panel):
                                   action=partial(self.onPlot, new=False))
 
         wids['sharey'] = Check(panel, ' ', size=(300, -1), default=False)
-        wids['win'] = Choice(panel, ['1', '2', '3', '4', '5'], size=(75, -1))
+        wids['win'] = Choice(panel, WIN_CHOICES, size=(75, -1))
         wids['win'].SetStringSelection('1')
 
         wids['ychoices'] =  ['dim0: 0 points']
