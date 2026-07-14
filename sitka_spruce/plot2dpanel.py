@@ -6,7 +6,7 @@ import wx
 
 from wxmplot import ImageFrame
 
-from wxutils import (GridPanel, SimpleText, pack, Button,
+from wxutils import (GridPanel, SimpleText, pack, Button, HLine,
                      Choice, Check, LEFT, TextCtrl, Popup,
                      get_color, register_darkdetect)
 
@@ -56,12 +56,25 @@ class ArrayImagePanel(wx.Panel):
         wids['ydim'].SetSelection(0)
         wids['xdim'].SetSelection(1)
 
+
         wids['save_array'] = Button(panel, 'Save Array', size=(125, -1),
                                   action=self.onNameArray)
         wids['array_name'] = TextCtrl(panel, 'imgdat', size=(200, -1),
                                       act_on_losefocus=False,
                                       action=self.onNameArray)
         wids['check_overwrite']  = Check(panel, ' ', size=(30, -1), default=True)
+
+        wids['red_array'] = Choice(panel, ['<none>'], size=(200, -1), action=self.onRGBChoice)
+        wids['green_array'] = Choice(panel, ['<none>'], size=(200, -1), action=self.onRGBChoice)
+        wids['blue_array'] = Choice(panel, ['<none>'], size=(200, -1), action=self.onRGBChoice)
+
+        wids['red_text'] = SimpleText(panel, ' ', size=(300, -1))
+        wids['blue_text'] = SimpleText(panel, ' ', size=(300, -1))
+        wids['green_text'] = SimpleText(panel, ' ', size=(300, -1))
+
+        wids['show_rgb'] = Button(panel, 'Show RGB Image', size=(200, -1),
+                                  action=self.onShowRGB)
+
 
         def padd_text(text, dcol=1, size=(100, -1), newrow=True):
             panel.Add(SimpleText(panel, text, size=size, style=LEFT),
@@ -97,6 +110,21 @@ class ArrayImagePanel(wx.Panel):
         padd_text(' Verify Overwrite', size=(125, -1), newrow=False)
         panel.Add(wids['check_overwrite'], dcol=1)
 
+        panel.Add((5, 5), newrow=True)
+        panel.Add(HLine(panel, size=(725, 3)), dcol=7, newrow=True)
+        panel.Add((5, 5), newrow=True)
+        panel.Add(wids['show_rgb'], newrow=True)
+
+        padd_text(' Red: ', newrow=True)
+        panel.Add(wids['red_array'])
+        panel.Add(wids['red_text'])
+        padd_text(' Green: ', newrow=True)
+        panel.Add(wids['green_array'])
+        panel.Add(wids['green_text'])
+        padd_text(' Blue: ', newrow=True)
+        panel.Add(wids['blue_array'])
+        panel.Add(wids['blue_text'])
+
         panel.pack()
 
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -129,6 +157,7 @@ class ArrayImagePanel(wx.Panel):
         ylabel = dim_code(reddim)
         access_code = f"['{self.filename}']['{self.itemname}']{ylabel}"
         self.parent.data.add_array(arr_name, _yarr, address=access_code)
+        wx.CallAfter(self.update_array_choices)
 
 
     def onXdim(self, event=None):
@@ -193,6 +222,32 @@ class ArrayImagePanel(wx.Panel):
         self.wids['plot_xval'].SetChoices(xchoices)
         self.wids['plot_yval'].SetChoices(ychoices)
 
+        rgb_choices = ['<none>']
+        cval = {'red': '<none>', 'blue': '<none>', 'green': '<none>'}
+        for col in ('red', 'green', 'blue'):
+            cval[col] = self.wids[f'{col}_array'].GetStringSelection()
+
+        cshape = None
+        for col in ('red', 'green', 'blue'):
+            val = cval[col]
+            if val in self.parent.data.arrays:
+                cshape = self.parent.data.arrays[val].shape
+        if cshape is None:
+            rgb_choices.extend(self.parent.data.arrays.keys())
+        else:
+            rgb_choices.extend(self.parent.data.array_shapes.get(cshape, []))
+
+        self.wids['red_array'].SetChoices(rgb_choices)
+        self.wids['green_array'].SetChoices(rgb_choices)
+        self.wids['blue_array'].SetChoices(rgb_choices)
+
+        for col in ('red', 'green', 'blue'):
+            if cval[col] in rgb_choices:
+                self.wids[f'{col}_array'].SetStringSelection(cval[col])
+                self.wids[f'{col}_text'].SetLabel(str(cshape))
+
+    def onRGBChoice(self, event=None):
+        self.update_array_choices()
 
     def set_object(self, object, itemtype='?', itemname='', filename='', **kws):
         """fill from object"""
@@ -314,3 +369,105 @@ class ArrayImagePanel(wx.Panel):
         iframe.Show()
         iframe.Raise()
         self.parent.data.add_array('_imgdat', self._img, address=self.parent.access_code)
+
+    def onShowRGB(self, event=None):
+        """Display three arrays combined as RGB channels"""
+        win = self.wids['win'].GetStringSelection()
+        red_name = self.wids['red_array'].GetStringSelection()
+        green_name = self.wids['green_array'].GetStringSelection()
+        blue_name = self.wids['blue_array'].GetStringSelection()
+
+        if red_name == '<none>' and green_name == '<none>' and blue_name == '<none>':
+            Popup(self, 'Please select at least one channel for RGB display',
+                  'RGB Display Error')
+            return
+
+        arrays = self.parent.data.arrays
+        channels = {}
+
+        if red_name != '<none>' and red_name in arrays:
+            channels['red'] = arrays[red_name]
+        if green_name != '<none>' and green_name in arrays:
+            channels['green'] = arrays[green_name]
+        if blue_name != '<none>' and blue_name in arrays:
+            channels['blue'] = arrays[blue_name]
+
+        if len(channels) == 0:
+            Popup(self, 'Selected arrays not found', 'RGB Display Error')
+            return
+
+        self.parent.status_message('Combining RGB channels...')
+
+        try:
+            rgb_img = self.make_rgb(channels)
+            if rgb_img is None:
+                return
+
+            frame_opts = {'title': f'SitkaRGB Image {win} '}
+            iframe = self.show_imageframe(int(win), **frame_opts)
+
+            title_parts = [self.filename]
+            if red_name != '<none>':
+                title_parts.append(f'R:{red_name}')
+            if green_name != '<none>':
+                title_parts.append(f'G:{green_name}')
+            if blue_name != '<none>':
+                title_parts.append(f'B:{blue_name}')
+
+            opts = {'title': ' '.join(title_parts)}
+            iframe.display(rgb_img, **opts)
+            iframe.Show()
+            iframe.Raise()
+
+            self.parent.data.add_array('_rgb_imgdat', rgb_img,
+                                      address='[RGB]')
+            self.parent.status_message('RGB image displayed successfully')
+
+        except Exception as e:
+            Popup(self, f'Error combining RGB channels:\n{str(e)}',
+                  'RGB Display Error')
+            self.parent.status_message(f'RGB display error: {str(e)}')
+
+    def make_rgb(self, channels):
+        """Combine selected channels into an RGB image
+
+        Parameters
+        ----------
+        channels : dict
+            Dictionary with keys 'red', 'green', 'blue' and 2D numpy array values
+
+        Returns
+        -------
+        rgb_img : ndarray
+            Shape (height, width, 3) RGB image, normalized to 0-255 range
+        """
+        if not channels:
+            return None
+
+        shapes = [arr.shape for arr in channels.values()]
+        if len(set(shapes)) > 1:
+            Popup(self, 'All selected channels must have the same shape',
+                  'Shape Mismatch Error')
+            return None
+
+        shape = shapes[0]
+        if len(shape) != 2:
+            Popup(self, 'All channels must be 2D arrays',
+                  'Dimension Error')
+            return None
+
+        rgb_img = np.zeros(shape + (3,), dtype=np.uint8)
+
+        channel_order = [('red', 0), ('green', 1), ('blue', 2)]
+        for channel_name, channel_idx in channel_order:
+            if channel_name in channels:
+                channel_data = channels[channel_name].astype(np.float32)
+                channel_min = channel_data.min()
+                channel_max = channel_data.max()
+                if channel_max > channel_min:
+                    channel_data = (channel_data - channel_min) / (channel_max - channel_min) * 255
+                else:
+                    channel_data[:] = 127
+                rgb_img[:, :, channel_idx] = channel_data.astype(np.uint8)
+
+        return rgb_img
