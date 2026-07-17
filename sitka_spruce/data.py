@@ -369,3 +369,4 @@ class SitkaData:
                                        compression_opts=2,
                                        chunks=shape)
             dset.attrs['origin'] = self.array_addrs.get(name, 'unknown')
+        f.close()
