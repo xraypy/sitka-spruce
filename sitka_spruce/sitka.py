@@ -98,8 +98,10 @@ class SitkaFrame(wx.Frame):
         self.itemname_label = SimpleText(mpanel, '', font=get_font(larger=1),
                                          colour='title_red', size=(525, -1),
                                          style=LEFT|wx.ALIGN_CENTER_VERTICAL)
-        self.copybtn = Button(mpanel, 'Copy Address', size=(150, -1),
+        self.copybtn = Button(mpanel, 'Copy Address', size=(200, -1),
                               action=self.onCopyAddress)
+        self.importbtn = Button(mpanel, 'Import Named Arrays', size=(200, -1),
+                                     action=self.onImportNamedArrays)
 
         self.nb = flatnotebook(mpanel, {},
                                on_change=self.onNBChanged,
@@ -117,6 +119,7 @@ class SitkaFrame(wx.Frame):
         mpanel.Add(self.filename_label, dcol=3)
         mpanel.Add(self.copybtn, dcol=1)
         mpanel.Add(self.itemname_label, dcol=3, newrow=True)
+        mpanel.Add(self.importbtn, dcol=1)
         mpanel.Add(self.nb, dcol=4, drow=5, newrow=True)
         mpanel.pack()
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -154,6 +157,14 @@ class SitkaFrame(wx.Frame):
             msg = 'Copied data address to Clipboard'
         self.status_message(msg)
 
+    def onImportNamedArrays(self, event=None):
+        obj = self.tree.GetItemData(self.tree.item)
+        addr = self.tree.get_address(self.tree.item)
+        fname = addr.pop(0)
+        addr = '/'.join(addr)
+        for key, val in obj.items():
+            self.data.add_array(key, val[()], address=f'{fname}:{addr}/{key}')
+
 
     def onNBChanged(self, event=None):
         oldpage = self.nb.GetPage(event.GetOldSelection())
@@ -178,8 +189,10 @@ class SitkaFrame(wx.Frame):
 
         self.filename_label.SetLabel(f" Filename: {filename}")
         self.itemname_label.SetLabel(f" Address: {itemname}")
+        self.importbtn.Enable(itemname=='sitka_arrays')
 
         self.fill_info(filename, itemtype, itemname, object)
+
         for ipage in range(self.nb.GetPageCount()):
             page = self.nb.GetPage(ipage)
             page.set_object(object, itemtype=itemtype,
