@@ -150,7 +150,7 @@ class ArraysPanel(wx.Panel):
 
         for aname, arr in data.arrays.items():
             addr = data.array_addrs.get(aname, 'unknown')
-            args = [False, aname, repr(arr.shape), addr]
+            args = [True, aname, repr(arr.shape), addr]
             self.array_data.append(args)
             warrays.AppendItem(tuple(args))
 
@@ -236,7 +236,6 @@ class ArraysPanel(wx.Panel):
 
     def onExportArrays(self, evt=None):
         arrays = self.get_arraynames()
-        print("export  ", arrays)
         tstamp = fix_filename(isotime(),
                               allow_spaces=True).replace('_','').replace(' ', '_')
         oname = fix_filename(f'Sitka_{tstamp}.h5')
