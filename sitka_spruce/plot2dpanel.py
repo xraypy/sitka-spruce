@@ -113,17 +113,17 @@ class ArrayImagePanel(wx.Panel):
         panel.Add((5, 5), newrow=True)
         panel.Add(HLine(panel, size=(725, 3)), dcol=7, newrow=True)
         panel.Add((5, 5), newrow=True)
-        panel.Add(wids['show_rgb'], newrow=True)
+        panel.Add(wids['show_rgb'], dcol=2, newrow=True)
 
         padd_text(' Red: ', newrow=True)
         panel.Add(wids['red_array'])
-        panel.Add(wids['red_text'])
+        panel.Add(wids['red_text'], dcol=3)
         padd_text(' Green: ', newrow=True)
         panel.Add(wids['green_array'])
-        panel.Add(wids['green_text'])
+        panel.Add(wids['green_text'], dcol=3)
         padd_text(' Blue: ', newrow=True)
         panel.Add(wids['blue_array'])
-        panel.Add(wids['blue_text'])
+        panel.Add(wids['blue_text'], dcol=3)
 
         panel.pack()
 
