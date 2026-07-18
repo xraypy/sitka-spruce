@@ -164,6 +164,10 @@ class SitkaFrame(wx.Frame):
         addr = '/'.join(addr)
         for key, val in obj.items():
             self.data.add_array(key, val[()], address=f'{fname}:{addr}/{key}')
+        ipage, page = self.get_page('ArraysPanel')
+        if page is not None:
+            page.set_object()
+            self.nb.SetSelection(ipage)
 
 
     def onNBChanged(self, event=None):
