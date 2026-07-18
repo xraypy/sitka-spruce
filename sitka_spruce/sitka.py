@@ -336,7 +336,7 @@ class SitkaFrame(wx.Frame):
             self.add_dataset(fname, dataset=dset)
 
     def add_dataset(self, name, dataset=None):
-        """add dataset to Sitka.
+        """add dataset (HDF5/Zarr Group or Dataset) to Sitka.
 
         Arguments
         ----------
@@ -357,6 +357,33 @@ class SitkaFrame(wx.Frame):
         if dataset is not None:
             self.data.add_dataset(name, dataset)
             self.tree.onRefresh()
+
+    def add_array(self, name, data, address=None):
+        """add single nd-data array to Sitka.
+
+        Arguments
+        ----------
+        name    (str)     name for array (must be valid Python variable name)
+        data    (ndarray) data to add
+        address (str or None) address to use for named array
+        """
+        self.data.add_array(name, data, address=address)
+        self.tree.onRefresh()
+        ipage, page = self.get_page('ArraysPanel')
+        if page is not None:
+            page.set_object()
+            self.nb.SetSelection(ipage)
+
+    def get_page(self, name):
+        for ipage in range(self.nb.GetPageCount()):
+            page = self.nb.GetPage(ipage)
+            pname = page.__class__.__name__
+            if name in pname:
+                return ipage, page
+                break
+        return 0, None
+
+
 
     def onChangeDir(self, event=None):
         SelectWorkdir(self)
@@ -429,3 +456,6 @@ class Sitka_App(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
     def add_dataset(self, name, dataset=None):
         self.frame.add_dataset(name, dataset=dataset)
+
+    def add_array(self, name, array, address=None):
+        self.frame.add_dataset(name, array, address=address)
