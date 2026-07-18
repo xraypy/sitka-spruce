@@ -203,24 +203,22 @@ class ArraysPanel(wx.Panel):
         if array is not None:
             title = self.parent.data.array_addrs.get(name, name)
             if len(array.shape) == 1:
-                for ipage in range(self.parent.nb.GetPageCount()):
-                    page = self.parent.nb.GetPage(ipage)
-                    if hasattr(page, 'show_plotframe'):
-                        frame = page.show_plotframe(window=1)
-                        _x = np.arange(len(array))
-                        frame.plot(_x, array, label=name, ylabel=name,
-                                       title=title)
-                        frame.Show()
-                        frame.Raise()
+                ipage, page = self.parent.get_page('Plot1DPanel')
+                if page is not None:
+                    frame = page.show_plotframe(window=1)
+                    _x = np.arange(len(array))
+                    frame.plot(_x, array, label=name, ylabel=name,
+                               title=title)
+                    frame.Show()
+                    frame.Raise()
 
             elif len(array.shape) == 2:
-                for ipage in range(self.parent.nb.GetPageCount()):
-                    page = self.parent.nb.GetPage(ipage)
-                    if hasattr(page, 'show_imageframe'):
-                        frame = page.show_imageframe(window=1)
-                        frame.display(array, title=f'{name}: {title}')
-                        frame.Show()
-                        frame.Raise()
+                ipage, page = self.parent.get_page('ImagePanel')
+                if page is not None:
+                    frame = page.show_imageframe(window=1)
+                    frame.display(array, title=f'{name}: {title}')
+                    frame.Show()
+                    frame.Raise()
 
     def get_arraynames(self, all=False):
         """get list of array names, either all or selected"""
