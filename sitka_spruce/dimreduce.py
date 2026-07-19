@@ -8,6 +8,53 @@ from .config import read_configfile
 
 DEFAULT_OPTIONS = {'maxdim': 5, 'method': 'single', 'point': 'mid'}
 
+class NumericCombo(wx.ComboBox):
+    """
+    Numeric Combo: ComboBox with numeric-only choices
+    """
+    def __init__(self, parent, choices, precision=1, fmt=None,
+                 init=0, default_val=None, width=80, action=None):
+
+        self.fmt = fmt
+        if fmt is None:
+            self.fmt = "%%.%if" % precision
+
+        self.action = action
+        self.choices  = choices
+        schoices = [self.fmt % i for i in self.choices]
+        wx.ComboBox.__init__(self, parent, -1, '', (-1, -1), (width, -1),
+                             schoices, wx.CB_DROPDOWN|wx.TE_PROCESS_ENTER)
+
+        init = min(init, len(self.choices))
+        if default_val is not None:
+            if default_val in schoices:
+                self.SetStringSelection(default_val)
+            else:
+                self.add_choice(default_val, select=True)
+        else:
+            self.SetStringSelection(schoices[init])
+        self.Bind(wx.EVT_TEXT_ENTER, self.OnEnter)
+        if action is not None:
+            self.Bind(wx.EVT_COMBOBOX, action)
+
+    def OnEnter(self, event=None):
+        val = float(event.GetString())
+        self.add_choice(val)
+        if self.action is not None:
+            self.action(val)
+
+    def add_choice(self, val, select=True):
+        if val not in self.choices:
+            self.choices.append(val)
+        self.choices.sort()
+        self.Clear()
+        self.AppendItems([self.fmt % x for x in self.choices])
+        if select:
+            self.SetSelection(self.choices.index(val))
+            if self.action is not None:
+                self.action(val)
+
+
 class DimReduceWidgets():
     """panel for selecting how to reduce array dimension to scalar"""
     def __init__(self, parent, npts=1, options=None, callback=None):
@@ -107,9 +154,9 @@ class DimReducePanel(wx.Panel):
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
 
 
-        step_sizes = ['1','2', '5', '10', '20', '50', '100']
-        self.wids['stepsize'] = Choice(panel, step_sizes, size=(100, -1),
-                                       action=self.onStepSize)
+        step_sizes = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000]
+        self.wids['stepsize'] = NumericCombo(panel, step_sizes, precision=0,
+                                             width=100, action=self.onStepSize)
 
         def padd_text(text, dcol=1, newrow=False, size=(80, -1), right=False):
             style = wx.ALIGN_RIGHT if right else wx.ALIGN_LEFT
