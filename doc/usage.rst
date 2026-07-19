@@ -163,6 +163,7 @@ familiar to anyone who has used one of the other HDF5 viewers (see
     for details.
 
 
+
 Plots and Table displays for selected data arrays will be shown in
 separate windows.  Each of the notebook pages will be discussed in
 detail in a separate section:
@@ -182,13 +183,15 @@ panels.
 Saving Arrays by Name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For the Notebook Panels, the array data selected for plotting can be
-saved to a named array.  In the lower panel, simply typing a name
-(which must follow the valid conventions for a Python variable: A
-letter or underscore followed by any number of letters, numbers, or
-underscore) and hitting return or the Save Array button will save the
-array.  By default, this will ask to verify overwriting an existing
-array.
+For the Notebook Panels, the array data selected for viewing can be
+saved to a named array, which allows it to be used later (and without
+having to re-extract it from the file).  In the lower panel, simply
+typing a name (which must follow the valid conventions for a Python
+variable: A letter or underscore followed by any number of letters,
+numbers, or underscore) and hitting return or the "Save Array" button
+will save the array by name.  By default, this will ask to verify
+overwriting an existing array, but this can be controlled with the
+"Verify Overwrite" checkbox.
 
 
 .. _copy_address:
@@ -224,9 +227,9 @@ Exporting Group/Dataset Metadata
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Just as you can copy array addresses, you can also export the values
-in the Info section for any Group or Dataset.  Using Ctrl-E (Option-E
-on macOS) will bring up a dialog to save the data shown in the table
-in the Info section to a tab-separated file.
+shown in the "Info Section" for any Group or Dataset.  Using Ctrl-E
+(Option-E on macOS) will bring up a dialog to save the data shown in
+the table in the "Info Section" to a tab-separated file.
 
 
 .. _dimreduce_panel:
@@ -234,7 +237,7 @@ in the Info section to a tab-separated file.
 The Dimension Reduction Panel
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The dimension reduction panel assists you in converting
+The "Dimension Reduction" panel assists you in converting
 multi-dimensional datasets into 1- and 2-dimensional arrays for XY
 plots, image display, and table display.
 
@@ -243,18 +246,23 @@ This panel might looks like this:
 .. image:: images/sitka_dimreduce.png
    :width: 98 %
 
-Here, dimensions 0 and 1 must have been selected as the Y or X arrays
-for image or table display.  The remaining dimension has 2048 points.
-The settings here will select a **single** value, pixel 1024 out
-of 2048.  The Method selection of **single** can be changed to **sum**
-or **mean**, and then a Min and Max value be chosen to sum over that
-slice of the array dimension.
+Here, dimensions 0 and 1 are "grayed out", so must have been selected as the Y
+or X arrays for an image or table display.  The remaining dimension has 2048
+points, and selections here tell Sitka how to turn this data into a single
+dimension, to reduce the 3-dimensional data to 2-dimensions for display. The
+example here will select a **single** value, pixel 1024 out of 2048.  The Method
+selection of **single** can be changed to **sum** or **mean**, and then a Min
+and Max value can be chosen to select a "slice" of the array dimension to sum
+(and perhaps divide by the number of points to give the mean value).
 
-If choosing a slice range for **sum** or **mean**, you can check the
-"Fix Width" box.  With this checked, changing either the Min or Max
-value (with the arrows or by typing in a number) will update both
-values to try to preserve their difference.  You can change to step
-taken by the arrow keys with the Min/Max Step Size selection.
+If choosing a slice range for **sum** or **mean**, you can check the "Fix Width"
+box.  With this checked, changing either the Min or Max value (with the arrows
+or by typing in a number) will update both values to try to preserve their
+difference.  You can change the size of the step taken by the arrow with the
+"Min/Max Step Size" selection - this has a pre-loaded set of choices, but you
+can enter any integer step size you like.
+
+
 Finally, if you check the "Auto Update" box, then changing the Min or
 Max value will update the display to reflect the newly sliced data.
 
