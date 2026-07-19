@@ -211,8 +211,8 @@ class ArraysPanel(wx.Panel):
                                title=title)
                     frame.Show()
                     frame.Raise()
-
-            elif len(array.shape) == 2:
+            elif (len(array.shape) == 2 or
+                  (len(array.shape) == 3 and array.shape[2] == 3)):
                 ipage, page = self.parent.get_page('ImagePanel')
                 if page is not None:
                     frame = page.show_imageframe(window=1)
