@@ -69,40 +69,8 @@ standalone application.  You can also use the shell or notebook to
 access the data in the Sitka Viewer, either adding datasets to the GUI
 or pulling arrays from the GUI into the shell.
 
+.. literalinclude:: ../examples/jupyter_sitka.py
 
-.. code:: Python
-
-    ##
-    # import an HDF5 file from the shell, and add it to the Sitka Viewer
-    # this allows you to fully explore the data arrays in the file
-    import h5py
-    myfile = h5py.File('myhdf5_file.h5', 'r')
-    sview.add_dataset('myhdf5_file.h5', myfile)
-
-    ##
-    # Sitka allows you to copy addresses and slices to the System
-    # Clipboard, so you can paste them into your shell/notebook
-    # Doing <Ctrl-V>  might paste
-    #     ['myeiger_file.h5']['/entry/data/data'][10:20,:,:].sum(axis=0)
-    # into the shell, and you can use that to access the data as
-    myimage = sview.data.datasets['myeiger_file.h5']['/entry/data/data'][10:20,:,:].sum(axis=0)
-
-    ##
-    # list all datasets in the viewer, no matter how they were read
-    for name, dset in sview.data.datasets.items():
-        print(name, dset)
-
-    ##
-    # list all "named arrays" saved during data exploration
-    for name, array in sview.data.array.items():
-        print(name, array.shape)
-
-    ##
-    # take an example array and run your analysis pipeline on it
-    myarray = sview.data.array['spectra1']
-
-    from my_analysistool import analyze
-    result  = analyze(myarray)
 
 With this approach, you can quickly load and explore your datasets and
 extract and use the arrays you want for downstream processing.
