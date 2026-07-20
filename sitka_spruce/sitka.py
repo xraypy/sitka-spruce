@@ -5,6 +5,7 @@ sitka_spruce HDF5 and Zarr data browser
 import wx
 import wx.dataview as dv
 import wx.lib.mixins.inspection
+from wx.adv import AboutBox, AboutDialogInfo
 
 from pathlib import Path
 
@@ -16,7 +17,7 @@ from wxutils.colors import add_named_color
 
 
 from pyshortcuts import get_cwd, fix_filename
-
+from .version import version
 from .gui_utils import  get_font, FONTSIZE
 from .data  import get_attributes, SitkaData, get_opener, get_sitka_files
 from .hdatatree import HDataTree
@@ -29,8 +30,6 @@ try:
     import larch
 except ImportError:
     larch = None
-
-VERSION = '0.1'
 
 FILE_WILDCARD = 'HDF5/Zarr files(*.hdf5;*.h5;*.zarr)|*.hdf5;*.h5;*.zarr|All files (*.*)|*.*'
 
@@ -233,7 +232,7 @@ class SitkaFrame(wx.Frame):
         wx.Frame.Raise(self)
 
     def BuildMenus(self):
-        menuBar = wx.MenuBar()
+        menubar = wx.MenuBar()
         fmenu = wx.Menu()
         MenuItem(self, fmenu, "Read Data File\tCtrl+O",
                  "Read Data File", self.onReadData)
@@ -244,7 +243,7 @@ class SitkaFrame(wx.Frame):
         fmenu.AppendSeparator()
         self.Bind(wx.EVT_CLOSE,  self.onExit)
         MenuItem(self, fmenu, 'E&xit', 'Exit', self.onExit)
-        menuBar.Append(fmenu, '&File')
+        menubar.Append(fmenu, '&File')
 
         omenu = wx.Menu()
         MenuItem(self, omenu,  "Increase Font Size", "", self.onIncreaseFont)
@@ -263,9 +262,14 @@ class SitkaFrame(wx.Frame):
                      'Debug wxPython App', self.onWxInspect)
 
 
-        menuBar.Append(omenu, 'Options')
+        menubar.Append(omenu, 'Options')
 
-        self.SetMenuBar(menuBar)
+        hmenu = wx.Menu()
+        MenuItem(self, hmenu, 'About Sitka Spruce', 'About Sitka Spruce',
+                 self.onAbout)
+        menubar.Append(hmenu, '&Help')
+
+        self.SetMenuBar(menubar)
 
     def onIncreaseFont(self, event=None):
         self.set_fontsize(self.GetFont().GetPointSize()+1)
@@ -413,11 +417,13 @@ class SitkaFrame(wx.Frame):
         self.status_message(f'Wrote attributes to {path}')
 
     def onAbout(self, event=None):
-        about_msg =  """HDF5 Viewer"""
-        dlg = wx.MessageDialog(self, about_msg,
-                               "About HDF5 Viewer", wx.OK | wx.ICON_INFORMATION)
-        dlg.ShowModal()
-        dlg.Destroy()
+        info = AboutDialogInfo()
+        info.SetName(' Sitka Spruce')
+        info.SetDescription(' Hierarchical Data Viewer for HDF5 and Zarr')
+        info.SetVersion(f' Version {version}')
+        info.AddDeveloper('Matthew Newville: newville@cars.uchicago.edu')
+        dlg = AboutBox(info)
+
 
 
     def onExit(self, event=None):
