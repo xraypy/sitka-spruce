@@ -12,7 +12,7 @@
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     
-    <script src="_static/documentation_options.js?v=10f1778b"></script>
+    <script src="_static/documentation_options.js?v=b489f392"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -64,9 +64,17 @@ highlighted array (as a simple plot or image display).</p>
 <cite>_tabledat</cite>.  These arrays are automatically written as the last data
 used by the Image Display page, the XY Display page and the Table
 Display page.</p>
-<p>You can use the <strong>Export Selected Arrays to HDF5</strong> to export the
+<p>You can use <strong>Delete Selected Arrays</strong> to remove selected named arrays.
+You can use the <strong>Export Selected Arrays to HDF5</strong> to export
 selected arrays to a simple HDF5 file (and so easily read into later
-Sitka sessions) or use <strong>Delete Selected Arrays</strong> to remove them.</p>
+Sitka sessions.</p>
+<p>The arrays selected will be written to a new HDF5 file, and all arrays
+will be put into a Group name “sitka_arrays”.  If you read in this
+file in a later session and select thie “sitka_arrays’ Group, the
+<strong>Import Named Arrays”</strong> at the upper right of the main Sitka window
+will be enables.  Hitting that button will import all of these named
+arrays into the Named Arrays panel.  This allows you to extract data
+from complex datasets and easily retrieve them.</p>
 <p>At the bottom, you can also create a new array directly.  Here you
 give a name (which must follow the valid conventions for a Python
 variable: A letter or underscore followed by any number of letters,
@@ -144,7 +152,7 @@ expressions would include</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2026-07-13, Matthew Newville, The University of Chicago.
+    &#169; Copyright 2026-07-19, Matthew Newville, The University of Chicago.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>

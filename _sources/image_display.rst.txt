@@ -48,3 +48,9 @@ of color table can be used.  The upper and lower levels can be
 adjusted by hand or by selecting or stepping through a wide dynamic
 range of "percent contrasts".  For more details using this image
 display, see `WXMPLOT Interactive Image Display`_
+
+If you have saved multiple images of the same shape -- perhaps
+different slices of a third dimension for a 3-d dataset -- then you
+can use the "Red: ", "Green: ", and "Blue: " choices to select 2 or 3
+arrays of the same shape to show as an image with each array in Red,
+Green, or Blue.

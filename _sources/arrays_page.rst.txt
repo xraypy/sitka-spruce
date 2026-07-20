@@ -22,9 +22,19 @@ Note that this list may contain arrays named `_imgdat`, `_ydat`, and
 used by the Image Display page, the XY Display page and the Table
 Display page.
 
-You can use the **Export Selected Arrays to HDF5** to export the
+You can use **Delete Selected Arrays** to remove selected named arrays.
+You can use the **Export Selected Arrays to HDF5** to export
 selected arrays to a simple HDF5 file (and so easily read into later
-Sitka sessions) or use **Delete Selected Arrays** to remove them.
+Sitka sessions.
+
+The arrays selected will be written to a new HDF5 file, and all arrays
+will be put into a Group name "sitka_arrays".  If you read in this
+file in a later session and select thie "sitka_arrays' Group, the
+**Import Named Arrays"** at the upper right of the main Sitka window
+will be enables.  Hitting that button will import all of these named
+arrays into the Named Arrays panel.  This allows you to extract data
+from complex datasets and easily retrieve them.
+
 
 At the bottom, you can also create a new array directly.  Here you
 give a name (which must follow the valid conventions for a Python

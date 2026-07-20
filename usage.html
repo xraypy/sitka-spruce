@@ -12,7 +12,7 @@
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     
-    <script src="_static/documentation_options.js?v=10f1778b"></script>
+    <script src="_static/documentation_options.js?v=b489f392"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -99,37 +99,84 @@ viewer also runs. That is, you can load and visualize data as with the
 standalone application.  You can also use the shell or notebook to
 access the data in the Sitka Viewer, either adding datasets to the GUI
 or pulling arrays from the GUI into the shell.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1">##</span>
-<span class="c1"># import an HDF5 file from the shell, and add it to the Sitka Viewer</span>
-<span class="c1"># this allows you to fully explore the data arrays in the file</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
-<span class="n">myfile</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;myhdf5_file.h5&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
-<span class="n">sview</span><span class="o">.</span><span class="n">add_dataset</span><span class="p">(</span><span class="s1">&#39;myhdf5_file.h5&#39;</span><span class="p">,</span> <span class="n">myfile</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># coding: utf-8</span>
 
-<span class="c1">##</span>
-<span class="c1"># Sitka allows you to copy addresses and slices to the System</span>
-<span class="c1"># Clipboard, so you can paste them into your shell/notebook</span>
-<span class="c1"># Doing &lt;Ctrl-V&gt;  might paste</span>
-<span class="c1">#     [&#39;myeiger_file.h5&#39;][&#39;/entry/data/data&#39;][10:20,:,:].sum(axis=0)</span>
-<span class="c1"># into the shell, and you can use that to access the data as</span>
-<span class="n">myimage</span> <span class="o">=</span> <span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;myeiger_file.h5&#39;</span><span class="p">][</span><span class="s1">&#39;/entry/data/data&#39;</span><span class="p">][</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># This notebook demonstrates using the Sitka Data Viewer within a Jupyter Notebook.</span>
+<span class="c1">#</span>
+<span class="c1"># Sitka is an interactive viewer for HDF5 files and Zarr stores.  Using it from</span>
+<span class="c1"># Jupyter allows you to</span>
+<span class="c1">#    1.  use the GUI to browse and explore the data and choose which datasets and arrays to work with in the Jupyter session.</span>
+<span class="c1">#    2.  push nd-arrays from your Jupyter notebook into the Sitka GUI, allowing you to use it for visualization and exporting multiple arrays to HDF5 files.</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># Since you can easily move data between the Jupyter session and the Sitka viewer, you can use Sitka as a visualization and extraction tool for nd-arrays in your Jupyter notebooks.</span>
 
-<span class="c1">##</span>
-<span class="c1"># list all datasets in the viewer, no matter how they were read</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dset</span> <span class="ow">in</span> <span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dset</span><span class="p">)</span>
+<span class="c1"># In[1]:</span>
+<span class="c1"># Step 0: if not already downloaded, get the Sitka example files</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="n">xrfmap1</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;xrf_map_seed.h5&#39;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">xrfmap1</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Downloading Sitka Examples&quot;</span><span class="p">)</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">get_sitka_examples</span>
 
-<span class="c1">##</span>
-<span class="c1"># list all &quot;named arrays&quot; saved during data exploration</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">filelist</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Files: &quot;</span><span class="p">,</span> <span class="n">filelist</span><span class="p">)</span>
 
-<span class="c1">##</span>
-<span class="c1"># take an example array and run your analysis pipeline on it</span>
-<span class="n">myarray</span> <span class="o">=</span> <span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="s1">&#39;spectra1&#39;</span><span class="p">]</span>
+<span class="c1"># In[2]:</span>
+<span class="c1"># Step 1: import and start the Sitka Viewer</span>
+<span class="c1"># This will show the Sitka GUI in a separate window,</span>
+<span class="c1"># and read in all the data HDF5/Zarr files in the current folder.</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">my_analysistool</span><span class="w"> </span><span class="kn">import</span> <span class="n">analyze</span>
-<span class="n">result</span>  <span class="o">=</span> <span class="n">analyze</span><span class="p">(</span><span class="n">myarray</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sitka_spruce</span><span class="w"> </span><span class="kn">import</span> <span class="n">sitka_viewer</span>
+<span class="n">sview</span> <span class="o">=</span> <span class="n">sitka_viewer</span><span class="p">(</span><span class="n">folder</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+<span class="c1"># In[3]:</span>
+<span class="c1"># The Sitka Viewer holds its data in the `data` attribute of the Sitka_Viewer, this has a</span>
+<span class="c1"># has a few useful attributes.</span>
+<span class="c1">#</span>
+<span class="c1"># And the Sitka Viewer has a few useful methods for accessing its data:</span>
+<span class="c1"># First, its &quot;data&quot; attribute really holds the data and can be accessed with:</span>
+<span class="c1">#    data.datasets           dict of {Filename: Data Object (h5py.File or zarr.Group)}</span>
+<span class="c1">#    data.arrays             dict of {Name: ndarray} for named arrays</span>
+<span class="c1">#    data.array_addrs        dict of {Name: access string} for how named arrays were created</span>
+<span class="c1">#    data.export_hdf5(filename, list_of_arraynames)  export a list of named arrays to an HDF5 file.</span>
+<span class="c1">#</span>
+<span class="c1"># Second, the Sitka Viewer has methods to add a dataset (and HDF5 File, Group, Dataset or Zarr Group, Array),</span>
+<span class="c1"># or a plain nd-array:</span>
+<span class="c1">#    add_dataset(filename, fileroot)    add a dataset into Sitka</span>
+<span class="c1">#    add_array(arrayname, ndarray)      add an array into the list of named arrays</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Datasets: &#39;</span><span class="p">,</span> <span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Named Arrays: &#39;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">arrays</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+<span class="c1"># datasets[&#39;Eiger9M_example.h5&#39;][&#39;entry/data/data&#39;][0,:,:]</span>
+
+<span class="c1"># In[4]:</span>
+<span class="c1"># if you copy an address with Ctrl-C in the Sitka window, you can paste it here and use it to extract data:</span>
+
+<span class="c1">##  Ctrl-V might give something like</span>
+<span class="c1">##       [&#39;xrf_map_seed.h5&#39;][&#39;xrfmap/mca/counts&#39;][:,:,250:350].sum(axis=2)</span>
+<span class="c1">##  in this session, you cand use that from `sview.data.datasets`:</span>
+<span class="n">map1</span> <span class="o">=</span> <span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;xrf_map_seed.h5&#39;</span><span class="p">][</span><span class="s1">&#39;xrfmap/mca/counts&#39;</span><span class="p">][:,:,</span><span class="mi">250</span><span class="p">:</span><span class="mi">350</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># now that you have the address to get slice of that array, you can easily get another slice of the data:</span>
+
+<span class="n">map2</span> <span class="o">=</span> <span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;xrf_map_seed.h5&#39;</span><span class="p">][</span><span class="s1">&#39;xrfmap/mca/counts&#39;</span><span class="p">][:,:,</span><span class="mi">350</span><span class="p">:</span><span class="mi">450</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">map1</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">map1</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+<span class="c1"># now you have all of Python to do some work on those arrays.  As a simple example,</span>
+<span class="c1"># we&#39;l take the square of th difference of the two arrays:</span>
+
+<span class="n">mapx</span> <span class="o">=</span> <span class="p">(</span><span class="n">map2</span><span class="o">-</span><span class="n">map1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="c1"># and now we put that back into Sitka  for viewing</span>
+<span class="n">sview</span><span class="o">.</span><span class="n">add_array</span><span class="p">(</span><span class="s1">&#39;xrf_diff1&#39;</span><span class="p">,</span> <span class="n">mapx</span><span class="p">,</span> <span class="s2">&quot;(map2-map1)**2&quot;</span><span class="p">)</span>
+
+<span class="c1"># The &quot;Named Arrays&quot; Page should be shown... click on &#39;xrf_diff1&#39; and then &quot;Plot Current&quot;</span>
 </pre></div>
 </div>
 <p>With this approach, you can quickly load and explore your datasets and
@@ -199,13 +246,15 @@ panels.</p>
 </section>
 <section id="saving-arrays-by-name">
 <span id="save-arrays"></span><h3>Saving Arrays by Name<a class="headerlink" href="#saving-arrays-by-name" title="Link to this heading">¶</a></h3>
-<p>For the Notebook Panels, the array data selected for plotting can be
-saved to a named array.  In the lower panel, simply typing a name
-(which must follow the valid conventions for a Python variable: A
-letter or underscore followed by any number of letters, numbers, or
-underscore) and hitting return or the Save Array button will save the
-array.  By default, this will ask to verify overwriting an existing
-array.</p>
+<p>For the Notebook Panels, the array data selected for viewing can be
+saved to a named array, which allows it to be used later (and without
+having to re-extract it from the file).  In the lower panel, simply
+typing a name (which must follow the valid conventions for a Python
+variable: A letter or underscore followed by any number of letters,
+numbers, or underscore) and hitting return or the “Save Array” button
+will save the array by name.  By default, this will ask to verify
+overwriting an existing array, but this can be controlled with the
+“Verify Overwrite” checkbox.</p>
 </section>
 <section id="copying-the-array-address">
 <span id="copy-address"></span><h3>Copying the Array Address<a class="headerlink" href="#copying-the-array-address" title="Link to this heading">¶</a></h3>
@@ -228,30 +277,33 @@ may need to pre-pend the address to the Sitka datasets, as with</p>
 <section id="exporting-group-dataset-metadata">
 <span id="export-info"></span><h3>Exporting Group/Dataset Metadata<a class="headerlink" href="#exporting-group-dataset-metadata" title="Link to this heading">¶</a></h3>
 <p>Just as you can copy array addresses, you can also export the values
-in the Info section for any Group or Dataset.  Using Ctrl-E (Option-E
-on macOS) will bring up a dialog to save the data shown in the table
-in the Info section to a tab-separated file.</p>
+shown in the “Info Section” for any Group or Dataset.  Using Ctrl-E
+(Option-E on macOS) will bring up a dialog to save the data shown in
+the table in the “Info Section” to a tab-separated file.</p>
 </section>
 <section id="the-dimension-reduction-panel">
 <span id="dimreduce-panel"></span><h3>The Dimension Reduction Panel<a class="headerlink" href="#the-dimension-reduction-panel" title="Link to this heading">¶</a></h3>
-<p>The dimension reduction panel assists you in converting
+<p>The “Dimension Reduction” panel assists you in converting
 multi-dimensional datasets into 1- and 2-dimensional arrays for XY
 plots, image display, and table display.</p>
 <p>This panel might looks like this:</p>
 <a class="reference internal image-reference" href="_images/sitka_dimreduce.png"><img alt="_images/sitka_dimreduce.png" src="_images/sitka_dimreduce.png" style="width: 98%;" />
 </a>
-<p>Here, dimensions 0 and 1 must have been selected as the Y or X arrays
-for image or table display.  The remaining dimension has 2048 points.
-The settings here will select a <strong>single</strong> value, pixel 1024 out
-of 2048.  The Method selection of <strong>single</strong> can be changed to <strong>sum</strong>
-or <strong>mean</strong>, and then a Min and Max value be chosen to sum over that
-slice of the array dimension.</p>
-<p>If choosing a slice range for <strong>sum</strong> or <strong>mean</strong>, you can check the
-“Fix Width” box.  With this checked, changing either the Min or Max
-value (with the arrows or by typing in a number) will update both
-values to try to preserve their difference.  You can change to step
-taken by the arrow keys with the Min/Max Step Size selection.
-Finally, if you check the “Auto Update” box, then changing the Min or
+<p>Here, dimensions 0 and 1 are “grayed out”, so must have been selected as the Y
+or X arrays for an image or table display.  The remaining dimension has 2048
+points, and selections here tell Sitka how to turn this data into a single
+dimension, to reduce the 3-dimensional data to 2-dimensions for display. The
+example here will select a <strong>single</strong> value, pixel 1024 out of 2048.  The Method
+selection of <strong>single</strong> can be changed to <strong>sum</strong> or <strong>mean</strong>, and then a Min
+and Max value can be chosen to select a “slice” of the array dimension to sum
+(and perhaps divide by the number of points to give the mean value).</p>
+<p>If choosing a slice range for <strong>sum</strong> or <strong>mean</strong>, you can check the “Fix Width”
+box.  With this checked, changing either the Min or Max value (with the arrows
+or by typing in a number) will update both values to try to preserve their
+difference.  You can change the size of the step taken by the arrow with the
+“Min/Max Step Size” selection - this has a pre-loaded set of choices, but you
+can enter any integer step size you like.</p>
+<p>Finally, if you check the “Auto Update” box, then changing the Min or
 Max value will update the display to reflect the newly sliced data.</p>
 </section>
 <section id="a-note-on-speed-of-array-selection">
@@ -353,7 +405,7 @@ to hear them.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2026-07-13, Matthew Newville, The University of Chicago.
+    &#169; Copyright 2026-07-19, Matthew Newville, The University of Chicago.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
