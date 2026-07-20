@@ -420,7 +420,7 @@ class SitkaFrame(wx.Frame):
         info = AboutDialogInfo()
         info.SetName(' Sitka Spruce')
         info.SetDescription(' Hierarchical Data Viewer for HDF5 and Zarr')
-        info.SetVersion(f' Version {version}')
+        info.SetVersion(version)
         info.AddDeveloper('Matthew Newville: newville@cars.uchicago.edu')
         dlg = AboutBox(info)
 
