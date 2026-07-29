@@ -8,8 +8,10 @@ import zarr
 
 import asteval
 
-from pyshortcuts import gformat, isotime
 from pathlib import Path
+
+from pyshortcuts import gformat, isotime
+from epics.dbr import EPICS2UNIX_EPOCH
 
 try:
     import larch
@@ -23,6 +25,7 @@ COMMONTYPES = (int, float, complex, str, bytes, bool, list, tuple, np.ndarray)
 
 ARRAY_TYPES = ('h5py.Dataset', 'zarr.Array', 'ndarray')
 GROUP_TYPES = ('h5py.Group', 'zarr.Group', 'larch.Group')
+EPICS_NDATTR = 'entry/instrument/NDAttributes'
 
 # reverse map of hdf5plugin filters
 HDF_FILTERS_MAP = {v: k for k, v in hdf5plugin.FILTERS.items()}
@@ -115,6 +118,17 @@ def get_items(obj):
           isinstance(obj, zarr.Array)):
         return obj
 
+def array2isotimes(arr, timespec='microseconds', is_epics=False):
+    """convert ndarray of timestamps to list of isotime strings
+
+    Arguments
+    ---------
+    arr        ndarray of timestampls
+    timespec   str, 'seconds', 'milliseconds', or 'microseconds'
+    is_epic    bool if timestamps are using the Epics epoch [False]
+    """
+    offset =  EPICS2UNIX_EPOCH if is_epics else 0.0
+    return [isotime(offset+x, timespec=timespec, sep=' ') for x in arr]
 
 def get_itemtype(obj):
     """return 'itemtyp for object,
@@ -199,19 +213,6 @@ def get_attributes(obj, itemname):
     for key, val in out.items():
         out[key] = dtype2str(type(val))(val)
     return out
-#
-#         if isinstance(val, bytes):
-#             val = val.decode('utf-8')
-#         elif isinstance(val, (np.int64, np.int32, np.int16,
-#                               np.uint64, np.uint32, np.uint16)):
-#             val = str(int(val))
-#         elif isinstance(val, (np.float64, np.float32, np.float16)):
-#             val = str(float(val))
-#         elif isinstance(val, (np.complex128, np.complex64)):
-#             val = str(complex(val))
-#         elif not isinstance(val, str):
-#             val = repr(val)
-#         out[key] = val
 
 
 
