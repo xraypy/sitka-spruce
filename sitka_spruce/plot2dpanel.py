@@ -336,7 +336,8 @@ class ArrayImagePanel(wx.Panel):
 
         dlabel = dim_code(reddim)
         self.parent.access_code = f"['{self.filename}']['{self.itemname}']{dlabel}"
-        opts = {'title': f'{self.filename} {dlabel}', 'contrast_level':'0.05'}
+        opts = {'title': f'{self.filename} {dlabel}', 'contrast_level':'0.05',
+                'colormap': 'viridis'}
 
         data_thread.join()
         if self._img.dtype == np.bool:
