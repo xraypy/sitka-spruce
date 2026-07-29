@@ -19,13 +19,14 @@ from wxutils.colors import add_named_color
 from pyshortcuts import get_cwd, fix_filename
 from .version import version
 from .gui_utils import  get_font, FONTSIZE
-from .data  import get_attributes, SitkaData, get_opener, get_sitka_files
+from .data  import (get_attributes, SitkaData, get_opener, get_sitka_files,
+                    GROUP_TYPES, EPICS_NDATTR)
 from .hdatatree import HDataTree
 from .plot1dpanel import ArrayPlot1DPanel
 from .plot2dpanel import ArrayImagePanel
 from .tablepanel import TablePanel
 from .arrayspanel import ArraysPanel
-
+from .ndattrpanel import NDAttrsPanel
 try:
     import larch
 except ImportError:
@@ -39,6 +40,8 @@ DV_STYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 ICON_FILE = 'sitka.ico'
 ICON_DIR = Path(Path(__file__).parent, 'icons').absolute()
 
+NDATTR_TITLE = 'Epics NDAttributes'
+
 add_named_color('sbg', (240, 245, 245, 255), ( 20,  30,  30, 255))
 
 
@@ -50,6 +53,7 @@ class SitkaFrame(wx.Frame):
         """Create Frame instance."""
         self.data = SitkaData()
         self.wids = {}
+        self.filename = None
         self.with_inspect = with_inspect
         wx.Frame.__init__(self, parent, title=title, size=size,
                           style=style)
@@ -113,6 +117,11 @@ class SitkaFrame(wx.Frame):
         self.nb.AddPage(ArraysPanel(self), 'Named Arrays', True)
         self.nb.SetSelection(0)
         self.current_nbpage = self.nb.GetSelection()
+        self.nb_pages = {}
+        for i in range(self.nb.GetPageCount()):
+            title = self.nb.GetPageText(i)
+            page = self.nb.GetPage(i)
+            self.nb_pages[title] = (i, page)
 
 
         mpanel.Add(self.filename_label, dcol=3)
@@ -182,6 +191,20 @@ class SitkaFrame(wx.Frame):
         wx.CallAfter(self.tree.onKillFocus)
         event.Skip()
 
+    def add_ndattrs_panel(self):
+        print("Add Epics ND Attributes Panel")
+
+        self.nb.AddPage(NDAttrsPanel(self), NDATTR_TITLE, True)
+        self.nb_pages = {}
+        ix = 0
+        for i in range(self.nb.GetPageCount()):
+            title = self.nb.GetPageText(i)
+            if title == NDATTR_TITLE:
+                ix = i
+            page = self.nb.GetPage(i)
+            self.nb_pages[title] = (i, page)
+        self.nb.SetSelection(ix)
+
     def onSelectObject(self, object, address, itemtype='?'):
         filename = address[0]
         if len(filename) < 1:
@@ -189,10 +212,17 @@ class SitkaFrame(wx.Frame):
         itemname = '/'.join(address[1:])
         if len(itemname) < 2:
             itemname = ''
-
+        self.filename = filename
         self.filename_label.SetLabel(f" Filename: {filename}")
         self.itemname_label.SetLabel(f" Address: {itemname}")
         self.importbtn.Enable(itemname=='sitka_arrays')
+
+        if EPICS_NDATTR in itemname:
+            print(" An Epics Attr: ", address)
+            if NDATTR_TITLE not in self.nb_pages:
+                self.add_ndattrs_panel()
+            ipage, page = self.nb_pages.get(NDATTR_TITLE, (0, None))
+            self.nb.SetSelection(ipage)
 
         self.fill_info(filename, itemtype, itemname, object)
 
@@ -204,6 +234,7 @@ class SitkaFrame(wx.Frame):
     def fill_info(self, name, itemtype, itemname, object):
         self.file_info = (name, itemname, itemtype)
         self.access_code = f"['{name}']['{itemname}']"
+
         self.info.DeleteAllItems()
         if name == 'Data':
             self.info.AppendItem(('filename', 'toplevel'))
@@ -236,6 +267,8 @@ class SitkaFrame(wx.Frame):
         fmenu = wx.Menu()
         MenuItem(self, fmenu, "Read Data File\tCtrl+O",
                  "Read Data File", self.onReadData)
+        MenuItem(self, fmenu, "Close Current Data File",
+                 "Close Data File", self.onCloseData)
         MenuItem(self, fmenu, "Read Files from Folder\tCtrl+F",
                  "Read all Files from Selected Folder",
                  self.onReadFolder)
@@ -311,6 +344,16 @@ class SitkaFrame(wx.Frame):
         if not shown:
             self.subframes[name] = creator(parent=self, **opts)
             self.subframes[name].Show()
+
+
+    def onCloseData(self, event=None):
+        if self.filename in self.data.datasets:
+            ret = Popup(self, f'Remove {self.filename} from Sitka?', '',
+                       style=wx.YES_NO|wx.NO_DEFAULT|wx.ICON_QUESTION)
+            if ret == wx.ID_YES:
+                self.data.datasets[self.filename].close()
+                self.data.datasets.pop(self.filename)
+                self.tree.onRefresh()
 
     def onReadData(self, event=None):
         path = FileOpen(self, 'Open Data File', default_dir=get_cwd(),
