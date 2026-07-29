@@ -8,15 +8,19 @@ TREESTYLE = wx.TR_DEFAULT_STYLE|wx.TR_HIDE_ROOT
 
 class HDataTree(wx.TreeCtrl):
     """TreeCtrl for hierarchical data structures and files such as HDF5/Zarr"""
-    def __init__(self, parent, size=(350, 250), style=TREESTYLE, on_select=None):
+    def __init__(self, parent, size=(350, 250), style=TREESTYLE, on_select=None,
+                 on_rightclick=None):
         """Create FillingTree instance."""
         wx.TreeCtrl.__init__(self, parent, size=size, style=style)
         self.item = None
         self.on_select = None
+        self.on_rightclick = None
         self.is_dark = DARK_THEME
         self.root = None
         if callable(on_select):
             self.on_select = on_select
+        if callable(on_rightclick):
+            self.on_rightclick = on_rightclick
         register_darkdetect(self.onDarkMode)
 
     def onDarkMode(self, is_dark=None):
@@ -38,19 +42,13 @@ class HDataTree(wx.TreeCtrl):
         self.Bind(wx.EVT_TREE_ITEM_EXPANDING, self.OnItemExpanding, id=self.GetId())
         self.Bind(wx.EVT_KILL_FOCUS, self.onKillFocus, id=self.GetId())
         self.Bind(wx.EVT_SET_FOCUS, self.onSetFocus, id=self.GetId())
-        # self.Bind(wx.EVT_RIGHT_DOWN, self.onRightDown)
+        self.Bind(wx.EVT_RIGHT_DOWN, self.onRightDown)
         wx.CallAfter(self.onRefresh)
 
     def onRightDown(self, event=None):
-        if self.item is not None:
-            addr = self.get_address(self.item)
-            if len(addr) > 0 and wx.TheClipboard.Open():
-                fname = addr.pop(0)
-                addr = '/'.join(addr)
-                addr = f"['{fname}']['{addr}']"
-                wx.TheClipboard.SetData(wx.TextDataObject(addr))
-                wx.TheClipboard.Close()
-
+        item_name = self.GetItemText(self.item)
+        if self.on_rightclick is not None:
+            self.on_rightclick(item_name)
 
     def onKillFocus(self, event=None):
         if self.item is not None and event is not None:
