@@ -1,12 +1,15 @@
 import time
 from threading import Thread
+
 import wx
 from  wx.grid import Grid
 
 from wxutils import (GridPanel, SimpleText, pack, Button,
-                     TextCtrl, Popup,
+                     TextCtrl, Popup, MenuItem, FileSave,
                      Check, Choice, LEFT, get_color,
                      register_darkdetect)
+
+from pyshortcuts import get_cwd, fix_filename
 
 from .dimreduce import DimReducePanel
 from .gui_utils import get_font, WIN_CHOICES
@@ -21,6 +24,8 @@ class DataGridFrame(wx.Frame):
         self.title = SimpleText(self, title, font=get_font(larger=1),
                                 colour='title_red', size=(500, -1),
                                 style=LEFT|wx.ALIGN_CENTER_VERTICAL)
+
+        self.file_info = 'sitka', 'data'
         self.grid = Grid(self, size=size)
         self.grid.CreateGrid(100, 100)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -28,6 +33,7 @@ class DataGridFrame(wx.Frame):
         sizer.Add(self.grid,  0, 0, LEFT|wx.GROW, 2)
         pack(self, sizer)
         register_darkdetect(self.onDarkMode)
+        self.BuildMenus()
         self.Raise()
         self.Show()
 
@@ -99,6 +105,44 @@ class DataGridFrame(wx.Frame):
             for j in range(nx):
                 self.grid.SetColLabelValue(j, f'{j}')
                 self.grid.SetCellValue(i, j, cast(data[i, j]))
+
+
+    def BuildMenus(self):
+        menubar = wx.MenuBar()
+        fmenu = wx.Menu()
+        MenuItem(self, fmenu, "Export Data to TSV",
+                 "Export to Tab-separated data", self.onExportData)
+
+        menubar.Append(fmenu, '&File')
+        self.SetMenuBar(menubar)
+
+
+    def onExportData(self, event=None):
+        (filename, itemname) =  self.file_info
+        oname = fix_filename(f'{filename}_{itemname}_data.tsv')
+
+        path = FileSave(self, 'Save Grid Data to Tab-separated File',
+                        default_dir=get_cwd(),
+                        default_file=oname)
+
+        if path is None:
+            return
+
+        ncols = self.grid.GetNumberCols()
+        nrows = self.grid.GetNumberRows()
+        out = ['\t'.join([self.grid.GetColLabelValue(i) for i in range(ncols)])]
+        for irow in range(nrows):
+            row = []
+            for icol in range(ncols):
+                row.append(self.grid.GetCellValue(irow, icol))
+            out.append('\t'.join(row))
+        out.append('')
+        with open(path, 'w') as fh:
+            fh.write('\n'.join(out))
+        print("wrote ", path)
+
+
+
 
 class TablePanel(wx.Panel):
     """Config Panel for Grid Display of HDF5/Zarr datasets"""
