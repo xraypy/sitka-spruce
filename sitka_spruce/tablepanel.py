@@ -43,11 +43,40 @@ class DataGridFrame(wx.Frame):
         """set data from s dict of lists / ndarrays
         """
         self.grid.ClearGrid()
-        for i, key in enumerate(data.keys()):
-            self.grid.SetColLabelValue(i, key)
-            for j, val in enumerate(data[key]):
-                self.grid.SetCellValue(j, i, val)
+        ncols = self.grid.GetNumberCols()
+        nrows = self.grid.GetNumberRows()
+        self.grid.DeleteCols(0, ncols)
+        self.grid.DeleteRows(0, nrows)
 
+        ncols = len(data)
+        nrows = 0
+        for d in data.values():
+            nrows = max(nrows, len(d))
+
+        if nrows == 1:
+            rdat = {}
+            for key, val in data.items():
+                rdat[key] = val[0]
+
+            self.grid.AppendRows(len(rdat))
+            self.grid.AppendCols(2)
+            self.grid.SetColLabelValue(0, ' Name ')
+            self.grid.SetColLabelValue(1, ' Value ')
+            i = 0
+            for key, val in rdat.items():
+                self.grid.SetCellValue(i, 0, key)
+                self.grid.SetCellValue(i, 1, val)
+                i += 1
+            self.grid.AutoSizeColumn(0)
+            self.grid.AutoSizeColumn(1)
+        else:
+            self.grid.AppendRows(nrows)
+            self.grid.AppendCols(ncols)
+            for i, key in enumerate(data.keys()):
+                self.grid.SetColLabelValue(i, key)
+                for j, val in enumerate(data[key]):
+                    self.grid.SetCellValue(j, i, val)
+                self.grid.AutoSizeColumn(i)
 
     def set_data2d(self, data, title=None):
         """set data from 2d array"""
