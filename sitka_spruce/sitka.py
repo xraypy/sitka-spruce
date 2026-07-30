@@ -192,8 +192,6 @@ class SitkaFrame(wx.Frame):
         event.Skip()
 
     def add_ndattrs_panel(self):
-        print("Add Epics ND Attributes Panel")
-
         self.nb.AddPage(NDAttrsPanel(self), NDATTR_TITLE, True)
         self.nb_pages = {}
         ix = 0
@@ -218,7 +216,6 @@ class SitkaFrame(wx.Frame):
         self.importbtn.Enable(itemname=='sitka_arrays')
 
         if EPICS_NDATTR in itemname:
-            print(" An Epics Attr: ", address)
             if NDATTR_TITLE not in self.nb_pages:
                 self.add_ndattrs_panel()
             ipage, page = self.nb_pages.get(NDATTR_TITLE, (0, None))
