@@ -126,6 +126,7 @@ class ArrayImagePanel(wx.Panel):
         panel.Add(wids['blue_text'], dcol=3)
 
         panel.pack()
+        panel.SetSize((750, 600))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, 0, LEFT|wx.GROW, 4)
