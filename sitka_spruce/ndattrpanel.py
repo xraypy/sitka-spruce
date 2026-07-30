@@ -10,7 +10,7 @@ from wxutils import (GridPanel, SimpleText, pack, Button, TextCtrl, HLine,
 from pyshortcuts import isotime, fix_filename, get_cwd
 from .gui_utils import get_font
 from .tablepanel import DataGridFrame
-from .data import array2isotimes, dtype2str
+from .data import array2isotimes, dtype2str, cast_int, cast_bytes
 
 DVSTYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 
@@ -52,16 +52,36 @@ class NDAttrsPanel(wx.Panel):
     def onShow(self, event=None):
         group = self.datasets[self.filename][self.itemname]
         out = {}
+        ndata = None
         for key, dat in group.items():
             val = dat[()]
+            if ndata is None:
+                ndata = val.shape[0]
             if key == 'NDArrayEpicsTSSec':
                 out[key] = array2isotimes(val, is_epics=True, timespec='seconds')
             elif key == 'NDArrayTimeStamp':
                 out[key] = array2isotimes(val, is_epics=True, timespec='microseconds')
+            elif len(val.shape) == 2:
+                # try a 2d array as an array of strings
+                nx, ny = val.shape
+                if (nx == ndata and dtype2str(val.dtype) == cast_int):
+                    tmp = []
+                    for i in range(nx):
+                        tx = []
+                        for j in range(ny):
+                            c = val[i, j]
+                            if c == 0:
+                                break
+                            tx.append(chr(c))
+                        tmp.append(''.join(tx))
+                    out[key] = tmp
+                else:
+                    out[key] = repr(val)
             else:
                 out[key] = [dtype2str(val.dtype)(x) for x in val]
 
         gridframe = self.show_gridframe(window=1)
+        gridframe.file_info = (self.filename, self.itemname)
         gridframe.set_datadict(out, title=f'NDAttributes for {self.filename}')
 
 
