@@ -10,6 +10,7 @@ from wxutils import (GridPanel, SimpleText, pack, Button, TextCtrl, HLine,
 from pyshortcuts import isotime, fix_filename, get_cwd
 from .gui_utils import get_font
 from .tablepanel import DataGridFrame
+from .data import array2isotimes, dtype2str
 
 DVSTYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 
@@ -20,20 +21,19 @@ class NDAttrsPanel(wx.Panel):
         self.parent = parent
         self.SetBackgroundColour(get_color('sbg'))
 
+        self.gridframes = {}
         self.wids = wids = {}
         panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
 
-        def padd_text(text, dcol=1, size=(80, -1), newrow=True):
-            panel.Add(SimpleText(panel, text, size=size), dcol=dcol, newrow=newrow)
 
         wids['show'] = Button(panel, 'Show ND Attributes Table', size=(200, -1),
                               action=self.onShow)
 
-        padd_text(' Epics ND Attribute: ', newrow=False)
-        panel.Add(wids['show'])
+        title = SimpleText(panel, ' Epics ND Attributs',  size=(650, -1), style=wx.ALIGN_LEFT)
 
+        panel.Add(title, newrow=False)
+        panel.Add(wids['show'], newrow=True)
         panel.pack()
-        panel.SetSize((725, 600))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, 0, LEFT|wx.GROW, 4)
@@ -50,44 +50,42 @@ class NDAttrsPanel(wx.Panel):
         wx.CallAfter(self.Refresh)
 
     def onShow(self, event=None):
-        print(" show NDAttrs ")
+        group = self.datasets[self.filename][self.itemname]
+        out = {}
+        for key, dat in group.items():
+            val = dat[()]
+            if key == 'NDArrayEpicsTSSec':
+                out[key] = array2isotimes(val, is_epics=True, timespec='seconds')
+            elif key == 'NDArrayTimeStamp':
+                out[key] = array2isotimes(val, is_epics=True, timespec='microseconds')
+            else:
+                out[key] = [dtype2str(val.dtype)(x) for x in val]
 
-    def onPanelExposed(self, *args, **kws):
-        self.set_object()
+        gridframe = self.show_gridframe(window=1)
+        gridframe.set_datadict(out, title=f'NDAttributes for {self.filename}')
 
-    def set_object(self, *args, **kws):
-        data = self.parent.data
-        self.array_data = []
-        # warrays = self.wids['arrays']
-        #warrays.DeleteAllItems()
 
-        # for aname, arr in data.arrays.items():
-        #    addr = data.array_addrs.get(aname, 'unknown')
-        #    args = [True, aname, repr(arr.shape), addr]
-        #    self.array_data.append(args)
-        #    warrays.AppendItem(tuple(args))
+    def set_object(self, object, itemtype='?', itemname='', filename='', **kws):
+        """fill from object"""
+        self.filename = filename
+        self.itemname = itemname
+        self.datasets = self.parent.data.datasets
 
-    def set_all_selected(self, val):
-        if self.wids['arrays'] is not None:
-            warrays = self.wids['arrays']
-            for row in range(warrays.GetItemCount()):
-                warrays.SetValue(val, row, 0)
+    def show_gridframe(self, window=1, **opts):
+        shown = False
+        if window in self.gridframes:
+            try:
+                self.gridframes[window].Raise()
+                shown = True
+            except Exception:
+                f = self.gridframes.pop(window)
+                del f
+                shown = False
+        if not shown:
+            self.gridframes[window] = DataGridFrame(self, **opts)
+            self.gridframes[window].Raise()
+        return self.gridframes[window]
 
-    def onSelectAll(self, evt=None):
-        self.set_all_selected(True)
-
-    def onSelectNone(self, evt=None):
-        self.set_all_selected(False)
-
-    def onSelectArray(self, evt=None):
-        if self.wids['arrays'] is None:
-            return
-        if not self.wids['arrays'].HasSelection():
-            return
-        item = self.wids['arrays'].GetSelectedRow()
-        address = self.array_data[item][3]
-        self.access_code = address
-        self.wids['access_code'].SetLabel(address)
 
     def onExportTable(self, evt=None):
         arrays = self.get_arraynames()
