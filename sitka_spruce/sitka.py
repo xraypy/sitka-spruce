@@ -13,7 +13,6 @@ from wxutils import (SimpleText, pack,  LEFT,  get_color,
                      use_darkdetect, register_darkdetect,
                      MenuItem,  flatnotebook, GridPanel, Button,
                      FileOpen, FileSave, SelectWorkdir, Popup)
-from wxutils.colors import add_named_color
 
 
 from pyshortcuts import get_cwd, fix_filename
@@ -42,7 +41,15 @@ ICON_DIR = Path(Path(__file__).parent, 'icons').absolute()
 
 NDATTR_TITLE = 'Epics NDAttributes'
 
-add_named_color('sbg', (240, 245, 245, 255), ( 20,  30,  30, 255))
+class FileDropTarget(wx.FileDropTarget):
+    def __init__(self, window, callback):
+        wx.FileDropTarget.__init__(self)
+        self.window = window
+        self.callback = callback
+
+    def OnDropFiles(self, x, y, filenames):
+        self.callback(filenames)
+        return True
 
 
 class SitkaFrame(wx.Frame):
@@ -93,20 +100,20 @@ class SitkaFrame(wx.Frame):
         pack(leftpanel, sizer)
 
 
-        mpanel = GridPanel(rightpanel, ncols=4, nrows=10, pad=2, itemstyle=LEFT)
+        tpanel = self.tpanel = GridPanel(rightpanel, ncols=4, nrows=10, pad=2, itemstyle=LEFT)
 
-        self.filename_label = SimpleText(mpanel, '', font=get_font(larger=1),
+        self.filename_label = SimpleText(tpanel, '', font=get_font(larger=1),
                                          colour='title_red', size=(675, -1),
                                          style=LEFT|wx.ALIGN_CENTER_VERTICAL)
-        self.itemname_label = SimpleText(mpanel, '', font=get_font(larger=1),
+        self.itemname_label = SimpleText(tpanel, '', font=get_font(larger=1),
                                          colour='title_red', size=(675, -1),
                                          style=LEFT|wx.ALIGN_CENTER_VERTICAL)
-        self.copybtn = Button(mpanel, 'Copy Address', size=(200, -1),
+        self.copybtn = Button(tpanel, 'Copy Address', size=(200, -1),
                               action=self.onCopyAddress)
-        self.importbtn = Button(mpanel, 'Import Named Arrays', size=(200, -1),
+        self.importbtn = Button(tpanel, 'Import Named Arrays', size=(200, -1),
                                      action=self.onImportNamedArrays)
 
-        self.nb = flatnotebook(mpanel, {},
+        self.nb = flatnotebook(tpanel, {},
                                on_change=self.onNBChanged,
                                size=(700, 625))
 
@@ -118,36 +125,40 @@ class SitkaFrame(wx.Frame):
         self.nb.SetSelection(0)
         self.current_nbpage = self.nb.GetSelection()
         self.nb_pages = {}
+
         for i in range(self.nb.GetPageCount()):
             title = self.nb.GetPageText(i)
             page = self.nb.GetPage(i)
+            page.SetBackgroundColour(get_color('sbg'))
             self.nb_pages[title] = (i, page)
 
 
-        mpanel.Add(self.filename_label, dcol=4)
-        mpanel.Add(self.itemname_label, dcol=4, newrow=True)
-        mpanel.Add(self.copybtn,   dcol=2, newrow=True)
-        mpanel.Add(self.importbtn, dcol=2, newrow=False)
-        mpanel.Add(self.nb, dcol=4, drow=5, newrow=True)
-        mpanel.pack()
+        tpanel.Add(self.filename_label, dcol=4)
+        tpanel.Add(self.itemname_label, dcol=4, newrow=True)
+        tpanel.Add(self.copybtn,   dcol=2, newrow=True)
+        tpanel.Add(self.importbtn, dcol=2, newrow=False)
+        tpanel.Add(self.nb, dcol=4, drow=5, newrow=True)
+        tpanel.pack()
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(mpanel, 1, wx.ALL|wx.LEFT, 4)
+        sizer.Add(tpanel, 1, wx.ALL|wx.LEFT, 4)
         pack(rightpanel, sizer)
+
+        # print("Sitka: SBG ", get_color('sbg'))
 
         rightpanel.SetBackgroundColour(get_color('sbg'))
         self.rightpanel = rightpanel
-        self.nb.SetBackgroundColour(get_color('sbg'))
-        self.nb.SetForegroundColour(get_color('sbg'))
-        self.tree.SetBackgroundColour(get_color('sbg'))
-        self.tree.SetForegroundColour(get_color('text_fg'))
 
         self.info.SetFont(get_font())
         self.tree.SetFont(get_font())
         self.set_fontsize(FONTSIZE)
 
+        self.tree.SetDropTarget(FileDropTarget(self,
+                                               self.onDroppedFiles))
+
         splitter.SplitVertically(leftpanel, rightpanel, 1)
         splitter.SetMinimumPaneSize(300)
         register_darkdetect(self.onDarkMode)
+        self.onDarkMode()
 
 
         # Display the root item.
@@ -200,6 +211,7 @@ class SitkaFrame(wx.Frame):
             if title == NDATTR_TITLE:
                 ix = i
             page = self.nb.GetPage(i)
+
             self.nb_pages[title] = (i, page)
         self.nb.SetSelection(ix)
 
@@ -247,11 +259,14 @@ class SitkaFrame(wx.Frame):
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)
         bgcol = get_color('sbg', dark=is_dark)
-        self.tree.SetBackgroundColour(bgcol)
-        self.tree.SetForegroundColour(fgcol)
-        self.info.SetBackgroundColour(bgcol)
-        self.info.SetForegroundColour(fgcol)
-        self.rightpanel.SetBackgroundColour(bgcol)
+        for w in (self.tree, self.info, self.rightpanel,
+                  self.nb, self.tpanel):
+            w.SetBackgroundColour(bgcol)
+            w.SetForegroundColour(fgcol)
+
+        self.info.SetAlternateRowColour(bgcol)
+        self.info.SetOwnBackgroundColour(bgcol)
+        self.nb.SetTabAreaColour(bgcol)
         wx.CallAfter(self.Refresh)
 
     def Raise(self):
@@ -351,6 +366,21 @@ class SitkaFrame(wx.Frame):
                 self.data.datasets[self.filename].close()
                 self.data.datasets.pop(self.filename)
                 self.tree.onRefresh()
+
+    def onDroppedFiles(self, filenames):
+        invalid = []
+        for filename in filenames:
+            path = Path(filename)
+            fname = path.name
+            opener = get_opener(path)
+            if opener is not None:
+                self.add_dataset(fname, opener(path, mode='r'))
+            else:
+                invalid.append(filename)
+        if len(invalid) > 0:
+            msg = '\n'.join(invalid)
+            Popup(self, 'Could not read some files in Sitka', msg)
+
 
     def onReadData(self, event=None):
         path = FileOpen(self, 'Open Data File', default_dir=get_cwd(),
