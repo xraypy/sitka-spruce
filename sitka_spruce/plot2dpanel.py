@@ -16,7 +16,7 @@ from .data import ARRAY_TYPES, get_data, dim_code, datasize_repr
 
 class ArrayImagePanel(wx.Panel):
     """Image Show Config Panel for HDF5/Zarr datasets"""
-    def __init__(self, parent, size=(750, 600)):
+    def __init__(self, parent, size=(700, 600)):
         wx.Panel.__init__(self, parent, size=size)
         self.parent = parent
 
@@ -126,7 +126,7 @@ class ArrayImagePanel(wx.Panel):
         panel.Add(wids['blue_text'], dcol=3)
 
         panel.pack()
-        panel.SetSize((750, 600))
+        panel.SetSize((700, 600))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, 0, LEFT|wx.GROW, 4)

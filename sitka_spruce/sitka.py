@@ -49,7 +49,7 @@ class SitkaFrame(wx.Frame):
     """Main Window for Sitka HDF5/Zarr viewer"""
     def __init__(self, parent=None, with_inspect=False,
                  title='Sitka Hierarchical Data Viewer for HDF5 and Zarr',
-                 size=(1100, 675),  style=wx.DEFAULT_FRAME_STYLE):
+                 size=(1000, 675),  style=wx.DEFAULT_FRAME_STYLE):
         """Create Frame instance."""
         self.data = SitkaData()
         self.wids = {}
@@ -68,7 +68,7 @@ class SitkaFrame(wx.Frame):
         self.Refresh()
 
 
-    def create_display(self, size=(1100, 650)):
+    def create_display(self, size=(1050, 650)):
         splitter = wx.SplitterWindow(self, size=size, style=wx.SP_LIVE_UPDATE)
 
         leftpanel = wx.Panel(splitter)
@@ -84,8 +84,8 @@ class SitkaFrame(wx.Frame):
             this.Sortable = False
             this.Alignment = this.Renderer.Alignment = wx.ALIGN_LEFT
 
-        self.tree.SetMinSize((250, 300))
-        self.info.SetMinSize((250, 250))
+        self.tree.SetMinSize((275, 300))
+        self.info.SetMinSize((275, 250))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.tree, 1, wx.ALL|wx.GROW)
@@ -96,10 +96,10 @@ class SitkaFrame(wx.Frame):
         mpanel = GridPanel(rightpanel, ncols=4, nrows=10, pad=2, itemstyle=LEFT)
 
         self.filename_label = SimpleText(mpanel, '', font=get_font(larger=1),
-                                         colour='title_red', size=(525, -1),
+                                         colour='title_red', size=(675, -1),
                                          style=LEFT|wx.ALIGN_CENTER_VERTICAL)
         self.itemname_label = SimpleText(mpanel, '', font=get_font(larger=1),
-                                         colour='title_red', size=(525, -1),
+                                         colour='title_red', size=(675, -1),
                                          style=LEFT|wx.ALIGN_CENTER_VERTICAL)
         self.copybtn = Button(mpanel, 'Copy Address', size=(200, -1),
                               action=self.onCopyAddress)
@@ -108,7 +108,7 @@ class SitkaFrame(wx.Frame):
 
         self.nb = flatnotebook(mpanel, {},
                                on_change=self.onNBChanged,
-                               size=(875, 625))
+                               size=(700, 625))
 
         # self.mainpanel = ArrayViewPanel(splitter)
         self.nb.AddPage(ArrayImagePanel(self), 'Image Display', True)
@@ -124,10 +124,10 @@ class SitkaFrame(wx.Frame):
             self.nb_pages[title] = (i, page)
 
 
-        mpanel.Add(self.filename_label, dcol=3)
-        mpanel.Add(self.copybtn, dcol=1)
-        mpanel.Add(self.itemname_label, dcol=3, newrow=True)
-        mpanel.Add(self.importbtn, dcol=1)
+        mpanel.Add(self.filename_label, dcol=4)
+        mpanel.Add(self.itemname_label, dcol=4, newrow=True)
+        mpanel.Add(self.copybtn,   dcol=2, newrow=True)
+        mpanel.Add(self.importbtn, dcol=2, newrow=False)
         mpanel.Add(self.nb, dcol=4, drow=5, newrow=True)
         mpanel.pack()
         sizer = wx.BoxSizer(wx.VERTICAL)

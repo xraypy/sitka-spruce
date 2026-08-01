@@ -146,7 +146,7 @@ class DataGridFrame(wx.Frame):
 
 class TablePanel(wx.Panel):
     """Config Panel for Grid Display of HDF5/Zarr datasets"""
-    def __init__(self, parent, size=(750, 500)):
+    def __init__(self, parent, size=(700, 600)):
         wx.Panel.__init__(self, parent)
         self.parent = parent
         self.SetBackgroundColour(get_color('sbg'))
@@ -210,6 +210,7 @@ class TablePanel(wx.Panel):
         panel.Add(wids['check_overwrite'], dcol=1)
 
         panel.pack()
+        panel.SetSize((700, 600))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, 0, LEFT|wx.GROW, 4)

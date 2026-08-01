@@ -14,7 +14,7 @@ DVSTYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 
 class ArraysPanel(wx.Panel):
     """Panel for Named Arrays"""
-    def __init__(self, parent, size=(750, 600)):
+    def __init__(self, parent, size=(700, 600)):
         wx.Panel.__init__(self, parent, size=size)
         self.parent = parent
         self.SetBackgroundColour(get_color('sbg'))
@@ -96,7 +96,7 @@ class ArraysPanel(wx.Panel):
         panel.Add(wids['check_overwrite'])
 
         panel.pack()
-        panel.SetSize((725, 600))
+        panel.SetSize((700, 600))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, 0, LEFT|wx.GROW, 4)
