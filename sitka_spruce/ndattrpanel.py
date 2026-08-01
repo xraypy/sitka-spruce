@@ -24,7 +24,7 @@ class NDAttrsPanel(wx.Panel):
 
         self.gridframes = {}
         self.wids = wids = {}
-        panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
+        panel = self.panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
 
 
         wids['show'] = Button(panel, 'Show ND Attributes Table', size=(200, -1),
@@ -40,11 +40,16 @@ class NDAttrsPanel(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, 0, LEFT|wx.GROW, 4)
         pack(self, sizer)
+        self.onDarkMode()
         register_darkdetect(self.onDarkMode)
 
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)
         bgcol = get_color('sbg', dark=is_dark)
+        for widget in (self, self.panel):
+            widget.SetBackgroundColour(bgcol)
+            widget.SetForegroundColour(fgcol)
+
         self.SetBackgroundColour(bgcol)
         self.SetForegroundColour(fgcol)
         self.SetBackgroundColour(bgcol)

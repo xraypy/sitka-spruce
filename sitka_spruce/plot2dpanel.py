@@ -20,7 +20,6 @@ class ArrayImagePanel(wx.Panel):
         wx.Panel.__init__(self, parent, size=size)
         self.parent = parent
 
-        self.SetBackgroundColour(get_color('sbg'))
         self.SetFont(get_font())
         self.data_shape = None
         self.data_obj = None
@@ -29,8 +28,7 @@ class ArrayImagePanel(wx.Panel):
         self.imageframes = {}
         self.wids = wids = {}
 
-
-        panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
+        panel = self.panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
         self.dim_reduce = DimReducePanel(parent=panel, callback=self.onDimReduce)
 
         wids['imshow'] = Button(panel, 'Show Image', size=(200, -1),
@@ -100,7 +98,6 @@ class ArrayImagePanel(wx.Panel):
         padd_text(' Y=0 at top?', size=(125, -1), newrow=False)
         panel.Add(wids['ydir'], dcol=2)
 
-
         panel.Add((5, 5), newrow=True)
         panel.Add(self.dim_reduce, dcol=5, newrow=True)
         panel.Add((5, 5), newrow=True)
@@ -131,15 +128,15 @@ class ArrayImagePanel(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, 0, LEFT|wx.GROW, 4)
         pack(self, sizer)
+        self.onDarkMode()
         register_darkdetect(self.onDarkMode)
 
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)
         bgcol = get_color('sbg', dark=is_dark)
-        self.SetBackgroundColour(bgcol)
-        self.SetForegroundColour(fgcol)
-        self.SetBackgroundColour(bgcol)
-        self.SetForegroundColour(fgcol)
+        for widget in (self, self.panel, self.dim_reduce, self.dim_reduce.panel):
+            widget.SetBackgroundColour(bgcol)
+            widget.SetForegroundColour(fgcol)
         wx.CallAfter(self.Refresh)
 
     def onNameArray(self, event=None):
@@ -255,7 +252,6 @@ class ArrayImagePanel(wx.Panel):
         self.filename = filename
         self.itemname = itemname
         self.data_obj = object
-        # print(f'Plot2D  {filename=}, {itemname=} {itemtype=}')
         if (itemtype in ARRAY_TYPES):
             self.data_shape = object.shape
             choices = self.dim_reduce.set_datashape(object.shape)

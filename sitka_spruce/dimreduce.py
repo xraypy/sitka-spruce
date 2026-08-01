@@ -151,7 +151,7 @@ class DimReducePanel(wx.Panel):
         conf = read_configfile()
         self.dimopts = conf.get('dimreduce',  DEFAULT_OPTIONS)
         self.maxdim = max(2, min(16, int(self.dimopts.get('maxdim', 5))))
-        panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
+        panel = self.panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
 
 
         step_sizes = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000]

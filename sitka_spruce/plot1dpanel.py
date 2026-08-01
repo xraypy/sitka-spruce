@@ -27,7 +27,7 @@ class ArrayPlot1DPanel(wx.Panel):
         self.plotframes = {}
         self.wids = wids = {}
 
-        panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
+        panel = self.panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
         self.dim_reduce = DimReducePanel(parent=panel, callback=self.onDimReduce)
 
         wids['newplot'] = Button(panel, 'New Plot', size=(200, -1),
@@ -90,16 +90,16 @@ class ArrayPlot1DPanel(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel,    1, 0, LEFT|wx.GROW, 2)
         pack(self, sizer)
+        self.onDarkMode()
         register_darkdetect(self.onDarkMode)
 
 
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)
         bgcol = get_color('sbg', dark=is_dark)
-        self.SetBackgroundColour(bgcol)
-        self.SetForegroundColour(fgcol)
-        self.SetBackgroundColour(bgcol)
-        self.SetForegroundColour(fgcol)
+        for widget in (self, self.panel, self.dim_reduce, self.dim_reduce.panel):
+            widget.SetBackgroundColour(bgcol)
+            widget.SetForegroundColour(fgcol)
         wx.CallAfter(self.Refresh)
 
     def onNameArray(self, event=None):

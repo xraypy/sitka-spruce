@@ -21,7 +21,7 @@ class ArraysPanel(wx.Panel):
 
         self.access_code = ''
         self.wids = wids = {}
-        panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
+        panel = self.panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
 
 
         aview = self.wids['arrays'] = dv.DataViewListCtrl(panel, style=DVSTYLE)
@@ -101,11 +101,16 @@ class ArraysPanel(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, 0, LEFT|wx.GROW, 4)
         pack(self, sizer)
+        self.onDarkMode()
         register_darkdetect(self.onDarkMode)
 
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)
         bgcol = get_color('sbg', dark=is_dark)
+        for widget in (self, self.panel,  self.wids['arrays']):
+            widget.SetBackgroundColour(bgcol)
+            widget.SetForegroundColour(fgcol)
+
         self.SetBackgroundColour(bgcol)
         self.SetForegroundColour(fgcol)
         self.SetBackgroundColour(bgcol)
