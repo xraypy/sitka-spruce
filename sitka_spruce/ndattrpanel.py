@@ -10,13 +10,14 @@ from wxutils import (GridPanel, SimpleText, pack, Button, TextCtrl, HLine,
 from pyshortcuts import isotime, fix_filename, get_cwd
 from .gui_utils import get_font
 from .tablepanel import DataGridFrame
-from .data import array2isotimes, dtype2str, cast_int, cast_bytes
+from .data import (array2isotimes, dtype2str, cast_int, cast_bytes,
+                   get_itemtype, EPICS_NDATTR)
 
 DVSTYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 
 class NDAttrsPanel(wx.Panel):
     """Panel for Epics ND Attributes"""
-    def __init__(self, parent, size=(750, 600)):
+    def __init__(self, parent, size=(700, 600)):
         wx.Panel.__init__(self, parent, size=size)
         self.parent = parent
         self.SetBackgroundColour(get_color('sbg'))
@@ -29,11 +30,12 @@ class NDAttrsPanel(wx.Panel):
         wids['show'] = Button(panel, 'Show ND Attributes Table', size=(200, -1),
                               action=self.onShow)
 
-        title = SimpleText(panel, ' Epics ND Attributs',  size=(650, -1), style=wx.ALIGN_LEFT)
+        title = SimpleText(panel, '  Epics ND Attributes',  size=(650, -1), style=wx.ALIGN_LEFT)
 
-        panel.Add(title, newrow=False)
+        panel.Add(title, newrow=True)
         panel.Add(wids['show'], newrow=True)
         panel.pack()
+        panel.SetSize((700, 600))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, 0, LEFT|wx.GROW, 4)
@@ -50,9 +52,16 @@ class NDAttrsPanel(wx.Panel):
         wx.CallAfter(self.Refresh)
 
     def onShow(self, event=None):
-        group = self.datasets[self.filename][self.itemname]
+        item = self.itemname
+        if EPICS_NDATTR in item and (item != EPICS_NDATTR):
+            item = EPICS_NDATTR
+        group = self.datasets[self.filename][item]
+        if get_itemtype(group) not in ('h5py.Group', 'arr.Group'):
+            return
+
         out = {}
         ndata = None
+
         for key, dat in group.items():
             val = dat[()]
             if ndata is None:
