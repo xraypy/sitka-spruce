@@ -85,10 +85,12 @@ On Startup the Sitka GUI will look like this:
    :width: 98 %
 
 
-with an empty panel in the upper left.  To reading in an HDF5 file or
-Zarr directory store using the File -> Read Data File or use Ctrl-O
-(Option-O on MacOS).  The file name will be shown in the Data Tree
-section of the Window.
+with an empty panel in the upper left.  To read in data from an HDF5
+file or Zarr directory store using the File -> Read Data File, or
+Ctrl-O (Option-O on MacOS), or simply drag the file on the Data Tree
+portion of the Sitka app. The file will be opened and shown in the
+Data Tree section of the Window.  Sitka always opens the files in
+"read only" mode, and will not ever write to the data files you open.
 
 .. note::
 
