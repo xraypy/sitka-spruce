@@ -3,6 +3,7 @@ from functools import partial
 
 import wx
 from pyshortcuts import uname
+from wxutils.colors import add_named_color
 
 FONTSIZE = 12
 FONTSIZE_FW = 13
@@ -15,6 +16,8 @@ elif uname == 'linux':
 
 
 WIN_CHOICES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+
+add_named_color('sbg', (220, 240, 240, 255), ( 30,  50,  50, 255))
 
 def fontsize(fixed_width=False):
     """return best default fontsize"""
