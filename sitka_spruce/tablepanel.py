@@ -302,6 +302,8 @@ class TablePanel(wx.Panel):
                 ycur = self.wids['ydim'].GetSelection()
                 self.dim_reduce.enable_dimension(xcur, enable=False, npts=None)
                 self.dim_reduce.enable_dimension(ycur, enable=False, npts=None)
+            aname = itemname.split('/')[-1]
+            self.wids['array_name'].SetValue(aname)
         self.Refresh()
 
 

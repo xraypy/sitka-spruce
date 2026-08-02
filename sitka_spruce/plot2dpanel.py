@@ -283,9 +283,12 @@ class ArrayImagePanel(wx.Panel):
 
                 self.dim_reduce.enable_dimension(xcur, enable=False, npts=None)
                 self.dim_reduce.enable_dimension(ycur, enable=False, npts=None)
-
                 xcur = self.wids['xdim'].GetSelection()
                 ycur = self.wids['ydim'].GetSelection()
+
+                aname = itemname.split('/')[-1]
+                self.wids['array_name'].SetValue(aname)
+
         self.Refresh()
 
 
