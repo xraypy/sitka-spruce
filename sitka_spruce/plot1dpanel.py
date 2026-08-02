@@ -135,6 +135,8 @@ class ArrayPlot1DPanel(wx.Panel):
             except Exception:
                 pass
             self.dim_reduce.enable_dimension(cur, enable=False, npts=None)
+            aname = itemname.split('/')[-1]
+            self.wids['array_name'].SetValue(aname)
 
         self.wids['yarray'].Enable(isdata)
         self.Refresh()
