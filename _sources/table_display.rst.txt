@@ -27,3 +27,7 @@ the contents of the **Dimension Reduction** is presented.  See
 
 .. image:: images/sitka_tableview.png
    :width: 98 %
+
+
+From the Sitka Table Window, you can save a tab-separated-value file for
+displayed data with the File->Export Data to TSV menu.

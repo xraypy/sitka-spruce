@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Epics areaDetector NDAttributes &#8212; Sitka Spruce: Heirarchical Data Browser</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    
+    <script src="_static/documentation_options.js?v=7f00635f"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Motivation for Sitka Spruce" href="motivation.html" />
+    <link rel="prev" title="The Named Arrays Page" href="arrays_page.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="motivation.html" title="Motivation for Sitka Spruce"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="arrays_page.html" title="The Named Arrays Page"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Sitka Spruce</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Epics areaDetector NDAttributes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="epics-areadetector-ndattributes">
+<span id="ndattrs-page"></span><h1>Epics areaDetector NDAttributes<a class="headerlink" href="#epics-areadetector-ndattributes" title="Link to this heading">¶</a></h1>
+<p>For HDF5 Files saved by the Epics control system’s areaDetector
+software, Sitka will recognize that an HDF5 file has a Group with an
+address of <cite>entry/instrument/NDAttributes</cite> is meant to hold meta-data
+for that data acquisition.  For the many synchrotron and user
+facilities using Epics and its areaDetector software, these files will
+be ubiquitous.  Reading and extracting the metadata from these files
+is somewhat challenging for the novice user, as long strings may be stored
+as byte arrays, and times will be stored as an Epics timestamp, offset
+from the standard Unix timestamp by 20 years.</p>
+<p>If the NDAttributes is recognized in an HDF5 file, Sitka will add an
+“Epics NDAttributes” Tab to the Notebook panels.</p>
+<a class="reference internal image-reference" href="_images/sitka_ndattrspage.png"><img alt="_images/sitka_ndattrspage.png" src="_images/sitka_ndattrspage.png" style="width: 98%;" />
+</a>
+<p>This page has only one Button to show the attributes in the Table
+display.</p>
+<p>Since the datasets in the <cite>NDAttributes</cite> group will be of uniform
+length (one for each “image” of the data acquisition), a table will be
+made containing all the datasets in this Group.  If the datasets have
+multiple values, the table will have a column for each dataset, such as</p>
+<a class="reference internal image-reference" href="_images/sitka_ndattrs1.png"><img alt="_images/sitka_ndattrs1.png" src="_images/sitka_ndattrs1.png" style="width: 98%;" />
+</a>
+<p>Note that timestamps have been converted to ISO-standard timestamps.</p>
+<p>If the NDattributes have only 1 value, such as with</p>
+<a class="reference internal image-reference" href="_images/sitka_ndattrspage.png"><img alt="_images/sitka_ndattrspage.png" src="_images/sitka_ndattrspage.png" style="width: 98%;" />
+</a>
+<p>then the values will be displayed as key/value pairs, such as</p>
+<a class="reference internal image-reference" href="_images/sitka_ndattrs2.png"><img alt="_images/sitka_ndattrs2.png" src="_images/sitka_ndattrs2.png" style="width: 98%;" />
+</a>
+<p>In all cases, the Table display allows the user to export the data
+shown into tab-separated-value files.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/sitka_logo.png" alt="Logo of Sitka Spruce"/>
+            </a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="arrays_page.html"
+                          title="previous chapter">The Named Arrays Page</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="motivation.html"
+                          title="next chapter">Motivation for Sitka Spruce</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ndattrs_page.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="motivation.html" title="Motivation for Sitka Spruce"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="arrays_page.html" title="The Named Arrays Page"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Sitka Spruce</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Epics areaDetector NDAttributes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026-08-02, Matthew Newville, The University of Chicago.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

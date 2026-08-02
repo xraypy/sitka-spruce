@@ -12,7 +12,7 @@
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     
-    <script src="_static/documentation_options.js?v=b489f392"></script>
+    <script src="_static/documentation_options.js?v=7f00635f"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -188,10 +188,12 @@ extract and use the arrays you want for downstream processing.</p>
 <p>On Startup the Sitka GUI will look like this:</p>
 <a class="reference internal image-reference" href="_images/sitka_start.png"><img alt="_images/sitka_start.png" src="_images/sitka_start.png" style="width: 98%;" />
 </a>
-<p>with an empty panel in the upper left.  To reading in an HDF5 file or
-Zarr directory store using the File -&gt; Read Data File or use Ctrl-O
-(Option-O on MacOS).  The file name will be shown in the Data Tree
-section of the Window.</p>
+<p>with an empty panel in the upper left.  To read in data from an HDF5
+file or Zarr directory store using the File -&gt; Read Data File, or
+Ctrl-O (Option-O on MacOS), or simply drag the file on the Data Tree
+portion of the Sitka app. The file will be opened and shown in the
+Data Tree section of the Window.  Sitka always opens the files in
+“read only” mode, and will not ever write to the data files you open.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The examples shown throughout this document can retrieved by
@@ -405,7 +407,7 @@ to hear them.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2026-07-19, Matthew Newville, The University of Chicago.
+    &#169; Copyright 2026-08-02, Matthew Newville, The University of Chicago.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>

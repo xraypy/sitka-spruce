@@ -12,7 +12,7 @@
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     
-    <script src="_static/documentation_options.js?v=b489f392"></script>
+    <script src="_static/documentation_options.js?v=7f00635f"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -22,7 +22,7 @@
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="The Named Arrays Page" href="arrays_page.html" />
+    <link rel="prev" title="Epics areaDetector NDAttributes" href="ndattrs_page.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <!--[if lt IE 9]>
     <script src="_static/css3-mediaqueries.js"></script>
@@ -35,7 +35,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="arrays_page.html" title="The Named Arrays Page"
+          <a href="ndattrs_page.html" title="Epics areaDetector NDAttributes"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Sitka Spruce</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Motivation for Sitka Spruce</a></li> 
@@ -82,25 +82,28 @@ room for one more viewer.</p>
 Sitka Spruce from existing tools include:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>using <a class="reference external" href="https://newville.github.io/wxmplot/">wxmplot</a> for data visualization. This gives high-quality
-graphics from matplotlib and very good interactivity for both line
-plots and 2D images.</p></li>
-<li><p>by using <a class="reference external" href="https://www.wxpython.org/">wxPython</a>, we plan to use Sitka as a reader for tools
-in the <a class="reference external" href="https://xraypy.github.io/xraylarch/">xraylarch</a> family, including the Larix application for
-XAS data. This is expected in the near future, but after the
-initial release.</p></li>
-<li><p>support for working with data in both HDF5 with <a class="reference external" href="https://code.google.com/p/h5py/">h5py</a> and
-<a class="reference external" href="https://zarr.dev/">zarr</a>.  The initial release supports Zarr Local File Storage,
-but not other stores.</p></li>
-<li><p>we aim to make it very easy to extract data from the complex data
-files for downstream analysis by exporting either selected data or
-the full addresses to data components.</p></li>
-<li><p>we aim to make a GUI that can be used as a general-purpose,
-standalone app for all users and also as an interactive
-application from a Python shell or Jupyter notebook, improving
-accessing data within HDF5 files for exploratory data analysis.</p></li>
-<li><p>for the initial release, we are not explicity or specifically
-supporting NeXuS, but this high on the list of things to consider.</p></li>
+<li><p>using <a class="reference external" href="https://newville.github.io/wxmplot/">wxmplot</a> gives publication-quality line plots and 2D
+images.  from matplotlib with every good interactivity and
+customizability for the end user.</p></li>
+<li><p>using <a class="reference external" href="https://www.wxpython.org/">wxPython</a>, will allow Sitka to be used as a reader for
+tools in the <a class="reference external" href="https://xraypy.github.io/xraylarch/">xraylarch</a> family, including the Larix application
+for XAS data. This is expected in the near future.</p></li>
+<li><p>supporting data in both HDF5 with <a class="reference external" href="https://code.google.com/p/h5py/">h5py</a> and <a class="reference external" href="https://zarr.dev/">zarr</a> stores.  The
+initial release supports Zarr Local File Storage, but other stores
+could be added easily.</p></li>
+<li><p>having special support for displaying the metadata written to HDF5
+files for Epics areaDetector files.  At US synchrotron facilities,
+many such HDF5 files are generated. By improving the ability to
+view and use metadata from these files, we hope to encourage
+better use and attention to these metadata capabilities.</p></li>
+<li><p>making it very easy to extract data from the complex data files
+for downstream analysis by exporting either selected data arrays,
+the full addresses to data components, or saving extracted data to
+arrays in simpler HDF5 files.</p></li>
+<li><p>making a GUI that can be used as a general-purpose, standalone app
+for all users and also as an interactive application from a Python
+shell or Jupyter notebook, improving accessing data within HDF5
+files for exploratory data analysis.</p></li>
 </ul>
 </div></blockquote>
 <p>We welcome feedback, comments, suggestions, and collaboration on all
@@ -120,8 +123,8 @@ data processing tools.</p>
             </a></p>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="arrays_page.html"
-                          title="previous chapter">The Named Arrays Page</a></p>
+    <p class="topless"><a href="ndattrs_page.html"
+                          title="previous chapter">Epics areaDetector NDAttributes</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -151,14 +154,14 @@ data processing tools.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="arrays_page.html" title="The Named Arrays Page"
+          <a href="ndattrs_page.html" title="Epics areaDetector NDAttributes"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Sitka Spruce</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Motivation for Sitka Spruce</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2026-07-19, Matthew Newville, The University of Chicago.
+    &#169; Copyright 2026-08-02, Matthew Newville, The University of Chicago.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>

@@ -29,4 +29,5 @@ For goals and motivation for Sitka, see :ref:`motivation`.
    xyplot_display
    table_display
    arrays_page
+   ndattrs_page
    motivation
