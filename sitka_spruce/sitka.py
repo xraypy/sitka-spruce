@@ -232,6 +232,14 @@ class SitkaFrame(wx.Frame):
                 self.add_ndattrs_panel()
             ipage, page = self.nb_pages.get(NDATTR_TITLE, (0, None))
             self.nb.SetSelection(ipage)
+        else:
+            ipage, page = self.nb_pages.get('Image  Display', (0, None))
+            try:
+                if len(object.shape) == 1:
+                    ipage, page = self.nb_pages.get('XY Plot Display', (1, None))
+            except:
+                pass
+            self.nb.SetSelection(ipage)
 
         self.fill_info(filename, itemtype, itemname, object)
 
