@@ -129,9 +129,7 @@ class ArraysPanel(wx.Panel):
             if ret != wx.ID_YES:
                 return
 
-        expr = self.wids['expr'].GetValue()
-        print(f"on Save Array {name=}  {expr=}")
-
+        expr = self.wids['expr'].GetValue().strip()
         data._last_error = []
 
         ret = data.eval(expr)
