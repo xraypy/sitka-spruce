@@ -49,7 +49,7 @@ dependencies = [
    "numpy>=2.3",
    "h5py>=3.13",
    "hdf5plugin>=4.0",
-   "zarr>=3.2",
+   "zarr>=3.1",
    "fsspec",
    "asteval>=1.0.9",
    "darkdetect",
@@ -82,3 +82,6 @@ doc = ["sphinx",
 
 test = ["pytest", "pytest-cov", "coverage"]
 all = ["sitka_spruce[dev, doc, test]"]
+
+[tool.ruff]
+exclude = ['sitka_spruce/__init__.py', 'sitka_spruce/version.py']

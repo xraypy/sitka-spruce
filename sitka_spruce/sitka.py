@@ -19,7 +19,7 @@ from pyshortcuts import get_cwd, fix_filename
 from .version import version
 from .gui_utils import  get_font, FONTSIZE
 from .data  import (get_attributes, SitkaData, get_opener, get_sitka_files,
-                    GROUP_TYPES, EPICS_NDATTR)
+                    EPICS_NDATTR)
 from .hdatatree import HDataTree
 from .plot1dpanel import ArrayPlot1DPanel
 from .plot2dpanel import ArrayImagePanel
@@ -237,7 +237,7 @@ class SitkaFrame(wx.Frame):
             try:
                 if len(object.shape) == 1:
                     ipage, page = self.nb_pages.get('XY Plot Display', (1, None))
-            except:
+            except Exception:
                 pass
             self.nb.SetSelection(ipage)
 
@@ -500,7 +500,7 @@ class SitkaFrame(wx.Frame):
         info.SetDescription(' Hierarchical Data Viewer for HDF5 and Zarr')
         info.SetVersion(version)
         info.AddDeveloper('Matthew Newville: newville@cars.uchicago.edu')
-        dlg = AboutBox(info)
+        AboutBox(info)
 
 
 

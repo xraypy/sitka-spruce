@@ -1,16 +1,12 @@
-import ast
-import numpy as np
 import wx
 import wx.dataview as dv
 
-from wxutils import (GridPanel, SimpleText, pack, Button, TextCtrl, HLine,
-                     Check, LEFT, get_color, register_darkdetect,
-                     FileSave, Popup)
+from wxutils import (GridPanel, SimpleText, pack, Button, LEFT, get_color, register_darkdetect,
+                     FileSave)
 
 from pyshortcuts import isotime, fix_filename, get_cwd
-from .gui_utils import get_font
 from .tablepanel import DataGridFrame
-from .data import (array2isotimes, dtype2str, cast_int, cast_bytes,
+from .data import (array2isotimes, dtype2str, cast_int,
                    get_itemtype, EPICS_NDATTR)
 
 DVSTYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
