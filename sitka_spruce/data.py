@@ -54,7 +54,7 @@ def get_sitka_files(folder=None):
     files = {}
     if folder is not None:
         path = Path(folder)
-        if path.exists and path.is_dir():
+        if path.exists() and path.is_dir():
             for fname in os.listdir(path):
                 thispath = Path(path, fname)
                 opener = get_opener(thispath)
