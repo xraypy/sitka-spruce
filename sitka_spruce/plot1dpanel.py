@@ -218,7 +218,7 @@ class ArrayPlot1DPanel(wx.Panel):
         if yop == '*':
             self._yarr = self._yarr * ynorm
         elif yop == '/':
-            self._yarr = self._yarr * ynorm
+            self._yarr = self._yarr / ynorm
         elif yop == '+':
             self._yarr = self._yarr + ynorm
         elif yop == '-':
