@@ -11,13 +11,16 @@ import asteval
 from pathlib import Path
 
 from pyshortcuts import gformat, isotime
-from epics.dbr import EPICS2UNIX_EPOCH
+
 
 try:
     import larch
 except ImportError:
     larch = None
 
+
+# epics epoch is Jan 1, 1990: offset to Unix Timestamp
+EPICS2UNIX_EPOCH = 631152000.0
 
 FILE_OPENERS = {'hdf5': h5py.File, 'h5': h5py.File, 'zarr': zarr.open}
 
