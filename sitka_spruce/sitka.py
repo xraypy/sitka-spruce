@@ -15,7 +15,7 @@ from wxutils import (SimpleText, pack,  LEFT,  get_color,
                      FileOpen, FileSave, SelectWorkdir, Popup)
 
 
-from pyshortcuts import get_cwd, fix_filename
+from pyshortcuts import get_cwd, fix_filename, uname
 from .version import version
 from .gui_utils import  get_font, FONTSIZE
 from .data  import (get_attributes, SitkaData, get_opener, get_sitka_files,
@@ -64,15 +64,18 @@ class SitkaFrame(wx.Frame):
         self.with_inspect = with_inspect
         wx.Frame.__init__(self, parent, title=title, size=size,
                           style=style)
-        self.create_display(size=size)
         self.CreateStatusBar()
-        self.status_message('Welcome to Sitka')
+        self.create_display(size=size)
         self.BuildMenus()
+        self.status_message('Welcome to Sitka')
 
     def status_message(self, msg):
         self.SetStatusText(msg)
-        self.GetStatusBar().Refresh()
-        self.Refresh()
+        sbar = self.GetStatusBar()
+        sbar.SetForegroundColour(get_color('text'))
+        sbar.SetBackgroundColour(get_color('sbg'))
+        sbar.Refresh()
+        # self.Refresh()
 
 
     def create_display(self, size=(1050, 650)):
@@ -147,10 +150,10 @@ class SitkaFrame(wx.Frame):
 
         rightpanel.SetBackgroundColour(get_color('sbg'))
         self.rightpanel = rightpanel
-
-        self.info.SetFont(get_font())
-        self.tree.SetFont(get_font())
+        isize = 1 if uname.startswith('win')else 0
         self.set_fontsize(FONTSIZE)
+        self.info.SetFont(get_font(smaller=isize))
+        self.tree.SetFont(get_font())
 
         self.tree.SetDropTarget(FileDropTarget(self,
                                                self.onDroppedFiles))
@@ -271,9 +274,9 @@ class SitkaFrame(wx.Frame):
                   self.nb, self.tpanel):
             w.SetBackgroundColour(bgcol)
             w.SetForegroundColour(fgcol)
-
-        self.info.SetAlternateRowColour(bgcol)
-        self.info.SetOwnBackgroundColour(bgcol)
+        
+        #self.info.SetAlternateRowColour(bgcol)
+        #self.info.SetOwnBackgroundColour(bgcol)
         self.nb.SetTabAreaColour(bgcol)
         wx.CallAfter(self.Refresh)
 
