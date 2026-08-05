@@ -30,10 +30,12 @@ class DataGridFrame(wx.Frame):
         self.grid.CreateGrid(100, 100)
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.title, 0, 0, LEFT|wx.GROW, 2)
-        sizer.Add(self.grid,  0, 0, LEFT|wx.GROW, 2)
+        sizer.Add(self.grid,  1, 0, LEFT|wx.GROW|wx.ALL, 2)
         pack(self, sizer)
         register_darkdetect(self.onDarkMode)
         self.BuildMenus()
+        self.onDarkMode()
+        self.SetSize(size)
         self.Raise()
         self.Show()
 
@@ -42,6 +44,10 @@ class DataGridFrame(wx.Frame):
         bgcol = get_color('sbg', dark=is_dark)
         self.SetBackgroundColour(bgcol)
         self.SetForegroundColour(fgcol)
+        self.title.SetBackgroundColour(bgcol)
+        self.title.SetForegroundColour(fgcol)                
+        self.grid.SetBackgroundColour(bgcol)
+        self.grid.SetForegroundColour(fgcol)        
         wx.CallAfter(self.Refresh)
 
 
