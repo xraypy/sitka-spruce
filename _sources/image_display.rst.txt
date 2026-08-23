@@ -3,7 +3,7 @@
 .. _image_display:
 
 
-The Image Display Page
+Image Display
 ====================================
 
 The Image Display page will look like
@@ -42,12 +42,16 @@ multiple images at a time.  Each of these will look like:
 
 These image displays are fully interactive, and allowing zooming,
 rotating, flipping, and smoothing.  Axes, grid lines, and scale bars
-can be configured and shown after the image is displayed.  The image
-can be copied to the system clipboard with Ctrl-C.  A wide selection
-of color table can be used.  The upper and lower levels can be
-adjusted by hand or by selecting or stepping through a wide dynamic
-range of "percent contrasts".  For more details using this image
-display, see `WXMPLOT Interactive Image Display`_
+can be configured and shown after the image is displayed.  Histograms of 
+values can be shown, as can slices through the image.  The image can be 
+quantized into a contour plot, and the contour levels can be adjusted.  
+The image can be saved to a PNG file or copied to the system clipboard 
+(with Ctrl-C), and the data array exported to a text file.  A wide 
+selection of color table can be used.  The upper and lower levels can be 
+adjusted by hand or by selecting or stepping through a range of 
+"percent contrasts" which give good and easily reproducible results for 
+datasets with extreme outliers or high dynamic range.  For more details 
+using this image display, see `WXMPLOT Interactive Image Display`_
 
 If you have saved multiple images of the same shape -- perhaps
 different slices of a third dimension for a 3-d dataset -- then you

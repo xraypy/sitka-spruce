@@ -3,7 +3,7 @@
 .. _xyplot_display:
 
 
-The XY Plot Display Page
+XY Plots
 ====================================
 
 The XY Plot Display page will look like
@@ -47,6 +47,6 @@ multiple plot traces should be shared or independent.
 As with the image displays, thes plots are fully interactive, and
 allowing zooming, panning.  The plots can be configured and can be
 copied to the system clipboard with Ctrl-C.  A wide selection of color
-themes are available, and colors, linetypes, text, and sizes for most
+themes are available, and colors, line types, text, and sizes for most
 elements can be changed after displayed.  For more details using this
 image display, see `WXMPLOT Interactive Plot Display`_

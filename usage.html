@@ -1,66 +1,186 @@
-
 <!DOCTYPE html>
-
 <html lang="en" data-content_root="./">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <title>Using Sitka &#8212; Sitka Spruce: Heirarchical Data Browser</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
-    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Using Sitka" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="usage.html" />
+<meta property="og:site_name" content="Sitka Spruce" />
+<meta property="og:description" content="In this section, we’ll give information for starting the Sitka GUI, loading, and using datafiles. Running the Sitka GUI: Sitka can be used as a stand-alone GUI application or from a Python REPL or ..." />
+<meta property="og:image:width" content="1146" />
+<meta property="og:image:height" content="600" />
+<meta property="og:image" content="_images/social_previews/summary_usage_87545b51.png" />
+<meta property="og:image:alt" content="In this section, we’ll give information for starting the Sitka GUI, loading, and using datafiles. Running the Sitka GUI: Sitka can be used as a stand-alone GUI application or from a Python REPL or ..." />
+<meta name="description" content="In this section, we’ll give information for starting the Sitka GUI, loading, and using datafiles. Running the Sitka GUI: Sitka can be used as a stand-alone GUI application or from a Python REPL or ..." />
+<meta name="twitter:card" content="summary_large_image" />
+<title>Using Sitka - Sitka Spruce: Hierarchical Data Browser</title><link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Image Display" href="image_display.html"><link rel="prev" title="Installation" href="installation.html"><script data-cfasync="false">(function(){
+    const m = localStorage.getItem("breeze-mode") || "auto";
+    const d = document.documentElement.dataset;
+    d.mode = m;
+    d.theme = m === "auto"
+      ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+      : m;
+  })();
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" /><link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" /><link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" /><link rel="stylesheet" type="text/css" href="_static/styles/breeze.css?v=7c62c100" /><script defer="defer" src="_static/scripts/breeze.js?v=dac9f8c6"></script></head>
+<body>
+  
+  
+  <div class="bz-skip-to-content"><a href="#bz-main-content">Skip to main content</a></div><header class="bz-header-main">
+  <div class="bz-header-start"><a class="bz-header-brand" href="index.html">
+  <img class="only-light" src="_static/sitka_logo.png" alt="Sitka Spruce" />
+  <img class="only-dark" src="_static/sitka_logo.png" alt="Sitka Spruce" />
+  <span>Sitka Spruce: Hierarchical Data Browser</span>
+</a>
+  </div>
+  <div class="bz-header-end"><div id="docsearch" class="bz-search-button">
+  <a
+    href="search.html#q"
+    aria-label="Search the docs"
+    data-tooltip="Search the docs"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 -1 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+      />
+    </svg>
+    <span>Search</span>
+    <kbd>Ctrl+K</kbd>
+  </a>
+</div><div class="bz-theme-switcher">
+  <button aria-label="Switch theme" data-tooltip="Switch theme">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="only-light" fill="currentColor">
+      <path d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-1.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm5.657-8.157a.75.75 0 0 1 0 1.061l-1.061 1.06a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734l1.06-1.06a.75.75 0 0 1 1.06 0Zm-9.193 9.193a.75.75 0 0 1 0 1.06l-1.06 1.061a.75.75 0 1 1-1.061-1.06l1.06-1.061a.75.75 0 0 1 1.061 0ZM8 0a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V.75A.75.75 0 0 1 8 0ZM3 8a.75.75 0 0 1-.75.75H.75a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 3 8Zm13 0a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 16 8Zm-8 5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 8 13Zm3.536-1.464a.75.75 0 0 1 1.06 0l1.061 1.06a.75.75 0 0 1-1.06 1.061l-1.061-1.06a.75.75 0 0 1 0-1.061ZM2.343 2.343a.75.75 0 0 1 1.061 0l1.06 1.061a.751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018l-1.06-1.06a.75.75 0 0 1 0-1.06Z"></path>
+    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="only-dark" fill="currentColor">
+      <path d="M9.598 1.591a.749.749 0 0 1 .785-.175 7.001 7.001 0 1 1-8.967 8.967.75.75 0 0 1 .961-.96 5.5 5.5 0 0 0 7.046-7.046.75.75 0 0 1 .175-.786Zm1.616 1.945a7 7 0 0 1-7.678 7.678 5.499 5.499 0 1 0 7.678-7.678Z"></path>
+    </svg>
+  </button>
+</div><div class="bz-external-links">
+  <a
+      href="https://github.com/xraypy/sitka-spruce"
+      aria-label="GitHub"
+      data-tooltip="GitHub"
+      target="_blank"
+    >
     
-    <script src="_static/documentation_options.js?v=7f00635f"></script>
-    <script src="_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="_static/copybutton.js?v=f281be69"></script>
-    <script src="_static/design-tabs.js?v=f930bc37"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script src="_static/bizstyle.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="The Image Display Page" href="image_display.html" />
-    <link rel="prev" title="Downloading and Installation" href="installation.html" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <!--[if lt IE 9]>
-    <script src="_static/css3-mediaqueries.js"></script>
-    <![endif]-->
-  </head><body>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="image_display.html" title="The Image Display Page"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="installation.html" title="Downloading and Installation"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Sitka Spruce</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Using Sitka</a></li> 
-      </ul>
-    </div>  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <section id="using-sitka">
-<h1>Using Sitka<a class="headerlink" href="#using-sitka" title="Link to this heading">¶</a></h1>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M6.766 11.695C4.703 11.437 3.25 9.904 3.25 7.92c0-.806.281-1.677.75-2.258-.203-.532-.172-1.662.062-2.129.626-.081 1.469.258 1.969.726.594-.194 1.219-.291 1.985-.291.765 0 1.39.097 1.953.274.484-.451 1.343-.79 1.969-.709.218.435.25 1.564.046 2.113.5.613.766 1.436.766 2.274 0 1.984-1.453 3.485-3.547 3.759.531.355.891 1.129.891 2.016v1.678c0 .484.39.758.859.564C13.781 14.824 16 11.905 16 8.291 16 3.726 12.406 0 7.984 0 3.562 0 0 3.726 0 8.291c0 3.581 2.203 6.55 5.172 7.663A.595.595 0 0 0 6 15.389v-1.291c-.219.097-.5.162-.75.162-1.031 0-1.641-.581-2.078-1.662-.172-.435-.36-.693-.719-.742-.187-.016-.25-.097-.25-.193 0-.194.313-.339.625-.339.453 0 .844.29 1.25.887.313.468.641.678 1.031.678.391 0 .641-.146 1-.516.266-.275.469-.517.657-.678Z"></path></svg>
+    
+    </a>
+  </div>
+  </div>
+</header><nav class="bz-header-tabs" aria-label="Primary Navigation"><label
+  class="bz-sidebar-primary-toggle"
+  for="bz-sidebar-primary"
+  role="button"
+  tabindex="0"
+  aria-label="Toggle site navigation"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M3.75 6.75h16.5M3.75 12H12m-8.25 5.25h12.5"
+    />
+  </svg>
+</label><ul><li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li><li class="toctree-l1 current"><a class="current reference internal" href="#">Using Sitka</a></li><li class="toctree-l1"><a class="reference internal" href="image_display.html">Image Display</a></li><li class="toctree-l1"><a class="reference internal" href="xyplot_display.html">XY Plots</a></li><li class="toctree-l1"><a class="reference internal" href="table_display.html">Table Display</a></li><li class="toctree-l1"><a class="reference internal" href="arrays_page.html">Named Arrays</a></li><li class="toctree-l1"><a class="reference internal" href="ndattrs_page.html">Epics NDAttributes</a></li><li class="toctree-l1"><a class="reference internal" href="motivation.html">Motivation</a></li></ul><div class="bz-dropdown">
+    <button aria-haspopup="true" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <g
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="19" cy="12" r="1" />
+          <circle cx="5" cy="12" r="1" />
+        </g>
+      </svg>
+    </button>
+    <ul role="menu" aria-hidden="true"></ul>
+  </div>
+</nav><hr class="bz-header-hr">
+  <div class="bz-content"><main id="bz-main-content"><header class="bz-article-header">
+  
+  
+    <nav class="bz-breadcrumbs" aria-label="Breadcrumb">
+  <ol>
+    <li class="bz-breadcrumbs-home">
+      <a href="index.html" aria-label="Home">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8.543 2.232a.75.75 0 0 0-1.085 0l-5.25 5.5A.75.75 0 0 0 2.75 9H4v4a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1a1 1 0 1 1 2 0v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V9h1.25a.75.75 0 0 0 .543-1.268l-5.25-5.5Z" />
+        </svg>
+      </a>
+    </li><li class="bz-breadcrumbs-current">
+      <span>Using Sitka</span>
+    </li>
+  </ol>
+</nav>
+  
+<label
+  class="bz-sidebar-secondary-toggle"
+  for="bz-sidebar-secondary"
+  role="button"
+  tabindex="0"
+  aria-label="Toggle table of contents"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M3.75 6.75H20.25 M11.25 12H20.25 M7.75 17.25H20.25"
+    />
+  </svg>
+</label></header><article class="bz-article-main" role="main"><div class="bz-page-actions" role="group" aria-label="Page actions">
+  <button data-copy-source="_sources/usage.rst.txt">
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor"><path d="M7.024 3.75c0-.966.784-1.75 1.75-1.75H20.25c.966 0 1.75.784 1.75 1.75v11.498a1.75 1.75 0 0 1-1.75 1.75H8.774a1.75 1.75 0 0 1-1.75-1.75Zm1.75-.25a.25.25 0 0 0-.25.25v11.498c0 .139.112.25.25.25H20.25a.25.25 0 0 0 .25-.25V3.75a.25.25 0 0 0-.25-.25Z"></path><path d="M1.995 10.749a1.75 1.75 0 0 1 1.75-1.751H5.25a.75.75 0 1 1 0 1.5H3.745a.25.25 0 0 0-.25.25L3.5 20.25c0 .138.111.25.25.25h9.5a.25.25 0 0 0 .25-.25v-1.51a.75.75 0 1 1 1.5 0v1.51A1.75 1.75 0 0 1 13.25 22h-9.5A1.75 1.75 0 0 1 2 20.25l-.005-9.501Z"></path></svg>
+    <span>Copy page</span>
+  </button>
+  <div class="bz-dropdown">
+    <button
+      aria-label="More actions"
+      aria-haspopup="true"
+      aria-expanded="false"
+    ></button>
+    <ul role="menu" aria-hidden="true">
+      <li>
+        <a href="#" role="menuitem" data-copy-source="_sources/usage.rst.txt">
+          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor"><path d="M7.024 3.75c0-.966.784-1.75 1.75-1.75H20.25c.966 0 1.75.784 1.75 1.75v11.498a1.75 1.75 0 0 1-1.75 1.75H8.774a1.75 1.75 0 0 1-1.75-1.75Zm1.75-.25a.25.25 0 0 0-.25.25v11.498c0 .139.112.25.25.25H20.25a.25.25 0 0 0 .25-.25V3.75a.25.25 0 0 0-.25-.25Z"></path><path d="M1.995 10.749a1.75 1.75 0 0 1 1.75-1.751H5.25a.75.75 0 1 1 0 1.5H3.745a.25.25 0 0 0-.25.25L3.5 20.25c0 .138.111.25.25.25h9.5a.25.25 0 0 0 .25-.25v-1.51a.75.75 0 1 1 1.5 0v1.51A1.75 1.75 0 0 1 13.25 22h-9.5A1.75 1.75 0 0 1 2 20.25l-.005-9.501Z"></path></svg>
+          <span>Copy page</span>
+        </a>
+      </li>
+      <li>
+        <a href="_sources/usage.rst.txt" role="menuitem" class="bz-page-actions-external" target="_blank" rel="noopener">
+          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3a2 2 0 0 1 2-2h9.982a2 2 0 0 1 1.414.586l4.018 4.018A2 2 0 0 1 21 7.018V21a2 2 0 0 1-2 2H4.75a.75.75 0 0 1 0-1.5H19a.5.5 0 0 0 .5-.5V8.5h-4a2 2 0 0 1-2-2v-4H5a.5.5 0 0 0-.5.5v6.25a.75.75 0 0 1-1.5 0Zm12-.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 0-.146-.336l-4.018-4.018A.5.5 0 0 0 15 2.5Z"></path><path d="M4.53 12.24a.75.75 0 0 1-.039 1.06l-2.639 2.45 2.64 2.45a.75.75 0 1 1-1.022 1.1l-3.23-3a.75.75 0 0 1 0-1.1l3.23-3a.75.75 0 0 1 1.06.04Zm3.979 1.06a.75.75 0 1 1 1.02-1.1l3.231 3a.75.75 0 0 1 0 1.1l-3.23 3a.75.75 0 1 1-1.021-1.1l2.639-2.45-2.64-2.45Z"></path></svg>
+          <span>View source</span>
+        </a>
+      </li></ul>
+  </div>
+</div><section id="using-sitka">
+<h1>Using Sitka<a class="headerlink" href="#using-sitka" title="Link to this heading">#</a></h1>
 <p>In this section, we’ll give information for starting the Sitka GUI,
 loading, and using datafiles.</p>
 <section id="running-the-sitka-gui">
-<h2>Running the Sitka GUI<a class="headerlink" href="#running-the-sitka-gui" title="Link to this heading">¶</a></h2>
+<h2>Running the Sitka GUI<a class="headerlink" href="#running-the-sitka-gui" title="Link to this heading">#</a></h2>
 <p>Sitka can be used as a stand-alone GUI application or from a Python
 REPL or Jupyter Notebook.</p>
 <section id="using-the-command-line-sitka-program">
-<h3>Using the command-line <cite>sitka</cite> program<a class="headerlink" href="#using-the-command-line-sitka-program" title="Link to this heading">¶</a></h3>
+<h3>Using the command-line <cite>sitka</cite> program<a class="headerlink" href="#using-the-command-line-sitka-program" title="Link to this heading">#</a></h3>
 <p>To run sitka from a command-line terminal, use</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sitka
 </pre></div>
@@ -72,30 +192,161 @@ datasets, as with</p>
 </div>
 </section>
 <section id="creating-and-using-a-desktop-shortcut">
-<h3>Creating and Using a Desktop shortcut<a class="headerlink" href="#creating-and-using-a-desktop-shortcut" title="Link to this heading">¶</a></h3>
+<h3>Creating and Using a Desktop shortcut<a class="headerlink" href="#creating-and-using-a-desktop-shortcut" title="Link to this heading">#</a></h3>
 <p>If you have created the desktop shortcut (see
 <a class="reference internal" href="installation.html#desktop-shortcut"><span class="std std-ref">Creating the Desktop Shortcut</span></a>), then clicking on that should launch the main
 Sitka application.</p>
 </section>
-<section id="running-sitka-from-a-python-shell-or-jupyter-notebook">
-<h3>Running Sitka from a Python shell or  Jupyter Notebook<a class="headerlink" href="#running-sitka-from-a-python-shell-or-jupyter-notebook" title="Link to this heading">¶</a></h3>
-<p>You can run the Sitka viewer from within a Python shell or Jupyter
-notebook that is connected to your computer (that is, supports drawing
-to your local screen) to get an interactive graphical exploration of
-your data.  To do this, use:</p>
+</section>
+<section id="basic-usage-of-the-sitka-gui">
+<h2>Basic Usage of the Sitka GUI<a class="headerlink" href="#basic-usage-of-the-sitka-gui" title="Link to this heading">#</a></h2>
+<p>On Startup the Sitka GUI will look like this:</p>
+<a class="reference internal image-reference" href="_images/sitka_start.png"><img alt="_images/sitka_start.png" src="_images/sitka_start.png" style="width: 98%;" />
+</a>
+<p>with an empty panel in the upper left.  To read in data from an HDF5
+file or Zarr directory store using the File -&gt; Read Data File, or
+Ctrl-O (Option-O on MacOS), or simply drag the file on the Data Tree
+portion of the Sitka app. The file will be opened and shown in the
+Data Tree section of the Window.  Sitka always opens the files in
+“read only” mode, and will not ever write to the data files you open.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The examples shown throughout this document can retrieved by
+downloading and running the <a class="reference external" href="https://raw.githubusercontent.com/xraypy/sitka-spruce/refs/heads/main/examples/get_sitka_examples.py">get_sitka_examples.py</a> script.</p>
+</div>
+<section id="overview-of-the-main-sitka-window">
+<h3>Overview of the main Sitka Window<a class="headerlink" href="#overview-of-the-main-sitka-window" title="Link to this heading">#</a></h3>
+<a class="reference internal image-reference" href="_images/sitka_main_annotated.png"><img alt="_images/sitka_main_annotated.png" src="_images/sitka_main_annotated.png" style="width: 98%;" />
+</a>
+<p>The main window is broken into several sections, as shown above.  This should be
+familiar to anyone who has used one of the other HDF5 viewers (see
+<a class="reference internal" href="motivation.html#motivation"><span class="std std-ref">Motivation</span></a> for a partial list).</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>A <strong>Data Tree</strong> in the upper left lets you browse through the
+Tree-like structure of the hierarchical datasets.</p></li>
+<li><p>An <strong>Info Section</strong> in the lower left will show information about
+the Groups and Datasets (or Arrays), including datatype, shape,
+chunking, compression, and the list of attributes saved in the
+Group or Dataset.</p></li>
+<li><p>The Right-hand panel has a notebook interface with pages for
+<strong>Image Display</strong>, <strong>XY Plot Display</strong>, <strong>Table Display</strong>, and
+<strong>Named Arrays</strong>.  The first three of the pages help you select
+and display multi-dimensional arrays, and have similar forms, with
+the sections shown in the screenshot above.</p></li>
+<li><p>An <strong>Array Selection</strong> panel in the upper section of the
+notebook page allows you to select one more dimensions of the Array
+data.</p></li>
+<li><p>A <strong>Dimension Reduction</strong> panel in the middle section of the
+notebook page allows you to select how to “reduce” other dimensions
+of the dataset, either selecting a single element or a range of
+values to sum. See <a class="reference internal" href="#dimreduce-panel"><span class="std std-ref">The Dimension Reduction Panel</span></a> for more details.</p></li>
+<li><p>An <strong>Array Saving</strong> panel at the bottom of the notebook page allows
+you give a name to the array selected, which can then be shown
+or exported later. See <a class="reference internal" href="#save-arrays"><span class="std std-ref">Saving Arrays by Name</span></a> and <a class="reference internal" href="#copy-address"><span class="std std-ref">Copying the Array Address</span></a>
+for details.</p></li>
+</ul>
+</div></blockquote>
+<p>Plots and Table displays for selected data arrays will be shown in
+separate windows.  Each of the notebook pages will be discussed in
+detail in a separate section:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="image_display.html#image-display"><span class="std std-ref">Image Display</span></a></p></li>
+<li><p><a class="reference internal" href="xyplot_display.html#xyplot-display"><span class="std std-ref">XY Plots</span></a></p></li>
+<li><p><a class="reference internal" href="table_display.html#table-display"><span class="std std-ref">Table Display</span></a></p></li>
+<li><p><a class="reference internal" href="arrays_page.html#arrays-page"><span class="std std-ref">Named Arrays</span></a></p></li>
+</ul>
+</div></blockquote>
+<p>In the following sections we discuss common features for many of these
+panels.</p>
+</section>
+<section id="saving-arrays-by-name">
+<span id="save-arrays"></span><h3>Saving Arrays by Name<a class="headerlink" href="#saving-arrays-by-name" title="Link to this heading">#</a></h3>
+<p>For the Notebook Panels, the array data selected for viewing can be
+saved to a named array, which allows it to be used later (and without
+having to re-extract it from the file).  In the lower panel, simply
+typing a name (which must follow the valid conventions for a Python
+variable: A letter or underscore followed by any number of letters,
+numbers, or underscore) and hitting return or the “Save Array” button
+will save the array by name.  By default, this will ask to verify
+overwriting an existing array, but this can be controlled with the
+“Verify Overwrite” checkbox.</p>
+</section>
+<section id="copying-the-array-address">
+<span id="copy-address"></span><h3>Copying the Array Address<a class="headerlink" href="#copying-the-array-address" title="Link to this heading">#</a></h3>
+<p>As you browse through Groups and Datasets and as you build arrays for
+plotting or display, you may find data components, slices, and
+addresses that you want to use for downstream processing.  Using
+Ctrl-C (Option-C on macOS), or hitting the “Copy Address” button above
+the Notebook pages will copy the Python syntax for the array address
+to the system clipboard.  For an image display that sums over a
+selected number of frames, the copied address may look like</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;myeiger_file.h5&#39;</span><span class="p">][</span><span class="s1">&#39;/entry/data/data&#39;</span><span class="p">][</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If your are using Sitka from A Jupyter notebook or Python shell, you
+may need to pre-pend the address to the Sitka datasets, as with</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">myimage</span> <span class="o">=</span> <span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;myeiger_file.h5&#39;</span><span class="p">][</span><span class="s1">&#39;/entry/data/data&#39;</span><span class="p">][</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="exporting-group-dataset-metadata">
+<span id="export-info"></span><h3>Exporting Group/Dataset Metadata<a class="headerlink" href="#exporting-group-dataset-metadata" title="Link to this heading">#</a></h3>
+<p>Just as you can copy array addresses, you can also export the values
+shown in the “Info Section” for any Group or Dataset.  Using Ctrl-E
+(Option-E on macOS) will bring up a dialog to save the data shown in
+the table in the “Info Section” to a tab-separated file.</p>
+</section>
+<section id="the-dimension-reduction-panel">
+<span id="dimreduce-panel"></span><h3>The Dimension Reduction Panel<a class="headerlink" href="#the-dimension-reduction-panel" title="Link to this heading">#</a></h3>
+<p>The “Dimension Reduction” panel assists you in converting
+multi-dimensional datasets into 1- and 2-dimensional arrays for XY
+plots, image display, and table display.</p>
+<p>This panel might looks like this:</p>
+<a class="reference internal image-reference" href="_images/sitka_dimreduce.png"><img alt="_images/sitka_dimreduce.png" src="_images/sitka_dimreduce.png" style="width: 98%;" />
+</a>
+<p>Here, dimensions 0 and 1 are “grayed out”, so must have been selected as the Y
+or X arrays for an image or table display.  The remaining dimension has 2048
+points, and selections here tell Sitka how to turn this data into a single
+dimension, to reduce the 3-dimensional data to 2-dimensions for display. The
+example here will select a <strong>single</strong> value, pixel 1024 out of 2048.  The Method
+selection of <strong>single</strong> can be changed to <strong>sum</strong> or <strong>mean</strong>, and then a Min
+and Max value can be chosen to select a “slice” of the array dimension to sum
+(and perhaps divide by the number of points to give the mean value).</p>
+<p>If choosing a slice range for <strong>sum</strong> or <strong>mean</strong>, you can check the “Fix Width”
+box.  With this checked, changing either the Min or Max value (with the arrows
+or by typing in a number) will update both values to try to preserve their
+difference.  You can change the size of the step taken by the arrow with the
+“Min/Max Step Size” selection - this has a pre-loaded set of choices, but you
+can enter any integer step size you like.</p>
+<p>Finally, if you check the “Auto Update” box, then changing the Min or
+Max value will update the display to reflect the newly sliced data.</p>
+</section>
+</section>
+<section id="using-sitka-from-a-python-shell-or-jupyter-notebook">
+<h2>Using Sitka from a Python shell or  Jupyter Notebook<a class="headerlink" href="#using-sitka-from-a-python-shell-or-jupyter-notebook" title="Link to this heading">#</a></h2>
+<p>An important feature of Sitka is the ability to run it from within a Python REPL
+shell  or Jupyter notebook that is connected to your computer (that is, supports
+drawing to  your local screen).  THis will give the ability to have an interactive
+graphical exploration of the data in your Python session or Jupyter notebook.
+To do this, use:</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sitka_spruce</span><span class="w"> </span><span class="kn">import</span> <span class="n">sitka_viewer</span>
 <span class="n">sview</span> <span class="o">=</span> <span class="n">sitka_viewer</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>You can also optionally specify a directory
-from which to read datasets with</p>
+<p>You can also optionally specify a directory from which to read datasets with</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">sview</span> <span class="o">=</span> <span class="n">sitka_viewer</span><span class="p">(</span><span class="n">folder</span><span class="o">=</span><span class="s1">&#39;/home/User/data&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This will launch the Sitka GUI application in a Window outside of the
-Python shell or Jupyter notebook.</p>
-<p>The Sitka Viewer will allow the shell or notebook to remain active while the
-viewer also runs. That is, you can load and visualize data as with the
+<p>This will launch the Sitka GUI application as shown above in a new Window,
+outside of the Python shell or browser running the Jupyter notebook.</p>
+<p>The Sitka Viewer will work in a background thread, allowing the shell or
+notebook to remain active while the viewer also runs and updates. This allows
+you to use the shell or notebook to access the data in the Sitka Viewer, either
+adding datasets to the GUI or pulling arrays from the GUI into the
+shell.  For example, if you have a dataset called “mydata.h5” with a dataset
+“/entry/data/data”, you can load and visualize data as with the
 standalone application.  You can also use the shell or notebook to
 access the data in the Sitka Viewer, either adding datasets to the GUI
 or pulling arrays from the GUI into the shell.</p>
@@ -180,136 +431,13 @@ or pulling arrays from the GUI into the shell.</p>
 </pre></div>
 </div>
 <p>With this approach, you can quickly load and explore your datasets and
-extract and use the arrays you want for downstream processing.</p>
-</section>
-</section>
-<section id="basic-usage-of-the-sitka-gui">
-<h2>Basic Usage of the Sitka GUI<a class="headerlink" href="#basic-usage-of-the-sitka-gui" title="Link to this heading">¶</a></h2>
-<p>On Startup the Sitka GUI will look like this:</p>
-<a class="reference internal image-reference" href="_images/sitka_start.png"><img alt="_images/sitka_start.png" src="_images/sitka_start.png" style="width: 98%;" />
-</a>
-<p>with an empty panel in the upper left.  To read in data from an HDF5
-file or Zarr directory store using the File -&gt; Read Data File, or
-Ctrl-O (Option-O on MacOS), or simply drag the file on the Data Tree
-portion of the Sitka app. The file will be opened and shown in the
-Data Tree section of the Window.  Sitka always opens the files in
-“read only” mode, and will not ever write to the data files you open.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The examples shown throughout this document can retrieved by
-downloading and running the <a class="reference external" href="https://raw.githubusercontent.com/xraypy/sitka-spruce/refs/heads/main/examples/get_sitka_examples.py">get_sitka_examples.py</a> script.</p>
-</div>
-<section id="overview-of-the-main-sitka-window">
-<h3>Overview of the main Sitka Window<a class="headerlink" href="#overview-of-the-main-sitka-window" title="Link to this heading">¶</a></h3>
-<a class="reference internal image-reference" href="_images/sitka_main_annotated.png"><img alt="_images/sitka_main_annotated.png" src="_images/sitka_main_annotated.png" style="width: 98%;" />
-</a>
-<p>The main window is broken into several sections, as shown above.  This should be
-familiar to anyone who has used one of the other HDF5 viewers (see
-<a class="reference internal" href="motivation.html#motivation"><span class="std std-ref">Motivation for Sitka Spruce</span></a> for a partial list).</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>A <strong>Data Tree</strong> in the upper left lets you browse through the
-Tree-like structure of the hierarchical datasets.</p></li>
-<li><p>An <strong>Info Section</strong> in the lower left will show information about
-the Groups and Datasets (or Arrays), including datatype, shape,
-chunking, compression, and the list of attributes saved in the
-Group or Dataset.</p></li>
-<li><p>The Right-hand panel has a notebook interface with pages for
-<strong>Image Display</strong>, <strong>XY Plot Display</strong>, <strong>Table Display</strong>, and
-<strong>Named Arrays</strong>.  The first three of the pages help you select
-and display multi-dimensional arrays, and have similar forms, with
-the sections shown in the screenshot above.</p></li>
-<li><p>An <strong>Array Selection</strong> panel in the upper section of the
-notebook page allows you to select one more dimensions of the Array
-data.</p></li>
-<li><p>A <strong>Dimension Reduction</strong> panel in the middle section of the
-notebook page allows you to select how to “reduce” other dimensions
-of the dataset, either selecting a single element or a range of
-values to sum. See <a class="reference internal" href="#dimreduce-panel"><span class="std std-ref">The Dimension Reduction Panel</span></a> for more details.</p></li>
-<li><p>An <strong>Array Saving</strong> panel at the bottom of the notebook page allows
-you give a name to the array selected, which can then be shown
-or exported later. See <a class="reference internal" href="#save-arrays"><span class="std std-ref">Saving Arrays by Name</span></a> and <a class="reference internal" href="#copy-address"><span class="std std-ref">Copying the Array Address</span></a>
-for details.</p></li>
-</ul>
-</div></blockquote>
-<p>Plots and Table displays for selected data arrays will be shown in
-separate windows.  Each of the notebook pages will be discussed in
-detail in a separate section:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><a class="reference internal" href="image_display.html#image-display"><span class="std std-ref">The Image Display Page</span></a></p></li>
-<li><p><a class="reference internal" href="xyplot_display.html#xyplot-display"><span class="std std-ref">The XY Plot Display Page</span></a></p></li>
-<li><p><a class="reference internal" href="table_display.html#table-display"><span class="std std-ref">The Table Display Page</span></a></p></li>
-<li><p><a class="reference internal" href="arrays_page.html#arrays-page"><span class="std std-ref">The Named Arrays Page</span></a></p></li>
-</ul>
-</div></blockquote>
-<p>In the following sections we discuss common features for many of these
-panels.</p>
-</section>
-<section id="saving-arrays-by-name">
-<span id="save-arrays"></span><h3>Saving Arrays by Name<a class="headerlink" href="#saving-arrays-by-name" title="Link to this heading">¶</a></h3>
-<p>For the Notebook Panels, the array data selected for viewing can be
-saved to a named array, which allows it to be used later (and without
-having to re-extract it from the file).  In the lower panel, simply
-typing a name (which must follow the valid conventions for a Python
-variable: A letter or underscore followed by any number of letters,
-numbers, or underscore) and hitting return or the “Save Array” button
-will save the array by name.  By default, this will ask to verify
-overwriting an existing array, but this can be controlled with the
-“Verify Overwrite” checkbox.</p>
-</section>
-<section id="copying-the-array-address">
-<span id="copy-address"></span><h3>Copying the Array Address<a class="headerlink" href="#copying-the-array-address" title="Link to this heading">¶</a></h3>
-<p>As you browse through Groups and Datasets and as you build arrays for
-plotting or display, you may find data components, slices, and
-addresses that you want to use for downstream processing.  Using
-Ctrl-C (Option-C on macOS), or hitting the “Copy Address” button above
-the Notebook pages will copy the Python syntax for the array address
-to the system clipboard.  For an image display that sums over a
-selected number of frames, the copied address may look like</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;myeiger_file.h5&#39;</span><span class="p">][</span><span class="s1">&#39;/entry/data/data&#39;</span><span class="p">][</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>If your are using Sitka from A Jupyter notebook or Python shell, you
-may need to pre-pend the address to the Sitka datasets, as with</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">myimage</span> <span class="o">=</span> <span class="n">sview</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;myeiger_file.h5&#39;</span><span class="p">][</span><span class="s1">&#39;/entry/data/data&#39;</span><span class="p">][</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="exporting-group-dataset-metadata">
-<span id="export-info"></span><h3>Exporting Group/Dataset Metadata<a class="headerlink" href="#exporting-group-dataset-metadata" title="Link to this heading">¶</a></h3>
-<p>Just as you can copy array addresses, you can also export the values
-shown in the “Info Section” for any Group or Dataset.  Using Ctrl-E
-(Option-E on macOS) will bring up a dialog to save the data shown in
-the table in the “Info Section” to a tab-separated file.</p>
-</section>
-<section id="the-dimension-reduction-panel">
-<span id="dimreduce-panel"></span><h3>The Dimension Reduction Panel<a class="headerlink" href="#the-dimension-reduction-panel" title="Link to this heading">¶</a></h3>
-<p>The “Dimension Reduction” panel assists you in converting
-multi-dimensional datasets into 1- and 2-dimensional arrays for XY
-plots, image display, and table display.</p>
-<p>This panel might looks like this:</p>
-<a class="reference internal image-reference" href="_images/sitka_dimreduce.png"><img alt="_images/sitka_dimreduce.png" src="_images/sitka_dimreduce.png" style="width: 98%;" />
-</a>
-<p>Here, dimensions 0 and 1 are “grayed out”, so must have been selected as the Y
-or X arrays for an image or table display.  The remaining dimension has 2048
-points, and selections here tell Sitka how to turn this data into a single
-dimension, to reduce the 3-dimensional data to 2-dimensions for display. The
-example here will select a <strong>single</strong> value, pixel 1024 out of 2048.  The Method
-selection of <strong>single</strong> can be changed to <strong>sum</strong> or <strong>mean</strong>, and then a Min
-and Max value can be chosen to select a “slice” of the array dimension to sum
-(and perhaps divide by the number of points to give the mean value).</p>
-<p>If choosing a slice range for <strong>sum</strong> or <strong>mean</strong>, you can check the “Fix Width”
-box.  With this checked, changing either the Min or Max value (with the arrows
-or by typing in a number) will update both values to try to preserve their
-difference.  You can change the size of the step taken by the arrow with the
-“Min/Max Step Size” selection - this has a pre-loaded set of choices, but you
-can enter any integer step size you like.</p>
-<p>Finally, if you check the “Auto Update” box, then changing the Min or
-Max value will update the display to reflect the newly sliced data.</p>
+extract and use the arrays you want for downstream processing.   That is,
+Sitka can act as a general-purpose viewer of 1-D and 2-D arrays.  With the
+ability to save named arrays to an external HDF5 file, Sitka also gives you
+a convenient way to save and later extract data data.</p>
 </section>
 <section id="a-note-on-speed-of-array-selection">
-<h3>A note on speed of Array Selection<a class="headerlink" href="#a-note-on-speed-of-array-selection" title="Link to this heading">¶</a></h3>
+<h2>A note on speed of Array Selection<a class="headerlink" href="#a-note-on-speed-of-array-selection" title="Link to this heading">#</a></h2>
 <p>HDF5 and Zarr hold data in chunks of binary data on disk, with
 optional compression.  These settings are displayed in the Info
 section.</p>
@@ -323,26 +451,25 @@ suggestions for speeding up data extraction or display, we’ll be happy
 to hear them.</p>
 </section>
 </section>
-</section>
 
+</article><footer class="bz-article-footer">
+  
+  
+    <nav class="bz-related-pages" aria-label="Related pages navigation"><a class="bz-related-pages-previous" href="installation.html" rel="prev">
+    <span>Previous</span><span class="bz-related-pages-title">Installation</span></a><a class="bz-related-pages-next" href="image_display.html" rel="next">
+    <span>Next</span>
+    <span class="bz-related-pages-title">Image Display</span>
+  </a></nav>
+  
 
-            <div class="clearer"></div>
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-            <p class="logo"><a href="index.html">
-              <img class="logo" src="_static/sitka_logo.png" alt="Logo of Sitka Spruce"/>
-            </a></p>
-  <div>
-    <h3><a href="index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">Using Sitka</a><ul>
+</footer><aside class="bz-sidebar-secondary" data-drawer="bz-sidebar-secondary">
+  
+  
+    <nav class="bz-sidebar-toc" aria-label="Table of contents">
+  <p>On this page</p><ul>
 <li><a class="reference internal" href="#running-the-sitka-gui">Running the Sitka GUI</a><ul>
 <li><a class="reference internal" href="#using-the-command-line-sitka-program">Using the command-line <cite>sitka</cite> program</a></li>
 <li><a class="reference internal" href="#creating-and-using-a-desktop-shortcut">Creating and Using a Desktop shortcut</a></li>
-<li><a class="reference internal" href="#running-sitka-from-a-python-shell-or-jupyter-notebook">Running Sitka from a Python shell or  Jupyter Notebook</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#basic-usage-of-the-sitka-gui">Basic Usage of the Sitka GUI</a><ul>
@@ -351,64 +478,51 @@ to hear them.</p>
 <li><a class="reference internal" href="#copying-the-array-address">Copying the Array Address</a></li>
 <li><a class="reference internal" href="#exporting-group-dataset-metadata">Exporting Group/Dataset Metadata</a></li>
 <li><a class="reference internal" href="#the-dimension-reduction-panel">The Dimension Reduction Panel</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-sitka-from-a-python-shell-or-jupyter-notebook">Using Sitka from a Python shell or  Jupyter Notebook</a></li>
 <li><a class="reference internal" href="#a-note-on-speed-of-array-selection">A note on speed of Array Selection</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+</ul></nav>
+  
+    
 
+
+  
+    
+  
+    
+  
+
+</aside></main>
   </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="installation.html"
-                          title="previous chapter">Downloading and Installation</a></p>
+<footer class="bz-footer">
+  <div class="bz-footer-copyright"><p class="bz-copyright">© Copyright 2026, Matthew Newville, The University of Chicago</p><p>
+    
+    
+    
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/aksiome/breeze">Breeze theme</a>.
+    
+  </p>
+</div><div class="bz-external-links">
+  <a
+      href="https://github.com/xraypy/sitka-spruce"
+      aria-label="GitHub"
+      data-tooltip="GitHub"
+      target="_blank"
+    >
+    
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M10.303 16.652c-2.837-.344-4.835-2.385-4.835-5.028 0-1.074.387-2.235 1.031-3.008-.279-.709-.236-2.214.086-2.837.86-.107 2.02.344 2.708.967.816-.258 1.676-.386 2.728-.386 1.053 0 1.913.128 2.686.365.666-.602 1.848-1.053 2.708-.946.3.581.344 2.085.064 2.815.688.817 1.053 1.913 1.053 3.03 0 2.643-1.998 4.641-4.877 5.006.73.473 1.224 1.504 1.224 2.686v2.235c0 .644.537 1.01 1.182.752 3.889-1.483 6.94-5.372 6.94-10.185 0-6.081-4.942-11.044-11.022-11.044-6.081 0-10.98 4.963-10.98 11.044a10.84 10.84 0 0 0 7.112 10.206c.58.215 1.139-.172 1.139-.752v-1.719a2.768 2.768 0 0 1-1.032.215c-1.418 0-2.256-.773-2.857-2.213-.237-.58-.495-.924-.989-.988-.258-.022-.344-.129-.344-.258 0-.258.43-.451.86-.451.623 0 1.16.386 1.719 1.181.43.623.881.903 1.418.903.537 0 .881-.194 1.375-.688.365-.365.645-.687.903-.902Z"></path></svg>
+    
+    </a>
   </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="image_display.html"
-                          title="next chapter">The Image Display Page</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/usage.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="image_display.html" title="The Image Display Page"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="installation.html" title="Downloading and Installation"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Sitka Spruce</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Using Sitka</a></li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2026-08-02, Matthew Newville, The University of Chicago.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    </div>
-  </body>
+</footer><a href="#" class="bz-back-to-top">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>
+    </svg>
+    <span>Back to top</span>
+  </a>
+  <label class="bz-overlay bz-overlay-primary" for="bz-sidebar-primary"></label>
+  <label class="bz-overlay bz-overlay-secondary" for="bz-sidebar-secondary"></label>
+  <input type="checkbox" name="bz-sidebar-primary" id="bz-sidebar-primary" aria-label="Toggle section navigation">
+  <input type="checkbox" name="bz-sidebar-secondary" id="bz-sidebar-secondary" aria-label="Toggle table of contents"><script src="_static/documentation_options.js?v=ff822928"></script><script src="_static/doctools.js?v=fd6eb6e6"></script><script src="_static/sphinx_highlight.js?v=6ffebe34"></script><script src="_static/clipboard.min.js?v=a7894cd8"></script><script src="_static/copybutton.js?v=f281be69"></script><script src="_static/design-tabs.js?v=f930bc37"></script><script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script></body>
 </html>

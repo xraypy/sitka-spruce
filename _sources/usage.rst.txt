@@ -39,43 +39,6 @@ If you have created the desktop shortcut (see
 Sitka application.
 
 
-Running Sitka from a Python shell or  Jupyter Notebook
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You can run the Sitka viewer from within a Python shell or Jupyter
-notebook that is connected to your computer (that is, supports drawing
-to your local screen) to get an interactive graphical exploration of
-your data.  To do this, use:
-
-.. code:: Python
-
-   from sitka_spruce import sitka_viewer
-   sview = sitka_viewer()
-
-You can also optionally specify a directory
-from which to read datasets with
-
-.. code:: Python
-
-    sview = sitka_viewer(folder='/home/User/data')
-
-
-This will launch the Sitka GUI application in a Window outside of the
-Python shell or Jupyter notebook.
-
-The Sitka Viewer will allow the shell or notebook to remain active while the
-viewer also runs. That is, you can load and visualize data as with the
-standalone application.  You can also use the shell or notebook to
-access the data in the Sitka Viewer, either adding datasets to the GUI
-or pulling arrays from the GUI into the shell.
-
-.. literalinclude:: ../examples/jupyter_sitka.py
-
-
-With this approach, you can quickly load and explore your datasets and
-extract and use the arrays you want for downstream processing.
-
-
 Basic Usage of the Sitka GUI
 -------------------------------------------------------------
 
@@ -237,8 +200,54 @@ Finally, if you check the "Auto Update" box, then changing the Min or
 Max value will update the display to reflect the newly sliced data.
 
 
+
+Using Sitka from a Python shell or  Jupyter Notebook
+-----------------------------------------------------------
+
+
+An important feature of Sitka is the ability to run it from within a Python REPL 
+shell  or Jupyter notebook that is connected to your computer (that is, supports 
+drawing to  your local screen).  THis will give the ability to have an interactive 
+graphical exploration of the data in your Python session or Jupyter notebook.  
+To do this, use:
+
+.. code:: Python
+
+   from sitka_spruce import sitka_viewer
+   sview = sitka_viewer()
+
+You can also optionally specify a directory from which to read datasets with
+
+.. code:: Python
+
+    sview = sitka_viewer(folder='/home/User/data')
+
+
+This will launch the Sitka GUI application as shown above in a new Window, 
+outside of the Python shell or browser running the Jupyter notebook.
+
+The Sitka Viewer will work in a background thread, allowing the shell or 
+notebook to remain active while the viewer also runs and updates. This allows 
+you to use the shell or notebook to access the data in the Sitka Viewer, either 
+adding datasets to the GUI or pulling arrays from the GUI into the 
+shell.  For example, if you have a dataset called "mydata.h5" with a dataset
+"/entry/data/data", you can load and visualize data as with the
+standalone application.  You can also use the shell or notebook to
+access the data in the Sitka Viewer, either adding datasets to the GUI
+or pulling arrays from the GUI into the shell.
+
+.. literalinclude:: ../examples/jupyter_sitka.py
+
+
+With this approach, you can quickly load and explore your datasets and
+extract and use the arrays you want for downstream processing.   That is, 
+Sitka can act as a general-purpose viewer of 1-D and 2-D arrays.  With the 
+ability to save named arrays to an external HDF5 file, Sitka also gives you
+a convenient way to save and later extract data data.
+
+
 A note on speed of Array Selection
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------
 
 HDF5 and Zarr hold data in chunks of binary data on disk, with
 optional compression.  These settings are displayed in the Info

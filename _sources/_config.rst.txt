@@ -7,7 +7,8 @@
 .. _scipy:    https://scipy.org/
 .. _numpy:    https://numpy.scipy.org/
 .. _matplotlib: https://matplotlib.org/
-.. _h5py:     https://code.google.com/p/h5py/
+.. _h5py:     https://docs.h5py.org/
+.. _hdf5plugin: https://hdf5plugin.readthedocs.io/
 
 .. _zarr:     https://zarr.dev/
 
@@ -15,7 +16,9 @@
 .. _myhdf5:   https://myhdf5.hdfgroup.org/
 .. _h5web:    https://github.com/silx-kit/h5web
 .. _hdf5view: https://tgwoodcock.github.io/hdf5view/
+.. _hdf5-viewer: https://github.com/loenard97/hdf5-viewer
 .. _argos:    https://github.com/titusjan/argos
+.. _vibehdf5:  https://jacobwilliams.github.io/vibehdf5/vibehdf5.html
 .. _silx:     https://github.com/silx-kit/silx
 .. _nexpy:    https://github.com/nexpy/nexpy
 .. _NeXuS:    https://github.com/nexpy/nexusformat

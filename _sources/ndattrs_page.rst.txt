@@ -3,12 +3,12 @@
 .. _ndattrs_page:
 
 
-Epics areaDetector NDAttributes
+Epics NDAttributes
 ==========================================
 
 For HDF5 Files saved by the Epics control system's areaDetector
 software, Sitka will recognize that an HDF5 file has a Group with an
-address of `entry/instrument/NDAttributes` is meant to hold meta-data
+address of ``entry/instrument/NDAttributes`` is meant to hold meta-data
 for that data acquisition.  For the many synchrotron and user
 facilities using Epics and its areaDetector software, these files will
 be ubiquitous.  Reading and extracting the metadata from these files

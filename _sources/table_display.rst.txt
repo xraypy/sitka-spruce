@@ -3,7 +3,7 @@
 .. _table_display:
 
 
-The Table Display Page
+Table Display
 ====================================
 
 The Table Display page will look like

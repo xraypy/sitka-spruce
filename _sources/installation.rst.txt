@@ -1,7 +1,7 @@
 .. include:: _config.rst
 
-Downloading and Installation
-====================================
+Installation
+=====================
 
 
 Prerequisites
@@ -14,7 +14,7 @@ version is suitable for testing but may not be ready for production
 use.  Comments and suggestions are welcome.
 
 Sitka Spruce requires Python 3.11 or higher and wxPython 4.2.4.  Other
-required packages and minmimum versions are listed in the
+required packages and minimum versions are listed in the
 `pyproject.toml` file in the source code repository.  All of the
 required dependencies are available from `pip` or on `conda` channels.
 
@@ -26,8 +26,8 @@ Anaconda Python environment, which provides `wxPython` and the
 libraries it needs through the `conda-forge` repository.
 
 
-Installation
-~~~~~~~~~~~~~~~~
+Installation with pip
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For Python installations that have a working `wxPython`_ package, the
 latest version (|release|) is available from `PyPI`_ and can be
