@@ -4,6 +4,7 @@
 import yaml
 from pathlib import Path
 from platformdirs import user_config_path
+from contextlib import suppress
 
 DEFAULT_CONFIG = {'dimreduce': {'maxdim': 5,
                                 'method': 'single',
@@ -21,6 +22,12 @@ def verify_configfile():
 
 def read_configfile():
     "read sitka configfile"
+    conf = {k: v for k, v in DEFAULT_CONFIG.items()}  
     verify_configfile()
     config_file = Path(user_config_path('sitka_spruce'), 'sitka.yaml')
-    return yaml.safe_load(open(config_file, 'r').read())
+    with suppress(Exception):
+        conf.update(yaml.safe_load(open(config_file, 'r').read()))
+
+    return conf
+    
+    
