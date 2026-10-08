@@ -28,7 +28,8 @@ class DataGridFrame(wx.Frame):
         self.logger = logger
         self.file_info = 'sitka', 'data'
         self.grid = Grid(self, size=size)
-        self.grid.CreateGrid(100, 100)
+
+        self.grid.CreateGrid(700, 700)
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.title, 0, 0, LEFT|wx.GROW, 2)
         sizer.Add(self.grid,  1, 0, LEFT|wx.GROW|wx.ALL, 2)
@@ -37,8 +38,14 @@ class DataGridFrame(wx.Frame):
         self.BuildMenus()
         self.onDarkMode()
         self.SetSize(size)
+        self.Bind(wx.EVT_SIZE, self.onSizeEvent)
         self.Raise()
         self.Show()
+
+    def onSizeEvent(self, event=None):
+        h, w = event.GetSize()
+        self.grid.SetSize((h-10, w-10))
+
 
     def onDarkMode(self, is_dark=None):
         fgcol = get_color('text', dark=is_dark)
