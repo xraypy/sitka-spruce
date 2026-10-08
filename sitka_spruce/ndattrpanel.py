@@ -22,14 +22,9 @@ class NDAttrsPanel(wx.Panel):
         self.wids = wids = {}
         panel = self.panel = GridPanel(self, ncols=7, nrows=10, pad=2, itemstyle=LEFT)
 
-
-        wids['show'] = Button(panel, 'Show ND Attributes Table', size=(200, -1),
+        showbtn = Button(panel, 'Show ND Attributes Table', size=(200, -1),
                               action=self.onShow)
-
-        title = SimpleText(panel, '  Epics ND Attributes',  size=(650, -1), style=wx.ALIGN_LEFT)
-
-        panel.Add(title, newrow=True)
-        panel.Add(wids['show'], newrow=True)
+        panel.Add(showbtn, newrow=True)
         panel.pack()
         panel.SetSize((700, 600))
 
