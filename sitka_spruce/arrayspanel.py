@@ -220,7 +220,7 @@ class ArraysPanel(wx.Panel):
                   (len(array.shape) == 3 and array.shape[2] == 3)):
                 _, page = self.parent.get_page('ImagePanel')
                 if page is not None:
-                    frame = page.show_imageframe(window=1)
+                    isnew, frame = page.show_imageframe(window=1)
                     frame.display(array, title=f'{name}: {title}')
                     frame.Show()
                     frame.Raise()
