@@ -290,24 +290,23 @@ class ArrayImagePanel(wx.Panel):
             self.update_array_choices()
         self.Refresh()
 
-
     def show_imageframe(self, window=1, **opts):
-        shown = False
+        isnew = True
         if window in self.imageframes:
             try:
                 self.imageframes[window].Raise()
-                shown = True
+                isnew = False
             except Exception:
                 f = self.imageframes.pop(window)
                 del f
-                shown = False
-        if not shown:
+                isnew = True
+        if isnew:
             self.imageframes[window] = ImageFrame(self, **opts)
             self.imageframes[window].Raise()
-        return self.imageframes[window]
+        return isnew, self.imageframes[window]
 
     def onDimReduce(self, event=None, dim=None, reduce=None):
-        self.onImshow(new=True)
+        self.onImshow(new=False)
 
 
     def onImshow(self, event=None, new=True):
@@ -367,8 +366,11 @@ class ArrayImagePanel(wx.Panel):
         self.parent.set_pycode('imshow', filename=self.filename,
                                itemname=self.itemname, dlabel=dlabel)
 
-        iframe = self.show_imageframe(int(win), **frame_opts)
-        iframe.display(self._img, x=xvals, y=yvals, **opts)
+        isnew, iframe = self.show_imageframe(int(win), **frame_opts)
+        if isnew:
+            iframe.display(self._img, x=xvals, y=yvals, **opts)
+        else:
+            iframe.panel.update_image(self._img)
         iframe.Show()
         iframe.Raise()
 
@@ -408,7 +410,7 @@ class ArrayImagePanel(wx.Panel):
                 return
 
             frame_opts = {'title': f'SitkaRGB Image {win} '}
-            iframe = self.show_imageframe(int(win), **frame_opts)
+            isnew, iframe = self.show_imageframe(int(win), **frame_opts)
 
             title_parts = [self.filename]
             if red_name != '<none>':
