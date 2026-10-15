@@ -1,13 +1,14 @@
 import wx
 import wx.dataview as dv
 
-from wxutils import (GridPanel, SimpleText, pack, Button, LEFT, get_color, register_darkdetect,
-                     FileSave)
+from wxutils import (GridPanel, SimpleText, Choice, pack, Button, LEFT,
+                     get_color, register_darkdetect, FileSave)
 
 from pyshortcuts import isotime, fix_filename, get_cwd
 from .tablepanel import DataGridFrame
 from .data import (array2isotimes, dtype2str, cast_int,
                    get_itemtype, EPICS_NDATTR)
+from .gui_utils import get_font, WIN_CHOICES
 
 DVSTYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 
@@ -24,7 +25,14 @@ class NDAttrsPanel(wx.Panel):
 
         showbtn = Button(panel, 'Show ND Attributes Table', size=(200, -1),
                               action=self.onShow)
+
+        wids['win'] = Choice(panel, WIN_CHOICES, size=(75, -1))
+        wids['win'].SetStringSelection('1')
         panel.Add(showbtn, newrow=True)
+
+        panel.Add(SimpleText(panel, ' Window:', size=(125, -1)), newrow=False)
+        panel.Add(wids['win'])
+
         panel.pack()
         panel.SetSize((700, 600))
 
@@ -85,7 +93,9 @@ class NDAttrsPanel(wx.Panel):
             else:
                 out[key] = [dtype2str(val.dtype)(x) for x in val]
 
-        gridframe = self.show_gridframe(window=1)
+        iwin  = int(self.wids['win'].GetStringSelection())
+
+        gridframe = self.show_gridframe(window=iwin)
         gridframe.file_info = (self.filename, self.itemname)
         gridframe.set_datadict(out, title=f'NDAttributes for {self.filename}')
 
@@ -108,6 +118,7 @@ class NDAttrsPanel(wx.Panel):
                 shown = False
         if not shown:
             self.gridframes[window] = DataGridFrame(self, **opts)
+            self.gridframes[window].SetTitle(f"{self.filename}:{self.itemname}")
             self.gridframes[window].Raise()
         return self.gridframes[window]
 
