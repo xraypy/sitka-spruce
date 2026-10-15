@@ -17,8 +17,8 @@ from .data import ARRAY_TYPES, dtype2str, get_data, dim_code, datasize_repr
 
 class DataGridFrame(wx.Frame):
     """Simple Data Grid Frame for HDF5/Zarr datasets"""
-    def __init__(self, parent, logger=None, size=(800, 600), title='Data Grid'):
-        wx.Frame.__init__(self, parent, title='Sitka Table',
+    def __init__(self, parent, logger=None, size=(800, 600), title='Sitka Data Grid'):
+        wx.Frame.__init__(self, parent, title=title,
                           size=size, style=wx.DEFAULT_FRAME_STYLE)
 
         self.title = SimpleText(self, title, font=get_font(larger=1),
