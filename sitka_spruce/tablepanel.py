@@ -44,7 +44,7 @@ class DataGridFrame(wx.Frame):
 
     def onSizeEvent(self, event=None):
         h, w = event.GetSize()
-        self.grid.SetSize((h-10, w-10))
+        self.grid.SetSize((h, w))
 
 
     def onDarkMode(self, is_dark=None):
