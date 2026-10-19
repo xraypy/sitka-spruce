@@ -370,7 +370,12 @@ class ArrayImagePanel(wx.Panel):
         if isnew:
             iframe.display(self._img, x=xvals, y=yvals, **opts)
         else:
-            iframe.panel.update_image(self._img)
+            panel = iframe.panel
+            clevel = float(panel.conf.contrast_level)
+            panel.display(self._img, contrast_level=clevel)
+            iframe.set_contrast_level(contrast_level=clevel)
+
+
         iframe.Show()
         iframe.Raise()
 
