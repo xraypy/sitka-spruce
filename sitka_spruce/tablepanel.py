@@ -17,7 +17,8 @@ from .data import ARRAY_TYPES, dtype2str, get_data, dim_code, datasize_repr
 
 class DataGridFrame(wx.Frame):
     """Simple Data Grid Frame for HDF5/Zarr datasets"""
-    def __init__(self, parent, logger=None, size=(800, 600), title='Sitka Data Grid'):
+    def __init__(self, parent, logger=None, size=(800, 600),
+                 title='  Sitka Data Grid  '):
         wx.Frame.__init__(self, parent, title=title,
                           size=size, style=wx.DEFAULT_FRAME_STYLE)
 
@@ -27,13 +28,16 @@ class DataGridFrame(wx.Frame):
 
         self.logger = logger
         self.file_info = 'sitka', 'data'
-        self.grid = Grid(self, size=size)
 
-        self.grid.CreateGrid(700, 700)
+        self.grid = Grid(self, size=size)
+        self.grid.CreateGrid(800, 600)
+
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.title, 0, 0, LEFT|wx.GROW, 2)
-        sizer.Add(self.grid,  1, 0, LEFT|wx.GROW|wx.ALL, 2)
+        sizer.Add(self.grid,  1, 1, LEFT|wx.GROW|wx.EXPAND|wx.ALL, 2)
+
         pack(self, sizer)
+
         register_darkdetect(self.onDarkMode)
         self.BuildMenus()
         self.onDarkMode()
@@ -44,7 +48,8 @@ class DataGridFrame(wx.Frame):
 
     def onSizeEvent(self, event=None):
         h, w = event.GetSize()
-        self.grid.SetSize((h, w))
+        self.grid.SetSize((h-5, w-50))
+        self.grid.ShowScrollbars(True, True)
 
 
     def onDarkMode(self, is_dark=None):
