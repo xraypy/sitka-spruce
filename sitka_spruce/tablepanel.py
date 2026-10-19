@@ -47,8 +47,8 @@ class DataGridFrame(wx.Frame):
         self.Show()
 
     def onSizeEvent(self, event=None):
-        h, w = event.GetSize()
-        self.grid.SetSize((h-5, w-50))
+        w, h = event.GetSize()
+        self.grid.SetSize((w-15, h-75))
         self.grid.ShowScrollbars(True, True)
 
 
