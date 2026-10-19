@@ -1,11 +1,13 @@
 """
 sitka_spruce HDF5 and Zarr data browser
 """
+import os
 import wx
 import wx.dataview as dv
 import wx.lib.mixins.inspection
 from wx.adv import AboutBox, AboutDialogInfo
-
+from contextlib import suppress
+from time import time
 from pathlib import Path
 
 from wxutils import (SimpleText, pack,  LEFT,  get_color,
@@ -13,11 +15,8 @@ from wxutils import (SimpleText, pack,  LEFT,  get_color,
                      MenuItem,  flatnotebook, GridPanel, Button,
                      FileOpen, FileSave, SelectWorkdir, Popup)
 
-try:
-    from wxutils import SetAppDisplayName, SetDockIcon
-except ImportError:
-     SetAppDisplayName = SetDockIcon = None
 
+    
 from pyshortcuts import get_cwd, fix_filename, uname
 from .version import version
 from .logger import get_logger
@@ -31,10 +30,15 @@ from .tablepanel import TablePanel
 from .arrayspanel import ArraysPanel
 from .ndattrpanel import NDAttrsPanel
 
-try:
+SetAppDisplayName = SetDockIcon = None
+with suppress(ImportError):
+    from wxutils import SetAppDisplayName, SetDockIcon
+
+get_ipython = None
+with suppress(ImportError):
     from IPython import get_ipython
-except ImportError:
-    get_ipython = None
+
+
 
 FILE_WILDCARD = 'HDF5/Zarr files(*.hdf5;*.h5;*.zarr)|*.hdf5;*.h5;*.zarr|All files (*.*)|*.*'
 
@@ -146,11 +150,13 @@ class SitkaFrame(wx.Frame):
         self.ipyconn = None
         if get_ipython is not None:
             self.ipyconn = IPyConnector(self.logger)
-
+            
+        self.workdir = None
         self.filename = None
         self.with_inspect = with_inspect
         self.access_code = None
         self.python_code = None
+        
         self.wids = {}
         wx.Frame.__init__(self, parent, title=title, size=size,
                           style=style)
@@ -160,7 +166,10 @@ class SitkaFrame(wx.Frame):
         self.create_display(size=size)
         self.BuildMenus()
         self.status_message('Welcome to Sitka')
+        self.watch_timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.onWatchTimer, self.watch_timer)
 
+        
     def status_message(self, msg):
         self.SetStatusText(msg)
         sbar = self.GetStatusBar()
@@ -428,6 +437,13 @@ class SitkaFrame(wx.Frame):
                  "Read all Files from Selected Folder",
                  self.onReadFolder)
 
+        fmenu.AppendSeparator()        
+        self.watch_menu =  MenuItem(self, fmenu, "Watch Working Folder",
+                                    "Automatically Import Folders from Working Folder",
+                                    self.onWatchFolder, kind=wx.ITEM_CHECK,
+                                    checked=False)
+        self.watch_menu.Enable(False)
+
         fmenu.AppendSeparator()
         self.Bind(wx.EVT_CLOSE,  self.onExit)
         MenuItem(self, fmenu, 'E&xit', 'Exit', self.onExit)
@@ -435,11 +451,15 @@ class SitkaFrame(wx.Frame):
 
         omenu = wx.Menu()
         if get_ipython is not None:
-            MenuItem(self, omenu,  "Show Plots/Images in IPython Notebook", "",
-                     self.onUseIPythonPlot, kind=wx.ITEM_CHECK,
-                     checked=False)
-            omenu.AppendSeparator()
-
+            ipy = None
+            with suppress(Exception):
+                ipy = get_ipython()
+            if ipy is not None:
+                MenuItem(self, omenu,  "Show Plots/Images in IPython Notebook", "",
+                         self.onUseIPythonPlot,  kind=wx.ITEM_CHECK,
+                         checked=False)
+                omenu.AppendSeparator()
+                
         MenuItem(self, omenu,  "Increase Font Size", "", self.onIncreaseFont)
         MenuItem(self, omenu,  "Decrease Font Size", "", self.onDecreaseFont)
 
@@ -564,8 +584,37 @@ class SitkaFrame(wx.Frame):
 
         folder = Path(dlg.GetPath()).absolute().as_posix()
         dlg.Destroy()
+        if len(folder) > 0:
+            self.ReadFolder(self, folder)
+
+    def ReadFolder(self, folder):
+        self.workdir = folder
+        self.watch_menu.Enable()
         for fname, dset in get_sitka_files(folder, logger=self.logger).items():
             self.add_dataset(fname, dataset=dset)
+
+    def onWatchFolder(self, event=None):
+        checked = event.IsChecked()
+        if not checked:
+            self.watch_time.Stop()
+        elif self.workdir is not None:
+            self.watch_timer.Start(5000)
+
+    def onWatchTimer(self, event=None):
+        path = Path(self.workdir)
+        if path.exists() and path.is_dir():
+            for fname in os.listdir(path):
+                if fname in self.data.datasets:
+                    continue
+                thispath = Path(path, fname)
+                opener = get_opener(thispath)
+                if opener is None:
+                    continue
+                
+                mtime = os.stat(thispath).st_mtime
+                if (time() >  mtime + 15):
+                    self.add_dataset(fname,
+                                     dataset=opener(thispath.absolute(), mode='r'))
 
     def add_dataset(self, name, dataset=None):
         """add dataset (HDF5/Zarr Group or Dataset) to Sitka.
@@ -653,6 +702,7 @@ class SitkaFrame(wx.Frame):
                     'Really Quit?', '',
                     style=wx.YES_NO|wx.NO_DEFAULT|wx.ICON_QUESTION)
         if ret == wx.ID_YES:
+            self.watch_timer.Stop()
             try:
                 for a in self.GetChildren():
                     a.Destroy()
