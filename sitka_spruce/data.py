@@ -274,11 +274,13 @@ def get_data(obj, reductions):
             else:
                 slices.append(slice(imin, imax))
                 sumaxis.append(idim)
-                npts = npts*(imax-imin)
+                if method == 'mean':
+                    npts = npts*(imax-imin)
         else:
             slices.append(slice(None, None))
 
     ret = obj[tuple(slices)]
+
     if len(sumaxis):
         ret = ret.sum(axis=tuple(sumaxis))/npts
     return ret.squeeze()
