@@ -24,8 +24,8 @@ def sitka_viewer(folder=None):
     get_wxapp()
     sview = SitkaFrame()
     if folder is not None:
-        for fname, dset in get_sitka_files(folder).items():
-            sview.add_dataset(fname, dataset=dset)
+        sview.ReadFolder(folder)    
+
     sview.Show()
     sview.Raise()
     return sview
@@ -50,9 +50,6 @@ def sitka_cli():
     frame = SitkaFrame(with_inspect=args.inspect)
 
     if args.directory is not None:
-        files = get_sitka_files(args.directory)
-        if len(files) > 0:
-            for fname, dset in files.items():
-                frame.add_dataset(fname, dataset=dset)
+        frame.ReadFolder(args.directory)
 
     app.run(frame)
