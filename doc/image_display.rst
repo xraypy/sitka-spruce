@@ -11,7 +11,7 @@ The Image Display page will look like
 .. image:: images/sitka_imagepage.png
    :width: 98 %
 
-and allow you make images or false-color maps of the multi-dimensional
+and allow you to make images or false-color maps of the multi-dimensional
 data.
 
 In the top **Array Selection** section, you can select the dimension
@@ -19,7 +19,7 @@ for Y (the vertical axis) and X (the horizontal axis). The choices for
 dimensions and number of points will be automatically updated for each
 dataset, following the shape values (shown in the Info section).
 
-For data arrays that have 3- or more dimensions, changing the
+For data arrays that have 3 or more dimensions, changing the
 selections for the Y and X dimensions will automatically change how
 the contents of the **Dimension Reduction** is presented.  See
 :ref:`dimreduce_panel` for information about how you can use this.
@@ -29,7 +29,7 @@ included in the drop-down lists for the "Y values" or "X values", to
 give dimensions to the resulting image.  By default, the array index
 will be used.
 
-To show an image for your selected arrays, but the "Show Image"
+To show an image for your selected arrays, push the "Show Image"
 button.  You can also select the window display number to show
 multiple images at a time.  Each of these will look like:
 
@@ -40,18 +40,18 @@ multiple images at a time.  Each of these will look like:
 .. image:: images/sitka_imshow2.png
    :width: 98 %
 
-These image displays are fully interactive, and allowing zooming,
+These image displays are fully interactive, and allow zooming,
 rotating, flipping, and smoothing.  Axes, grid lines, and scale bars
 can be configured and shown after the image is displayed.  Histograms of 
 values can be shown, as can slices through the image.  The image can be 
 quantized into a contour plot, and the contour levels can be adjusted.  
 The image can be saved to a PNG file or copied to the system clipboard 
 (with Ctrl-C), and the data array exported to a text file.  A wide 
-selection of color table can be used.  The upper and lower levels can be 
+selection of color tables can be used.  The upper and lower levels can be 
 adjusted by hand or by selecting or stepping through a range of 
 "percent contrasts" which give good and easily reproducible results for 
-datasets with extreme outliers or high dynamic range.  For more details 
-using this image display, see `WXMPLOT Interactive Image Display`_
+datasets with extreme outliers or high dynamic range.  For more details
+on using this image display, see `WXMPLOT Interactive Image Display`_
 
 If you have saved multiple images of the same shape -- perhaps
 different slices of a third dimension for a 3-d dataset -- then you

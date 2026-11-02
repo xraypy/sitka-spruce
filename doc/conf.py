@@ -30,8 +30,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinxcontrib.video',
               'sphinx_copybutton',
               "sphinx_design",
-              "nbsphinx"
-]
+              "nbsphinx"]
 
 # autoclass_content = 'both'
 templates_path = ['_templates']

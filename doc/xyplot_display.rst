@@ -11,8 +11,7 @@ The XY Plot Display page will look like
 .. image:: images/sitka_xyplotpage.png
    :width: 98 %
 
-and allow you make images or false-color maps of the multi-dimensional
-data.
+and allow you to make line plots of the multi-dimensional data.
 
 In the top **Array Selection** section, you can select the dimension
 for Y Array data.
@@ -22,7 +21,7 @@ The choices for dimensions and number of points will be automatically
 updated for each dataset, following the shape values (shown in the
 Info section).
 
-For data arrays that have 2- or more dimensions, changing the
+For data arrays that have 2 or more dimensions, changing the
 selections for the Y Array will automatically change how the contents
 of the **Dimension Reduction** is presented.  See
 :ref:`dimreduce_panel` for information about how you can use this.
@@ -44,9 +43,9 @@ these), or you can use "Over Plot" to plot with the existing XY Plot.
 The checkbox for "Share Y axis" will control whether the Y-scale for
 multiple plot traces should be shared or independent.
 
-As with the image displays, thes plots are fully interactive, and
-allowing zooming, panning.  The plots can be configured and can be
+As with the image displays, these plots are fully interactive, and
+allow zooming and panning.  The plots can be configured and can be
 copied to the system clipboard with Ctrl-C.  A wide selection of color
 themes are available, and colors, line types, text, and sizes for most
-elements can be changed after displayed.  For more details using this
-image display, see `WXMPLOT Interactive Plot Display`_
+elements can be changed after displayed.  For more details on using this
+plot display, see `WXMPLOT Interactive Plot Display`_

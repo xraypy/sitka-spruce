@@ -42,22 +42,22 @@ Sitka application.
 Basic Usage of the Sitka GUI
 -------------------------------------------------------------
 
-On Startup the Sitka GUI will look like this:
+On startup, the Sitka GUI will look like this:
 
 .. image:: images/sitka_start.png
    :width: 98 %
 
 
 with an empty panel in the upper left.  To read in data from an HDF5
-file or Zarr directory store using the File -> Read Data File, or
-Ctrl-O (Option-O on MacOS), or simply drag the file on the Data Tree
+file or Zarr directory store, use File -> Read Data File, or
+Ctrl-O (Option-O on macOS), or simply drag the file on the Data Tree
 portion of the Sitka app. The file will be opened and shown in the
 Data Tree section of the Window.  Sitka always opens the files in
 "read only" mode, and will not ever write to the data files you open.
 
 .. note::
 
-   The examples shown throughout this document can retrieved by
+   The examples shown throughout this document can be retrieved by
    downloading and running the `get_sitka_examples.py`_ script.
 
 
@@ -84,14 +84,14 @@ familiar to anyone who has used one of the other HDF5 viewers (see
     and display multi-dimensional arrays, and have similar forms, with
     the sections shown in the screenshot above.
   * An **Array Selection** panel in the upper section of the
-    notebook page allows you to select one more dimensions of the Array
+    notebook page allows you to select one or more dimensions of the Array
     data.
   * A **Dimension Reduction** panel in the middle section of the
     notebook page allows you to select how to "reduce" other dimensions
     of the dataset, either selecting a single element or a range of
     values to sum. See :ref:`dimreduce_panel` for more details.
   * An **Array Saving** panel at the bottom of the notebook page allows
-    you give a name to the array selected, which can then be shown
+    you to give a name to the array selected, which can then be shown
     or exported later. See :ref:`save_arrays` and :ref:`copy_address`
     for details.
 
@@ -120,8 +120,8 @@ For the Notebook Panels, the array data selected for viewing can be
 saved to a named array, which allows it to be used later (and without
 having to re-extract it from the file).  In the lower panel, simply
 typing a name (which must follow the valid conventions for a Python
-variable: A letter or underscore followed by any number of letters,
-numbers, or underscore) and hitting return or the "Save Array" button
+variable: a letter or underscore followed by any number of letters,
+numbers, or underscores) and hitting return or the "Save Array" button
 will save the array by name.  By default, this will ask to verify
 overwriting an existing array, but this can be controlled with the
 "Verify Overwrite" checkbox.
@@ -145,8 +145,8 @@ selected number of frames, the copied address may look like
     ['myeiger_file.h5']['/entry/data/data'][10:20,:,:].sum(axis=0)
 
 
-If your are using Sitka from A Jupyter notebook or Python shell, you
-may need to pre-pend the address to the Sitka datasets, as with
+If you are using Sitka from a Jupyter notebook or Python shell, you
+may need to prepend the address to the Sitka datasets, as with
 
 
 .. code:: Python
@@ -174,7 +174,7 @@ The "Dimension Reduction" panel assists you in converting
 multi-dimensional datasets into 1- and 2-dimensional arrays for XY
 plots, image display, and table display.
 
-This panel might looks like this:
+This panel might look like this:
 
 .. image:: images/sitka_dimreduce.png
    :width: 98 %
@@ -182,7 +182,7 @@ This panel might looks like this:
 Here, dimensions 0 and 1 are "grayed out", so must have been selected as the Y
 or X arrays for an image or table display.  The remaining dimension has 2048
 points, and selections here tell Sitka how to turn this data into a single
-dimension, to reduce the 3-dimensional data to 2-dimensions for display. The
+dimension, to reduce the 3-dimensional data to 2 dimensions for display. The
 example here will select a **single** value, pixel 1024 out of 2048.  The Method
 selection of **single** can be changed to **sum** or **mean**, and then a Min
 and Max value can be chosen to select a "slice" of the array dimension to sum
@@ -201,13 +201,13 @@ Max value will update the display to reflect the newly sliced data.
 
 
 
-Using Sitka from a Python shell or  Jupyter Notebook
+Using Sitka from a Python shell or Jupyter Notebook
 -----------------------------------------------------------
 
 
-An important feature of Sitka is the ability to run it from within a Python REPL 
-shell  or Jupyter notebook that is connected to your computer (that is, supports 
-drawing to  your local screen).  THis will give the ability to have an interactive 
+An important feature of Sitka is the ability to run it from within a Python REPL
+shell or Jupyter notebook that is connected to your computer (that is, supports 
+drawing to your local screen).  This will give the ability to have an interactive 
 graphical exploration of the data in your Python session or Jupyter notebook.  
 To do this, use:
 
@@ -232,10 +232,7 @@ you to use the shell or notebook to access the data in the Sitka Viewer, either
 adding datasets to the GUI or pulling arrays from the GUI into the 
 shell.  For example, if you have a dataset called "mydata.h5" with a dataset
 "/entry/data/data", you can load and visualize data as with the
-standalone application.  You can also use the shell or notebook to
-access the data in the Sitka Viewer, either adding datasets to the GUI
-or pulling arrays from the GUI into the shell.
-
+standalone application. 
 .. literalinclude:: ../examples/jupyter_sitka.py
 
 
@@ -243,7 +240,7 @@ With this approach, you can quickly load and explore your datasets and
 extract and use the arrays you want for downstream processing.   That is, 
 Sitka can act as a general-purpose viewer of 1-D and 2-D arrays.  With the 
 ability to save named arrays to an external HDF5 file, Sitka also gives you
-a convenient way to save and later extract data data.
+a convenient way to save and later extract data.
 
 
 A note on speed of Array Selection
@@ -253,7 +250,7 @@ HDF5 and Zarr hold data in chunks of binary data on disk, with
 optional compression.  These settings are displayed in the Info
 section.
 
-Extracting data from HDF5 and Zarr may no be instantaneous.  In
+Extracting data from HDF5 and Zarr may not be instantaneous.  In
 certain cases, it may even appear to be "slow".  The extraction speed
 can depend greatly on the chunking and compression used, and the data
 size.  We will assert that the speed of extracting data from HDF5

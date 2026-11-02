@@ -21,7 +21,7 @@
 .. _vibehdf5:  https://jacobwilliams.github.io/vibehdf5/vibehdf5.html
 .. _silx:     https://github.com/silx-kit/silx
 .. _nexpy:    https://github.com/nexpy/nexpy
-.. _NeXuS:    https://github.com/nexpy/nexusformat
+.. _NeXus:    https://github.com/nexpy/nexusformat
 .. _github:   https://github.com/xraypy/sitka-spruce
 .. _PyPI:     https://pypi.python.org/pypi/sitka-spruce
 
