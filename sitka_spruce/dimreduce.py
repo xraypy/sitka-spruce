@@ -61,7 +61,6 @@ class DimReduceWidgets:
         self.options = {k: v for k, v in DEFAULT_OPTIONS.items()}
         if options is not None:
             self.options.update(options)
-
         self.min, self.max = 0, npts-1
         self.callback = callback
         self.wids['npts'] = SimpleText(parent, str(npts), size=(65, -1),
@@ -76,6 +75,7 @@ class DimReduceWidgets:
         choices = ['sum', 'mean', 'single']
         self.wids['reduce'] = Choice(parent, choices, size=(100, -1),
                                      action=self.onReduce)
+        self.last_reduce = 'single'
         if self.options['method'] not in choices:
             self.options['method'] = 'single'
         self.wids['reduce'].SetStringSelection(self.options['method'])
@@ -110,8 +110,12 @@ class DimReduceWidgets:
 
     def onReduce(self, event=None):
         redval = self.wids['reduce'].GetStringSelection()
-        self.wids['max'].Enable(redval != 'single')
-        self.wids['fix_width'].Enable(redval != 'single')
+        multiple = (redval != 'single')
+        self.wids['max'].Enable(multiple)
+        self.wids['fix_width'].Enable(multiple)
+        if multiple and (self.last_reduce == 'single'):
+            self.wids['min'].SetValue(0)
+        self.last_reduce = redval
         if self.wids['live'].IsChecked() and callable(self.callback):
             wx.CallAfter(self.callback, self.get_result())
 
