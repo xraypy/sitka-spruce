@@ -11,7 +11,7 @@ from time import time
 from pathlib import Path
 
 from wxutils import (SimpleText, pack,  LEFT,  get_color,
-                     use_darkdetect, register_darkdetect,
+                     register_darkdetect,
                      MenuItem,  flatnotebook, GridPanel, Button,
                      FileOpen, FileSave, SelectWorkdir, Popup)
 

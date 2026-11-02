@@ -22,12 +22,10 @@ def verify_configfile():
 
 def read_configfile():
     "read sitka configfile"
-    conf = {k: v for k, v in DEFAULT_CONFIG.items()}  
+    conf = {k: v for k, v in DEFAULT_CONFIG.items()}
     verify_configfile()
     config_file = Path(user_config_path('sitka_spruce'), 'sitka.yaml')
-    with suppress(Exception):
-        conf.update(yaml.safe_load(open(config_file, 'r').read()))
+    with suppress(Exception), open(config_file, 'r') as fh:
+        conf.update(yaml.safe_load(fh.read()))
 
     return conf
-    
-    

@@ -8,7 +8,7 @@ from pyshortcuts import isotime, fix_filename, get_cwd
 from .tablepanel import DataGridFrame
 from .data import (array2isotimes, dtype2str, cast_int,
                    get_itemtype, EPICS_NDATTR)
-from .gui_utils import get_font, WIN_CHOICES
+from .gui_utils import WIN_CHOICES
 
 DVSTYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 

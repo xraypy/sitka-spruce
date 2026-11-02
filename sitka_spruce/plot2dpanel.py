@@ -415,7 +415,7 @@ class ArrayImagePanel(wx.Panel):
                 return
 
             frame_opts = {'title': f'SitkaRGB Image {win} '}
-            isnew, iframe = self.show_imageframe(int(win), **frame_opts)
+            _isnew, iframe = self.show_imageframe(int(win), **frame_opts)
 
             title_parts = [self.filename]
             if red_name != '<none>':
