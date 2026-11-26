@@ -61,15 +61,15 @@ class DimReduceWidgets:
         self.options = {k: v for k, v in DEFAULT_OPTIONS.items()}
         if options is not None:
             self.options.update(options)
-        self.min, self.max = 0, npts-1
+        self.min, self.max = 0, npts
         self.callback = callback
         self.wids['npts'] = SimpleText(parent, str(npts), size=(65, -1),
                                        style=wx.ALIGN_RIGHT)
 
-        fsopts = {'digits': 0, 'min_val': 0, 'max_val': npts-1, 'size':(85, -1),
+        fsopts = {'digits': 0, 'min_val': 0, 'max_val': npts, 'size':(85, -1),
                   'action': self.onMinMax}
-        self.wids['min'] = FloatSpin(parent, value=0,      **fsopts)
-        self.wids['max'] = FloatSpin(parent, value=npts-1, **fsopts)
+        self.wids['min'] = FloatSpin(parent, value=0,    **fsopts)
+        self.wids['max'] = FloatSpin(parent, value=npts, **fsopts)
         self.wids['fix_width'] = Check(parent, ' ', size=(75, -1), default=False)
         self.wids['live'] = Check(parent, ' ', size=(75, -1), default=False)
         choices = ['sum', 'mean', 'single']
@@ -83,26 +83,32 @@ class DimReduceWidgets:
     def onMinMax(self, event=None):
         redval = self.wids['reduce'].GetStringSelection()
         fix_width = self.wids['fix_width'].IsChecked()
-
-        if (redval in ('sum', 'mean') and fix_width):
-            newmin = int(self.wids['min'].GetValue())
-            newmax = int(self.wids['max'].GetValue())
+        newmin = int(self.wids['min'].GetValue())
+        newmax = int(self.wids['max'].GetValue())
+        # print(f"MinMax {redval=}, {newmin=}, {newmax=}, {self.min=}, {self.max=}, {fix_width=}")
+        if redval in ('sum', 'mean'):
             if newmax != self.max and newmin == self.min:
-                delta = newmax - self.max
-                self.max = newmax
-                self.min = max(0, self.min+delta)
-                self.wids['min'].SetValue(self.min)
+                if fix_width:
+                    delta = newmax - self.max
+                    newmin = max(0, self.min+delta)
+                    self.wids['min'].SetValue(newmin)
+                elif newmax <= newmin:
+                    newmin = max(0, self.min-1)
+                    self.wids['min'].SetValue(newmin)
+
             elif newmax == self.max and newmin != self.min:
-                delta = newmin - self.min
-                self.min = newmin
-                self.max = min(self.npts-1, self.max+delta)
-                self.wids['max'].SetValue(self.max)
-        else:
-            self.min = int(self.wids['min'].GetValue())
-            self.max = int(self.wids['max'].GetValue())
+                if fix_width:
+                    delta = newmin - self.min
+                    newmax = min(self.npts, self.max+delta)
+                    self.wids['max'].SetValue(newmax)
+                elif newmax <= newmin:
+                    newmax = min(self.npts, self.max+1)
+                    self.wids['max'].SetValue(newmax)
+
+        self.min = newmin
+        self.max = newmax
         if self.min > self.max:
-            newmin, newmax = self.max, self.min
-            self.min, self.max = newmin, newmax
+            self.min, self.max = self.max, self.min
             self.wids['min'].SetValue(self.min)
             self.wids['max'].SetValue(self.max)
         if self.wids['live'].IsChecked() and callable(self.callback):
@@ -128,9 +134,9 @@ class DimReduceWidgets:
     def set_npts(self, npts):
         self.npts = npts
         self.wids['npts'].SetLabel(f'{npts}')
-        self.wids['min'].SetMax(npts-1)
-        self.wids['max'].SetMax(npts-1)
-        self.wids['max'].SetValue(npts-1)
+        self.wids['min'].SetMax(npts)
+        self.wids['max'].SetMax(npts)
+        self.wids['max'].SetValue(npts)
         minval = 0
         if self.wids['reduce'].GetStringSelection() == 'single':
             self.wids['max'].Disable()
