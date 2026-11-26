@@ -332,9 +332,9 @@ class ArrayImagePanel(wx.Panel):
         frame_opts = {'title':  f'SitkaImage {win} '}
 
         dlabel = dim_code(reddim)
+        title = f'{self.filename} {dlabel}'
         self.parent.access_code = f"['{self.filename}']['{self.itemname}']{dlabel}"
-        opts = {'title': f'{self.filename} {dlabel}', 'contrast_level':'0.05',
-                'colormap': 'viridis'}
+        opts = {'title': title, 'contrast_level':'0.05', 'colormap': 'viridis'}
 
         data_thread.join()
         if self._img.dtype == np.bool:
@@ -374,7 +374,7 @@ class ArrayImagePanel(wx.Panel):
             clevel = float(panel.conf.contrast_level)
             panel.display(self._img, contrast_level=clevel)
             iframe.set_contrast_level(contrast_level=clevel)
-
+            iframe.SetTitle(title)
 
         iframe.Show()
         iframe.Raise()
