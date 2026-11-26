@@ -239,6 +239,7 @@ def dim_code(reductions):
     saxis = []
     off = 0
     npts = 1.0
+    use_mean = False
     for idim, use, method, imin, imax in reductions:
         if not use:
             reps.append(':')
@@ -249,16 +250,17 @@ def dim_code(reductions):
             saxis.append(idim)
             sums.append(f'sum(axis={idim-off})')
             off += 1
-            if method == 'mean' and imax > (imin+1):
-                npts *= (imax-imin)
+            if method == 'mean':
+                npts *= max(1, imax-imin)
+                use_mean = True
     words = [f"[{','.join(reps)}]"]
     if len(saxis) == 1:
         words.append(f'sum(axis={saxis[0]})')
     elif len(saxis) > 1:
         words.append(f'sum(axis={tuple(saxis)})')
     out = '.'.join(words)
-    if npts > 1.0:
-        out = f'{out}/{npts:.1f}'
+    if use_mean or npts > 1.0:
+        out = f'{out}/{int(npts)}'
     return out
 
 def get_data(obj, reductions):
@@ -270,17 +272,17 @@ def get_data(obj, reductions):
     for idim, use, method, imin, imax in reductions[:ndims]:
         if use:
             if method == 'single':
-                slices.append(slice(imin, imin+1))
+                imax = imin + 1
             else:
-                slices.append(slice(imin, imax))
                 sumaxis.append(idim)
                 if method == 'mean':
-                    npts = npts*(imax-imin)
+                    nx = max(1, imax-imin)
+                    npts = npts*nx
+            slices.append(slice(imin, imax))
+
         else:
             slices.append(slice(None, None))
-
     ret = obj[tuple(slices)]
-
     if len(sumaxis):
         ret = ret.sum(axis=tuple(sumaxis))/npts
     return ret.squeeze()
