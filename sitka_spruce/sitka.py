@@ -16,7 +16,7 @@ from wxutils import (SimpleText, pack,  LEFT,  get_color,
                      FileOpen, FileSave, SelectWorkdir, Popup)
 
 
-    
+
 from pyshortcuts import get_cwd, fix_filename, uname
 from .version import version
 from .logger import get_logger
@@ -150,13 +150,13 @@ class SitkaFrame(wx.Frame):
         self.ipyconn = None
         if get_ipython is not None:
             self.ipyconn = IPyConnector(self.logger)
-            
+
         self.workdir = None
         self.filename = None
         self.with_inspect = with_inspect
         self.access_code = None
         self.python_code = None
-        
+
         self.wids = {}
         wx.Frame.__init__(self, parent, title=title, size=size,
                           style=style)
@@ -169,7 +169,7 @@ class SitkaFrame(wx.Frame):
         self.watch_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.onWatchTimer, self.watch_timer)
 
-        
+
     def status_message(self, msg):
         self.SetStatusText(msg)
         sbar = self.GetStatusBar()
@@ -437,7 +437,7 @@ class SitkaFrame(wx.Frame):
                  "Read all Files from Selected Folder",
                  self.onReadFolder)
 
-        fmenu.AppendSeparator()        
+        fmenu.AppendSeparator()
         self.watch_menu =  MenuItem(self, fmenu, "Watch Working Folder",
                                     "Automatically Import Folders from Working Folder",
                                     self.onWatchFolder, kind=wx.ITEM_CHECK,
@@ -459,7 +459,7 @@ class SitkaFrame(wx.Frame):
                          self.onUseIPythonPlot,  kind=wx.ITEM_CHECK,
                          checked=False)
                 omenu.AppendSeparator()
-                
+
         MenuItem(self, omenu,  "Increase Font Size", "", self.onIncreaseFont)
         MenuItem(self, omenu,  "Decrease Font Size", "", self.onDecreaseFont)
 
@@ -585,7 +585,7 @@ class SitkaFrame(wx.Frame):
         folder = Path(dlg.GetPath()).absolute().as_posix()
         dlg.Destroy()
         if len(folder) > 0:
-            self.ReadFolder(self, folder)
+            self.ReadFolder(folder)
 
     def ReadFolder(self, folder):
         self.workdir = folder
@@ -610,7 +610,7 @@ class SitkaFrame(wx.Frame):
                 opener = get_opener(thispath)
                 if opener is None:
                     continue
-                
+
                 mtime = os.stat(thispath).st_mtime
                 if (time() >  mtime + 15):
                     self.add_dataset(fname,
