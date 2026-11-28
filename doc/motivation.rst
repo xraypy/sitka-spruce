@@ -5,12 +5,13 @@
 Motivation
 ===============================
 
-There are many applications for viewing HDF5 files, and many of
-these are written in Python.  An incomplete list includes:
+There are many applications for viewing HDF5 files, including several
+separate viewers written in Python.  An incomplete list includes:
 
  * `hdfview`_ from the HDF Group, perhaps the default HDF5 viewer.
    This is a Java-based standalone application, and can be used to edit
-   HDF5 files.  The graphics and interactivity are very limited.
+   as well as view HDF5 files.  The graphics are very limited at best,
+   and often work poorly. There is effectively no interactivity.
  * `argos`_     a Python application, using Python/Qt.
  * `hdf5view`_  a Python application, also using Python/Qt.
  * `hdf5-viewer`_  a Python application, also using Python/Qt.
@@ -23,18 +24,17 @@ these are written in Python.  An incomplete list includes:
  * `h5web`_     the base code for `myhdf5`_, that also includes an
    interface from Jupyter Lab.
 
-Many of these tools are very good, and may have some features that you
-may prefer over Sitka Spruce.
+Many of the Python tools are very good, and may have some features
+that you may prefer over Sitka Spruce.
 
-The number of viewers shows that there is a real need for such tools,
-and strongly suggests that the original viewer from the HDF Group is not
-good enough for many use cases. The fact that 6 independent projects
-implement "general HDF5 viewers" with Python/Qt is fascinating.
-Some of these (silx, nexpy) clearly have other important goals.  Still,
-this suggests that creating another viewer may be worthwhile, especially if
-there are differentiating features and goals.
-
-Several of these projects (nexpy, silx, h5web) are also somewhat
+The number of viewers shows that the need for such tools is real, and
+strongly suggests that the `hdfview`_ from the HDF Group is not good
+enough for serious data visulization and exploration.  The fact that 6
+independent projects implement "general HDF5 viewers" with Python/Qt
+is fascinating.  Some of these (silx, nexpy) clearly have other
+important goals.  Still, this shows that several people saw creating
+their own viewer as worthwhile, especially when other goals are
+included.  Some of these projects (nexpy, silx, h5web) are also
 associated with synchrotron data, which makes heavy use of HDF5 and
 `NeXuS`_.  Though we work in that same field, and many of these tools
 are very good, we hope we will be forgiven for thinking that there is
@@ -48,17 +48,16 @@ Sitka Spruce from the existing tools include, in no particular order:
     have written and supported many complex wxPython applications over
     the years.  It also avoids many conflicts that are inherent with two
     separate Qt libraries (PyQt and PySide). wxPython also uses a more
-    permissive license than PyQt, which uses the GPL. We respect the
-    authors of PyQt and the GPL, and do not want to worry about such
-    licensing issues.
+    permissive license than PyQt. We respect PyQt's use of the GPL,
+    and do not want to worry about such licensing issues.
   * Using `wxPython`_ will also allow Sitka to be used as a reader for
     tools in the `xraylarch`_ family, including the Larix application
     for XAS data. This is expected in the near future.
   * Using `wxmplot`_ gives publication-quality line plots and 2D
     images from matplotlib, and gives very good interactivity and
-    customizability to the end user. Images and Plots are shown in
-    separate windows, so that multiple datasets can be viewed at the
-    same time and arranged as the user decides.
+    customizability to the end user. In Sitka, Images and Plots are
+    displayed in separate windows. This allows multiple datasets to be
+    viewed at the same time and arranged as the user decides.
   * Supporting data in both HDF5 (with `h5py`_) and `zarr`_ stores.
     The initial release supports Zarr Local File Storage, but other
     stores could be added easily as they become supported by Zarr.
