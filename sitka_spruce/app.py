@@ -6,7 +6,6 @@ from wxutils import (AppConfig, WxApplication,
                      add_application_arguments, handle_shortcut_arguments)
 
 
-from .data import get_sitka_files
 from .sitka import SitkaFrame
 
 
@@ -24,7 +23,7 @@ def sitka_viewer(folder=None):
     get_wxapp()
     sview = SitkaFrame()
     if folder is not None:
-        sview.ReadFolder(folder)    
+        sview.ReadFolder(folder)
 
     sview.Show()
     sview.Raise()

@@ -17,7 +17,7 @@ elif uname == 'linux':
 
 WIN_CHOICES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 
-add_named_color('sbg', (235, 245, 245, 255), ( 30,  50,  50, 255))
+add_named_color('sbg', (240, 250, 250, 255), ( 30,  50,  50, 255))
 
 def fontsize(fixed_width=False):
     """return best default fontsize"""

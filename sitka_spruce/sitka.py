@@ -30,19 +30,11 @@ from .tablepanel import TablePanel
 from .arrayspanel import ArraysPanel
 from .ndattrpanel import NDAttrsPanel
 
-SetAppDisplayName = SetDockIcon = None
-with suppress(ImportError):
-    from wxutils import SetAppDisplayName, SetDockIcon
-
 get_ipython = None
 with suppress(ImportError):
     from IPython import get_ipython
 
-
-
 FILE_WILDCARD = 'HDF5/Zarr files(*.hdf5;*.h5;*.zarr)|*.hdf5;*.h5;*.zarr|All files (*.*)|*.*'
-
-
 DV_STYLE = dv.DV_SINGLE|dv.DV_VERT_RULES|dv.DV_ROW_LINES
 
 ICON_FILE = 'sitka.ico'
@@ -50,7 +42,6 @@ ICON_FILE_MAC = 'sitka.icns'
 ICON_DIR = Path(Path(__file__).parent, 'icons').absolute()
 
 NDATTR_TITLE = 'Epics NDAttributes'
-
 
 APPNAME_CODE = """ # used to find name of SitkaFrame instance
 from sitka_spruce import SitkaFrame
