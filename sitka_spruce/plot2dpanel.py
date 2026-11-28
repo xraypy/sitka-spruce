@@ -372,7 +372,8 @@ class ArrayImagePanel(wx.Panel):
         else:
             panel = iframe.panel
             clevel = float(panel.conf.contrast_level)
-            panel.display(self._img, contrast_level=clevel)
+            panel.display(self._img, title=title, contrast_level=clevel,
+                          x=xvals, y=yvals)
             iframe.set_contrast_level(contrast_level=clevel)
             iframe.SetTitle(title)
 
